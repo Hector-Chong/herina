@@ -1,4 +1,4 @@
-import { HerinaVersions } from "@herina/shared";
+import { HerinaVersions } from "@herina-rn/shared";
 import AppCapacityInterface from "./contracts/AppCapacityInterface";
 import UpdateManagerInterface from "./contracts/UpdateManagerInterface";
 

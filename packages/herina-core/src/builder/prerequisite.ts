@@ -3,7 +3,7 @@ import { emptyDirSync } from "fs-extra";
 import defineHerinaConfig from "../helpers/defineHerinaConfig";
 import { getConfigFilePath } from "../utils/file";
 import fs from "fs-extra";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 
 const cleanCache = (config: HerinaConfig) => {
   return emptyDirSync(config.outputPath);

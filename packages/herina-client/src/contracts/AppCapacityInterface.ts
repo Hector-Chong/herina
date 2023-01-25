@@ -1,4 +1,4 @@
-import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina/shared";
+import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina-rn/shared";
 
 interface AppCapacityInterface {
   getCurrentVersion(): Promise<AppVersionConfig>;

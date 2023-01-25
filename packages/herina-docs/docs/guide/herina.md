@@ -22,7 +22,7 @@ Under the hood, Herina has Metro as bundler to build bundle. It is like Vite to 
 ## Installation
 
 ```tsx
-yarn add @herina/core @herina/client
+yarn add @herina-rn/core @herina-rn/client
 cd ios && pod install
 ```
 
@@ -41,7 +41,7 @@ There two types of updates: full and incremental updates.
 Before updating, you must register `UpdateManager` by invoking `registerUpdateManager`. The first argument indicating the base URL for your resources to be downloaded is optional. If this argument is undefined, it will read base URL from the original bundle.
 
 ```tsx
-import {registerUpdateManager} from '@herina/client';
+import {registerUpdateManager} from '@herina-rn/client';
 
 const manager = registerUpdateManager('http://127.0.0.1:8080');
 ```
@@ -51,7 +51,7 @@ const manager = registerUpdateManager('http://127.0.0.1:8080');
 By the full update, the new bundle from your server will be downloaded and replaces the original one.
 
 ```tsx
-import {getUpdateManager} from '@herina/client';
+import {getUpdateManager} from '@herina-rn/client';
 
 const onUpdateBundle = async () => {
 		// After invoking `registerUpdateManager`
@@ -69,7 +69,7 @@ const onUpdateBundle = async () => {
 By the incremental update, the runtime sends a request to know what incremental update is available, and downloads them to generate a new bundle to replace the original one.
 
 ```tsx
-import {getUpdateManager} from '@herina/client';
+import {getUpdateManager} from '@herina-rn/client';
 
 const onUpdateByIncremental = async () => {
     const manager = getUpdateManager();

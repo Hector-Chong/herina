@@ -1,14 +1,14 @@
 # Installation
 
 ```bash
-yarn add @herina/core @herina/client
+yarn add @herina-rn/core @herina-rn/client
 cd ./ios && pod install
 ```
 
 or
 
 ```bash
-npm install --save @herina/core @herina/client
+npm install --save @herina-rn/core @herina-rn/client
 cd ./ios && pod install
 ```
 
@@ -17,6 +17,6 @@ cd ./ios && pod install
 If you are using an older version of React Native, you might need to execude the command to link the library to your App.
 
 ```bash
-npx react-native link @herina/core
-npx react-native link @herina/client
+npx react-native link @herina-rn/core
+npx react-native link @herina-rn/client
 ```

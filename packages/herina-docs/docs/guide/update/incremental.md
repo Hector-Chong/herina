@@ -9,7 +9,7 @@ You may use function or CLI to build update.
 :::code-group
 
 ```typescript [function]
-import { buildIncremental } from "@herina/core";
+import { buildIncremental } from "@herina-rn/core";
 import config from "./herina.config";
 
 const start = async () => {

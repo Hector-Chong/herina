@@ -1,4 +1,4 @@
-import { HerinaVersions } from "@herina/shared";
+import { HerinaVersions } from "@herina-rn/shared";
 
 interface UpdateManagerInterface {
   getVersionsFromRemote(): Promise<HerinaVersions>;

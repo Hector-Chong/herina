@@ -7,7 +7,7 @@ Herina requires you to modify the native code for managing bundle. If you find i
 ## Android
 
 ::: warning
-Before modifying the code, make sure you've installed `@herina/client` and sync your project with Gradle, otherwise an error may be encountered.
+Before modifying the code, make sure you've installed `@herina-rn/client` and sync your project with Gradle, otherwise an error may be encountered.
 :::
 
 ### Legacy Architecture
@@ -112,7 +112,7 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
 ## iOS
 
 ::: warning
-Before modifying the code, make sure you've installed `@herina/client` and executed `pod install`, otherwise an error may be encountered.
+Before modifying the code, make sure you've installed `@herina-rn/client` and executed `pod install`, otherwise an error may be encountered.
 :::
 
 First, open `AppDelegate.m` or `AppDelegate.mm` inside `ios` foloder.

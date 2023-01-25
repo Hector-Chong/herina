@@ -9,7 +9,7 @@ You may use function or CLI to build update.
 ::: code-group
 
 ```typescript [function]
-import {build} from '@herina/core';
+import {build} from '@herina-rn/core';
 import herinaConfig from './herina.config';
 
 const start = async (config: any) => {
@@ -36,7 +36,7 @@ Ignore this step if `versions.json` is built before.
 ::: code-group
 
 ```typescript [function]
-import {buildVersionsJson, HerinaConfig} from '@herina/core';
+import {buildVersionsJson, HerinaConfig} from '@herina-rn/core';
 import herinaConfig from './herina.config';
 
 const start = async (config: HerinaConfig) => {

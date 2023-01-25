@@ -19,7 +19,7 @@ Promise<string>
 ## Example
 
 ```typescript
-import {buildVersionsJson, defineHerinaConfig} from '@herina/core';
+import {buildVersionsJson, defineHerinaConfig} from '@herina-rn/core';
 
 const config = defineHerinaConfig({ ... });
 

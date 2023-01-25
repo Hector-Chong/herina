@@ -21,7 +21,7 @@ typeof UpdateManager;
 ## Example
 
 ```typescript
-import { registerUpdateManager, getUpdateManager } from "@herina/client";
+import { registerUpdateManager, getUpdateManager } from "@herina-rn/client";
 
 registerUpdateManager("https://hector.im");
 

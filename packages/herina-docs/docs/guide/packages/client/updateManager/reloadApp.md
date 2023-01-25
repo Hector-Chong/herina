@@ -13,7 +13,7 @@ None
 ## Example
 
 ```typescript
-import { registerUpdateManager } from "@herina/client";
+import { registerUpdateManager } from "@herina-rn/client";
 
 const manager = registerUpdateManager();
 

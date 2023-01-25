@@ -1,5 +1,5 @@
 import { buildBundleWithConfig } from "@react-native-community/cli-plugin-metro";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 import createBuildConfig from "../factory/createBuildConfig";
 
 const buildBundle = async (config: HerinaConfig) => {

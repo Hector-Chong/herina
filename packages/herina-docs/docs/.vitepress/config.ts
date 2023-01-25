@@ -79,7 +79,7 @@ function getGuideConfig() {
       text: "Packages",
       items: [
         {
-          text: "@herina/core",
+          text: "@herina-rn/core",
           items: [
             {
               text: "Introduction",
@@ -108,7 +108,7 @@ function getGuideConfig() {
           ]
         },
         {
-          text: "@herina/client",
+          text: "@herina-rn/client",
           items: [
             {
               text: "Introduction",

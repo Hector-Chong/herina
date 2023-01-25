@@ -1,5 +1,5 @@
 declare module "metro-babel-transformer" {
-  import { Recordable } from "@herina/shared";
+  import { Recordable } from "@herina-rn/shared";
   import { Node } from "@babel/types";
 
   export type CustomTransformOptions = Recordable;

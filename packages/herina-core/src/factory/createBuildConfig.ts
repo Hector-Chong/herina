@@ -3,7 +3,7 @@ import { loadMetroConfig } from "@react-native-community/cli-plugin-metro";
 import createMetroConfig from "./createMetroConfig";
 import fs from "fs-extra";
 import path from "path";
-import { HerinaConfig, Recordable } from "@herina/shared";
+import { HerinaConfig, Recordable } from "@herina-rn/shared";
 
 const createArgs = (config: HerinaConfig) => ({
   platform: config.platform as string,

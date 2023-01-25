@@ -1,4 +1,4 @@
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 
 const fs = require("fs-extra");
 

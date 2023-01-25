@@ -21,7 +21,7 @@ Promise<boolean>;
 ## Example
 
 ```typescript
-import { getUpdateManager } from "@herina/client";
+import { getUpdateManager } from "@herina-rn/client";
 
 const manager = getUpdateManager();
 

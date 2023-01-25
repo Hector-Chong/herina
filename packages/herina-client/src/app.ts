@@ -1,4 +1,4 @@
-import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina/shared";
+import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina-rn/shared";
 import AppCapacityInterface from "./contracts/AppCapacityInterface";
 import { promisifyNativeFunction } from "./utils/fn";
 

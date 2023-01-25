@@ -1,6 +1,6 @@
 import { existsSync, readJsonSync, writeFileSync } from "fs-extra";
 import path from "path";
-import { HerinaConfig, HerinaVersions } from "@herina/shared";
+import { HerinaConfig, HerinaVersions } from "@herina-rn/shared";
 import { md5 } from "./str";
 
 export const getVersionsJsonPath = (config: HerinaConfig) => {

@@ -1,4 +1,4 @@
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 import { ensureFileSync, writeFileSync } from "fs-extra";
 import { isGitRepository } from "../utils/git";
 import {

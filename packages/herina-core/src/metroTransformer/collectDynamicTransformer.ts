@@ -2,7 +2,7 @@ import { MetroTranformerParams } from ".";
 import fs from "fs-extra";
 import { createManifestIfNotExist } from "../utils/manifest";
 import { isArrayWithLength } from "../utils/arr";
-import { Recordable } from "@herina/shared";
+import { Recordable } from "@herina-rn/shared";
 
 const collectDynamicTransformer = ({
   herinaConfig,

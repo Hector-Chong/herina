@@ -1,4 +1,4 @@
-import { HerinaManifest } from "@herina/shared";
+import { HerinaManifest } from "@herina-rn/shared";
 import { getManifestChunks } from "../utils/file";
 
 export const removeDuplicatedDependencies = (manifest: HerinaManifest) => {

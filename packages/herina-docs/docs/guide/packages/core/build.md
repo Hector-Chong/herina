@@ -27,7 +27,7 @@ interface ChunkAsset {
 ## Example
 
 ```typescript
-import {build, defineHerinaConfig} from '@herina/core';
+import {build, defineHerinaConfig} from '@herina-rn/core';
 
 const config = defineHerinaConfig({ ... });
 

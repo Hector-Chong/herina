@@ -22,7 +22,7 @@ import {
   createVersiosnJsonIfNotExist,
   getVersionsJsonPath
 } from "../utils/version";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 
 const clearResult = (config: HerinaConfig) => {
   removeSync(path.join(config.outputPath, "bundle.js"));

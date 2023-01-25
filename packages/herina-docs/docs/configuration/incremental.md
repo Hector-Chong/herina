@@ -3,7 +3,7 @@
 By adding `incremental` key to customize configuration.
 
 ```typescript
-import { defineHerinaConfig } from "@herina/core";
+import { defineHerinaConfig } from "@herina-rn/core";
 
 export default defineHerinaConfig({
   environment: "production",

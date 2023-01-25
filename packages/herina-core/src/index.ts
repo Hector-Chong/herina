@@ -7,4 +7,4 @@ export type {
   HerinaConfigManualChunks,
   HerinaVersionsHistoryItem,
   HerinaVersions
-} from "@herina/shared";
+} from "@herina-rn/shared";

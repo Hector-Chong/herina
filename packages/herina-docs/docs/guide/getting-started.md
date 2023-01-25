@@ -8,12 +8,12 @@ To save space, the full update will be introduced here.
 
 Create a file named `herina.config.ts` (recommended) in the root dictionary of your project.
 
-Then, import `defineHerinaConfig` from `@herina/core` and call it to create the configuration to be exported.
+Then, import `defineHerinaConfig` from `@herina-rn/core` and call it to create the configuration to be exported.
 
 Here is an example:
 
 ```typescript
-import { defineHerinaConfig } from "@herina/core";
+import { defineHerinaConfig } from "@herina-rn/core";
 
 export default defineHerinaConfig({
   environment: "production",
@@ -38,7 +38,7 @@ You may use function or CLI to build update.
 ::: code-group
 
 ```typescript [function]
-import {build} from '@herina/core';
+import {build} from '@herina-rn/core';
 import herinaConfig from './herina.config';
 
 const start = async (config: any) => {
@@ -63,7 +63,7 @@ This step is essential. Without the file, Herina would not know the newest versi
 ::: code-group
 
 ```typescript [function]
-import {buildVersionsJson, HerinaConfig} from '@herina/core';
+import {buildVersionsJson, HerinaConfig} from '@herina-rn/core';
 import herinaConfig from './herina.config';
 
 const start = async (config: HerinaConfig) => {
@@ -107,7 +107,7 @@ Then, call `requestBundleUpdate` to download the new bundle. This function retur
 Finally, When the promise is resolved, call `applyBundleUpdate` to apply the new bundle and reload the App.
 
 ```typescript
-import {registerUpdateManager} from '@herina/client';
+import {registerUpdateManager} from '@herina-rn/client';
 
 const manager = registerUpdateManager('https://hector.im');
 

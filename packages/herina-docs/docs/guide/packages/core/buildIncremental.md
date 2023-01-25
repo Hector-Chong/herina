@@ -27,7 +27,7 @@ Promise<string>
 ## Example
 
 ```typescript
-import {buildIncremental, defineHerinaConfig} from '@herina/core';
+import {buildIncremental, defineHerinaConfig} from '@herina-rn/core';
 
 const config = defineHerinaConfig({ ... });
 

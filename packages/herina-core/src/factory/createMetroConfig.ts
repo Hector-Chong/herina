@@ -1,6 +1,6 @@
 import { MetroConfig } from "@react-native-community/cli-plugin-metro";
 import { resolve } from "path";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 import { merge } from "lodash";
 import getReactNativePolyfills from "@react-native/js-polyfills";
 import { isProd } from "../utils/runtime";

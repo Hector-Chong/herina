@@ -9,7 +9,7 @@ import {
 } from "@babel/types";
 import { CommitDifferentFile } from "../utils/git";
 import { getManifestChunks } from "src/utils/file";
-import { HerinaManifest } from "@herina/shared";
+import { HerinaManifest } from "@herina-rn/shared";
 
 const incrementalTransformer = (
   manifest: HerinaManifest,

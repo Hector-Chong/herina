@@ -6,10 +6,10 @@ Created a file named `herina.config.ts` (recommended) or `herina.config.js` in y
 
 ### TypeScript (Recommended)
 
-Name your configuration file to `herina.config.ts`. import `defineHerinaConfig` from `@herina/core` like this:
+Name your configuration file to `herina.config.ts`. import `defineHerinaConfig` from `@herina-rn/core` like this:
 
 ```typescript
-import { defineHerinaConfig } from "@herina/core";
+import { defineHerinaConfig } from "@herina-rn/core";
 
 export default defineHerinaConfig({
   environment: "production",
@@ -29,7 +29,7 @@ If this does not work on your IDE, make sure you've installed JSDOC-specific plu
 
 ```js
 /**
- * @type {import('@herina/core').HerinaConfig}
+ * @type {import('@herina-rn/core').HerinaConfig}
  */
 module.exports = {
   environment: "production",

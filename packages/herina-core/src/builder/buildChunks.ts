@@ -17,7 +17,7 @@ import bundleTransformer from "../bundleTransformer";
 import { createManifestIfNotExist } from "../utils/manifest";
 import { writeJsonSync } from "fs-extra";
 import { prepareToBuild } from "./prerequisite";
-import { HerinaConfig, HerinaManifest } from "@herina/shared";
+import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 import path from "path";
 import removeDynamicFromBundleTransformer from "src/bundleTransformer/removeDynamicFromBundleTransformer";
 

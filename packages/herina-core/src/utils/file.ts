@@ -7,7 +7,7 @@ import {
 import { resolve } from "path";
 import { isProd } from "./runtime";
 import { md5 } from "./str";
-import { HerinaConfig, HerinaManifest } from "@herina/shared";
+import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 
 export const getConfigFilePath = () => {
   const filePath = resolve(

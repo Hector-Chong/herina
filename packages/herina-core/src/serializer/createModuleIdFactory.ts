@@ -1,5 +1,5 @@
 import { resolve } from "path";
-import { HerinaConfig, HerinaManifest } from "@herina/shared";
+import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 import { manifest } from "../builder/buildChunks";
 
 const getChunkName = (config: HerinaConfig, modulePath: string) => {

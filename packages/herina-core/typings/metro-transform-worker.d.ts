@@ -1,5 +1,5 @@
 declare module "metro-transform-worker" {
-  import { Recordable } from "@herina/shared";
+  import { Recordable } from "@herina-rn/shared";
 
   export type DynamicRequiresBehavior = "throwAtRuntime" | "reject";
 

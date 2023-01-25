@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { cpus } from "os";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 
 const defaultConfig: Partial<HerinaConfig> = {
   extensions: ["js", "jsx", "ts", "tsx"],

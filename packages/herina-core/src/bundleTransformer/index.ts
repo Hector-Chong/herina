@@ -7,7 +7,7 @@ import {
   ArrayExpression,
   CallExpression
 } from "@babel/types";
-import { HerinaConfig } from "@herina/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 import { manifest } from "../builder/buildChunks";
 
 const bundleTransformer = (config: HerinaConfig, ast: Node) => {
