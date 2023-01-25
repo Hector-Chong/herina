@@ -64,7 +64,7 @@ public class AppCapacityImpl {
     }
   }
 
-  public void recordNewestVersion(ReadableMap params, Callback callback) {
+  public void setVersionConfigValues(ReadableMap params, Callback callback) {
     AppVersionConfig versionConfig = VersionUtils.getVersionJson(reactContext);
 
     if (versionConfig != null) {
@@ -95,18 +95,9 @@ public class AppCapacityImpl {
               break;
           }
 
-          String jsonPlain = versionConfigJson.toString();
+          VersionUtils.writeVersionJson(reactContext, versionConfigJson);
 
-          FileOutputStream os = new FileOutputStream(VersionUtils.getVersionJsonPath(reactContext));
-
-          os.write(jsonPlain.getBytes(StandardCharsets.UTF_8));
-          os.close();
-        } catch (JSONException | FileNotFoundException e) {
-          e.printStackTrace();
-          callback.invoke(true);
-
-          return;
-        } catch (IOException e) {
+        } catch (JSONException e) {
           e.printStackTrace();
           callback.invoke(true);
 
@@ -241,8 +232,8 @@ public class AppCapacityImpl {
 
     Collections.reverse(incrementals);
 
-    VersionUtils.setVersionKeyInt(reactContext, "isIncrementalAvailable", 1);
-    VersionUtils.setVersionKeyArray(reactContext, "incrementalsToApply", incrementals);
+    VersionUtils.setVersionKey(reactContext, "isIncrementalAvailable", 1);
+    VersionUtils.setVersionKey(reactContext, "incrementalsToApply", incrementals);
 
     callback.invoke(false);
   }
@@ -288,7 +279,18 @@ public class AppCapacityImpl {
 
     nextBundleFile.renameTo(bundleFile);
 
-    VersionUtils.setVersionKeyInt(reactContext, "useOriginal", 0);
+    AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
+
+    if (config != null) {
+      VersionUtils.setVersionKey(reactContext, "versionNum", config.getNextVersionNum());
+      VersionUtils.setVersionKey(reactContext, "commitHash", config.getNextCommitHash());
+
+      VersionUtils.setVersionKey(reactContext, "nextVersionNum", 0);
+      VersionUtils.setVersionKey(reactContext, "nextCommitHash", "");
+    }
+
+    VersionUtils.setVersionKey(reactContext, "useOriginal", 0);
+    VersionUtils.setVersionKey(reactContext, "isBundleAvailable", 0);
 
     callback.invoke(false);
   }
@@ -359,9 +361,15 @@ public class AppCapacityImpl {
       os.write(bundleCode.getBytes(StandardCharsets.UTF_8));
       os.close();
 
-      VersionUtils.setVersionKeyInt(reactContext, "isIncrementalAvailable", 0);
-      VersionUtils.setVersionKeyArray(reactContext, "incrementalsToApply", new ArrayList());
-      VersionUtils.setVersionKeyInt(reactContext, "useOriginal", 0);
+      VersionUtils.setVersionKey(reactContext, "versionNum", config.getNextVersionNum());
+      VersionUtils.setVersionKey(reactContext, "commitHash", config.getNextCommitHash());
+
+      VersionUtils.setVersionKey(reactContext, "nextVersionNum", 0);
+      VersionUtils.setVersionKey(reactContext, "nextCommitHash", "");
+
+      VersionUtils.setVersionKey(reactContext, "isIncrementalAvailable", 0);
+      VersionUtils.setVersionKey(reactContext, "incrementalsToApply", new ArrayList());
+      VersionUtils.setVersionKey(reactContext, "useOriginal", 0);
 
       callback.invoke(false);
     } catch (IOException e) {
@@ -374,7 +382,7 @@ public class AppCapacityImpl {
   public void setUseOriginalBundle(ReadableMap params, Callback callback) {
     int isOriginal = params.getInt("original");
 
-    boolean res = VersionUtils.setVersionKeyInt(reactContext, "useOriginal", isOriginal);
+    boolean res = VersionUtils.setVersionKey(reactContext, "useOriginal", isOriginal);
 
     callback.invoke(res);
   }

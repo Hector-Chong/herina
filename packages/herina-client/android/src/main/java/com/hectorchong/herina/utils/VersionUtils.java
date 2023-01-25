@@ -22,56 +22,59 @@ public class VersionUtils {
     return FileUtils.getHerinaDir(context) + "/" + "version.json";
   }
 
-  public static boolean setVersionKeyInt(Context context, String key, int value) {
-    String path = getVersionJsonPath(context);
-    File jsonFile = new File(path);
+  public static boolean setVersionKey(Context context, String key, int value) {
+    JSONObject jsonObject = getVersionJsonAsJson(context);
 
-    if (jsonFile.exists()) {
-      String jsonPlain = FileUtils.readFileAsJsonString(path);
+    try {
+      jsonObject.put(key, value);
 
-      try {
-        JSONObject jsonObject = new JSONObject(jsonPlain);
-        jsonObject.put(key, value);
+      writeVersionJson(context, jsonObject);
 
-        FileOutputStream os = new FileOutputStream(path);
-        os.write(jsonObject.toString().getBytes(StandardCharsets.UTF_8));
-        os.close();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
 
-        return true;
-      } catch (JSONException | IOException e) {
-        e.printStackTrace();
-
-        return false;
-      }
+      return false;
     }
-
-    return false;
   }
 
-  public static boolean setVersionKeyArray(Context context, String key, ArrayList value) {
-    String path = getVersionJsonPath(context);
-    File jsonFile = new File(path);
+  public static boolean setVersionKey(Context context, String key, Object value) {
+    JSONObject jsonObject = getVersionJsonAsJson(context);
 
-    if (jsonFile.exists()) {
-      String jsonPlain = FileUtils.readFileAsJsonString(path);
+    try {
+      jsonObject.put(key, value);
 
-      try {
-        JSONObject jsonObject = new JSONObject(jsonPlain);
-        jsonObject.put(key, new JSONArray(value));
+      writeVersionJson(context, jsonObject);
 
-        FileOutputStream os = new FileOutputStream(path);
-        os.write(jsonObject.toString().getBytes(StandardCharsets.UTF_8));
-        os.close();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
 
-        return true;
-      } catch (JSONException | IOException e) {
-        e.printStackTrace();
-
-        return false;
-      }
+      return false;
     }
+  }
 
-    return false;
+  public static void writeVersionJson(Context context, JSONObject jsonObject) {
+    String path = getVersionJsonPath(context);
+
+    try {
+      FileOutputStream os = new FileOutputStream(path);
+      os.write(jsonObject.toString().getBytes(StandardCharsets.UTF_8));
+      os.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+
+    }
+  }
+
+  public static JSONObject getVersionJsonAsJson(Context context) {
+    AppVersionConfig config = getVersionJson(context);
+
+    if (config != null) {
+      return config.getJsonObject();
+    } else {
+      return null;
+    }
   }
 
   public static AppVersionConfig getVersionJson(Context context) {
@@ -104,9 +107,12 @@ public class VersionUtils {
 
     config.setUseOriginal(params.getBoolean("useOriginal") ? 1 : 0);
     config.setOriginalVersionNum(params.getInt("originalVersionNum"));
+    config.setIsBundleAvailable(params.getInt("isBundleAvailable"));
     config.setOriginalCommitHash(params.getString("originalCommitHash"));
     config.setVersionNum(params.getInt("versionNum"));
     config.setCommitHash(params.getString("commitHash"));
+    config.setNextVersionNum(params.getInt("nextVersionNum"));
+    config.setNextCommitHash(params.getString("nextCommitHash"));
     config.setIsIncrementalAvailable(params.getInt("isIncrementalAvailable"));
     config.setIncrementalsToApply(new JSONArray(params.getArray("incrementalsToApply").toArrayList()));
 

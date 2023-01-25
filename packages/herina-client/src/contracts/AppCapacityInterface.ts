@@ -8,7 +8,7 @@ interface AppCapacityInterface {
     versions: HerinaVersionsHistoryItem[]
   ): Promise<boolean>;
 
-  recordNewestVersion(versionNum: number, commitHash: string): Promise<boolean>;
+  setVersionConfigValues(params: Partial<AppVersionConfig>): Promise<boolean>;
 
   applyBundleUpdate(immediate: boolean): Promise<boolean>;
 

@@ -15,6 +15,9 @@ public class AppVersionConfig {
   private String originalCommitHash;
   private int versionNum;
   private String commitHash;
+  private int nextVersionNum;
+  private String nextCommitHash;
+  private int isBundleAvailable;
   private int isIncrementalAvailable;
   private JSONArray incrementalsToApply;
 
@@ -50,12 +53,36 @@ public class AppVersionConfig {
     this.commitHash = commitHash;
   }
 
+  public int getNextVersionNum() {
+    return nextVersionNum;
+  }
+
+  public void setNextVersionNum(int nextVersionNum) {
+    this.nextVersionNum = nextVersionNum;
+  }
+
+  public String getNextCommitHash() {
+    return nextCommitHash;
+  }
+
+  public void setNextCommitHash(String nextCommitHash) {
+    this.nextCommitHash = nextCommitHash;
+  }
+
   public boolean getIsIncrementalAvailable() {
     return isIncrementalAvailable == 1;
   }
 
   public void setIsIncrementalAvailable(int isIncrementalAvailable) {
     this.isIncrementalAvailable = isIncrementalAvailable;
+  }
+
+  public boolean getIsBundleAvailable() {
+    return isBundleAvailable == 1;
+  }
+
+  public void setIsBundleAvailable(int isBundleAvailable) {
+    this.isBundleAvailable = isBundleAvailable;
   }
 
   public JSONArray getIncrementalsToApply() {
@@ -81,6 +108,8 @@ public class AppVersionConfig {
       config.setUseOriginal(dictionary.getInt("useOriginal"));
       config.setVersionNum(dictionary.getInt("versionNum"));
       config.setCommitHash(dictionary.getString("commitHash"));
+      config.setNextVersionNum(dictionary.getInt("nextVersionNum"));
+      config.setNextCommitHash(dictionary.getString("nextCommitHash"));
       config.setOriginalCommitHash(dictionary.getString("originalCommitHash"));
       config.setOriginalVersionNum(dictionary.getInt("originalVersionNum"));
       config.setIsIncrementalAvailable(dictionary.getInt("isIncrementalAvailable"));
@@ -101,8 +130,11 @@ public class AppVersionConfig {
       object.put("useOriginal", useOriginal);
       object.put("versionNum", versionNum);
       object.put("commitHash", commitHash);
+      object.put("nextVersionNum", nextVersionNum);
+      object.put("nextCommitHash", nextCommitHash);
       object.put("originalCommitHash", originalCommitHash);
       object.put("originalVersionNum", originalVersionNum);
+      object.put("isBundleAvailable", isBundleAvailable);
       object.put("isIncrementalAvailable", isIncrementalAvailable);
       object.put("incrementalsToApply", incrementalsToApply);
     } catch (JSONException e) {
@@ -132,8 +164,11 @@ public class AppVersionConfig {
     object.putInt("useOriginal", useOriginal);
     object.putInt("versionNum", versionNum);
     object.putString("commitHash", commitHash);
+    object.putInt("nextVersionNum", nextVersionNum);
+    object.putString("nextCommitHash", nextCommitHash);
     object.putString("originalCommitHash", originalCommitHash);
     object.putInt("originalVersionNum", originalVersionNum);
+    object.putInt("isBundleAvailable", isBundleAvailable);
     object.putInt("isIncrementalAvailable", isIncrementalAvailable);
     object.putArray("incrementalsToApply", Arguments.fromList(incrementalsToApplyArr));
 

@@ -48,4 +48,9 @@ export interface AppVersionConfig {
   originCommitHash: string;
   versionNum: number;
   commitHash: string;
+  nextVersionNum: number;
+  nextCommitHash: string;
+  isBundleAvailable: boolean;
+  isIncrementalAvailable: boolean;
+  incrementalsToApply: string[];
 }

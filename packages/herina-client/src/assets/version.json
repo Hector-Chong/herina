@@ -2,8 +2,11 @@
     "versionNum": 1,
     "useOriginal": false,
     "commitHash": "{commitHash}",
+    "nextVersionNum": 0,
+    "nextCommitHash": "",
     "originalVersionNum": 1,
     "originalCommitHash": "{originalCommitHash}",
     "isIncrementalAvailable": 0,
+    "isBundleAvailable": 0,
     "incrementalsToApply": []
 }

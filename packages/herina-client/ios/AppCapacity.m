@@ -6,24 +6,23 @@
 //
 
 #import "AppCapacity.h"
-#import "Utils/VersionUtils.h"
-#import "Utils/FileUtils.h"
 #import "AppVersionConfig.h"
-#import "HerinaVersionsHistoryItem.h"
 #import "BundleManager.h"
+#import "HerinaVersionsHistoryItem.h"
+#import "Utils/FileUtils.h"
+#import "Utils/VersionUtils.h"
 
 @implementation AppCapacity
 
 RCT_EXPORT_MODULE(Herina)
 
 RCT_EXPORT_METHOD(initVersionJson:
-                  (NSDictionary *)params
-                  callback:(RCTResponseSenderBlock)callback
-                  )
-{
+                      (NSDictionary *)params
+                      callback:(RCTResponseSenderBlock)callback
+                  ) {
     AppVersionConfig *config = [VersionUtils createVersionJson:params];
-    
-    callback(@[[NSNumber numberWithBool:config==nil]]);
+
+    callback(@[[NSNumber numberWithBool:config == nil]]);
 }
 
 RCT_EXPORT_METHOD(getVersionConfig:
@@ -38,51 +37,33 @@ RCT_EXPORT_METHOD(getVersionConfig:
     }
 }
 
-RCT_EXPORT_METHOD(recordNewestVersion:
+RCT_EXPORT_METHOD(setVersionConfigValues:
                       (NSDictionary *)params
                       callback:(RCTResponseSenderBlock)callback
                   ) {
     NSFileManager *manager = [NSFileManager defaultManager];
-    NSString *versionJsonPath = [VersionUtils getVersionJsonPath];
 
-    NSDictionary *versionConfigDict = params;
-    
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:versionConfigDict options:NSJSONWritingFragmentsAllowed error:nil];
-
-    BOOL jsonExist = [manager fileExistsAtPath:versionJsonPath];
-
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:params options:NSJSONWritingFragmentsAllowed error:nil];
     NSString *plainData = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
     NSData *dataToStore = [plainData dataUsingEncoding:NSUTF8StringEncoding];
 
-    if (jsonExist) {
-        AppVersionConfig *versionConfig = [VersionUtils getVersionJson];
-                
-        if(versionConfig){
-            for(NSString *key in versionConfigDict){
-                id value = [versionConfigDict valueForKey:key];
-                
-                [versionConfig setValue:value forKey:key];
-            }
-            
-            NSMutableDictionary *newVersionDict = [versionConfig getVersionConfigDict];
-            
-            NSData *newData = [NSJSONSerialization dataWithJSONObject:newVersionDict options:NSJSONWritingFragmentsAllowed error:nil];
+    NSString *versionJsonPath = [VersionUtils getVersionJsonPath];
 
-            NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:versionJsonPath];
+    AppVersionConfig *versionConfig = [VersionUtils getVersionJson];
 
-            [handle seekToFileOffset:0];
-            [handle writeData:newData];
-            [handle truncateFileAtOffset:newData.length];
-            [handle closeFile];
-            
-            return callback(@[[NSNumber numberWithBool:NO]]);
+    if (versionConfig) {
+        for (NSString *key in params) {
+            id value = [params valueForKey:key];
+
+            [VersionUtils setVersionKeyValue:key value:value];
         }
+
+        return callback(@[[NSNumber numberWithBool:NO]]);
+    } else {
+        [manager createFileAtPath:versionJsonPath contents:dataToStore attributes:nil];
+
+        return callback(@[[NSNumber numberWithBool:NO]]);
     }
-
-    [manager createFileAtPath:versionJsonPath contents:dataToStore attributes:nil];
-
-    callback(@[[NSNumber numberWithBool:NO]]);
 }
 
 RCT_EXPORT_METHOD(downloadBundleToUpdate:
@@ -144,40 +125,39 @@ RCT_EXPORT_METHOD(downloadBundleToUpdate:
 }
 
 RCT_EXPORT_METHOD(downloadIncrementalUpdates:
-                  (NSDictionary *)params
-                  callback:(RCTResponseSenderBlock)callback
-                  )
-{
+                      (NSDictionary *)params
+                      callback:(RCTResponseSenderBlock)callback
+                  ) {
     NSString *baseUrl = params[@"baseUrl"];
     NSArray<NSDictionary *> *versionDicts = params[@"versions"];
     NSMutableArray<NSString *> *incrementals = [@[] mutableCopy];
-        
+
     NSFileManager *manager = [NSFileManager defaultManager];
-    
-    for(int i=0;i<versionDicts.count;i++){
+
+    for (int i = 0; i < versionDicts.count; i++) {
         HerinaVersionsHistoryItem *item = [[HerinaVersionsHistoryItem alloc] initWithDictionary:[versionDicts objectAtIndex:i]];
-        
+
         NSURL *incrementalUrl = [[[NSURL URLWithString:baseUrl] URLByAppendingPathComponent:@"incremental"] URLByAppendingPathComponent:item.filePath];
-    
+
         NSString *incrementalStorePath = [[FileUtils getIncrementalStorePath] stringByAppendingPathComponent:item.filePath];
-        
-        if([manager fileExistsAtPath:incrementalStorePath]){
+
+        if ([manager fileExistsAtPath:incrementalStorePath]) {
             [manager removeItemAtPath:incrementalStorePath error:nil];
         }
-        
+
         NSError *downloadError;
-        
+
         NSData *incrementalData = [NSData dataWithContentsOfURL:incrementalUrl options:NSDataReadingMappedIfSafe error:&downloadError];
-        
-        if(downloadError){
+
+        if (downloadError) {
             return callback(@[[NSNumber numberWithBool:YES], [NSString stringWithFormat:@"`%@` incremental update download failed", incrementalUrl]]);
         }
-        
+
         [manager createFileAtPath:incrementalStorePath contents:incrementalData attributes:nil];
-        
+
         [incrementals addObject:item.filePath];
     }
-    
+
     [VersionUtils setVersionKeyValue:@"isIncrementalAvailable" value:@1];
     [VersionUtils setVersionKeyValue:@"incrementalsToApply" value:[incrementals reverseObjectEnumerator].allObjects];
 
@@ -217,64 +197,82 @@ RCT_EXPORT_METHOD(applyBundleUpdate:
     if ([manager fileExistsAtPath:bundleStorePath]) {
         [manager moveItemAtPath:bundleStorePath toPath:oldBundleStorePath error:nil];
     }
-
+    
     [manager moveItemAtPath:nextBundleStorePath toPath:bundleStorePath error:nil];
+    
+    AppVersionConfig *config = [VersionUtils getVersionJson];
+
+    if(config){
+        [VersionUtils setVersionKeyValue:@"versionNum" value:config.nextVersionNum];
+        [VersionUtils setVersionKeyValue:@"commitHash" value:config.nextCommitHash];
+    }
+
+    [VersionUtils setVersionKeyValue:@"nextVersionNum" value:@0];
+    [VersionUtils setVersionKeyValue:@"nextCommitHash" value:@""];
 
     [VersionUtils setVersionKeyValue:@"useOriginal" value:@0];
-    
+    [VersionUtils setVersionKeyValue:@"isBundleAvailable" value:@0];
+
     callback(@[[NSNumber numberWithBool:NO]]);
 }
 
 RCT_EXPORT_METHOD(applyIncrementalUpdate:
-                  (RCTResponseSenderBlock)callback
-                  )
-{
+                      (RCTResponseSenderBlock)callback
+                  ) {
     AppVersionConfig *config = [VersionUtils getVersionJson];
-    
-    if(!config){
+
+    if (!config) {
         return callback(@[[NSNumber numberWithBool:YES], @"No version.json found."]);
     }
-    
-    if(![config.isIncrementalAvailable isEqualToNumber:@1] || [config.incrementalsToApply count] == 0){
+
+    if (![config.isIncrementalAvailable isEqualToNumber:@1] || [config.incrementalsToApply count] == 0) {
         return callback(@[[NSNumber numberWithBool:YES], @"No incremental updates found. Make sure you've invoked `requestIncrementalUpdates`"]);
     }
-    
+
     NSString *incrementalCode = @"";
-    
-    for (int i=0; i<[config.incrementalsToApply count]; i++) {
+
+    for (int i = 0; i < [config.incrementalsToApply count]; i++) {
         NSString *filePath = [config.incrementalsToApply objectAtIndex:i];
         NSString *fullFilePath = [[FileUtils getIncrementalStorePath] stringByAppendingPathComponent:filePath];
-        
+
         NSData *data = [NSData dataWithContentsOfFile:fullFilePath];
         NSString *code = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        
+
         incrementalCode = [incrementalCode stringByAppendingString:code];
     }
-    
+
     NSString *insertTag = @"\"#HERINAINSERTTAG#\"";
-    
+
     incrementalCode = [incrementalCode stringByAppendingString:insertTag];
-    
+
     NSString *bundleCode = [BundleManager getBundleCode];
-    
+
     bundleCode = [bundleCode stringByReplacingOccurrencesOfString:insertTag withString:incrementalCode];
-        
+
     NSFileManager *manager = [NSFileManager defaultManager];
-    
+
     NSString *oldBundlePath = [[FileUtils getBundleStoreDirPath] stringByAppendingPathComponent:@"old.bundle.js"];
-    
+
     NSString *bundlePath = [[FileUtils getBundleStoreDirPath] stringByAppendingPathComponent:@"bundle.js"];
-    
-    if([manager fileExistsAtPath:bundlePath]){
-        if([manager fileExistsAtPath:oldBundlePath]){
+
+    if ([manager fileExistsAtPath:bundlePath]) {
+        if ([manager fileExistsAtPath:oldBundlePath]) {
             [manager removeItemAtPath:oldBundlePath error:nil];
         }
-        
+
         [manager moveItemAtPath:bundlePath toPath:oldBundlePath error:nil];
     }
-    
+
     [manager createFileAtPath:bundlePath contents:[bundleCode dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+
+    if(config){
+        [VersionUtils setVersionKeyValue:@"versionNum" value:config.nextVersionNum];
+        [VersionUtils setVersionKeyValue:@"commitHash" value:config.nextCommitHash];
+    }
     
+    [VersionUtils setVersionKeyValue:@"nextVersionNum" value:@0];
+    [VersionUtils setVersionKeyValue:@"nextCommitHash" value:@""];
+
     [VersionUtils setVersionKeyValue:@"isIncrementalAvailable" value:@0];
     [VersionUtils setVersionKeyValue:@"incrementalsToApply" value:@[]];
     [VersionUtils setVersionKeyValue:@"useOriginal" value:@0];
@@ -283,14 +281,13 @@ RCT_EXPORT_METHOD(applyIncrementalUpdate:
 }
 
 RCT_EXPORT_METHOD(setUseOriginalBundle:
-                  (NSDictionary *)params
-                  callback:(RCTResponseSenderBlock)callback
-                  )
-{
+                      (NSDictionary *)params
+                      callback:(RCTResponseSenderBlock)callback
+                  ) {
     NSNumber *isOriginal = params[@"original"];
-    
+
     [VersionUtils setVersionKeyValue:@"useOriginal" value:isOriginal];
-    
+
     callback(@[[NSNumber numberWithBool:NO]]);
 }
 

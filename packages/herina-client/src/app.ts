@@ -25,10 +25,10 @@ class AppCapacityImplements implements AppCapacityInterface {
 
       await this.initVersionJson(versionFromLocal);
 
-      this.recordNewestVersion(
-        versionFromLocal.versionNum,
-        versionFromLocal.commitHash
-      );
+      this.setVersionConfigValues({
+        versionNum: versionFromLocal.versionNum,
+        commitHash: versionFromLocal.commitHash
+      });
 
       return versionFromLocal;
     } else {
@@ -51,10 +51,10 @@ class AppCapacityImplements implements AppCapacityInterface {
     )({ baseUrl });
   }
 
-  recordNewestVersion(versionNum: number, commitHash: string) {
+  setVersionConfigValues(params: Partial<AppVersionConfig>) {
     return promisifyNativeFunction<boolean>(
-      this.__nativeModule.recordNewestVersion
-    )({ versionNum, commitHash });
+      this.__nativeModule.setVersionConfigValues
+    )(params);
   }
 
   setUseOriginalBundle(original: boolean) {

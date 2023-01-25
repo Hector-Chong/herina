@@ -19,7 +19,13 @@
 
 @property (nonatomic, readwrite, strong) NSString *commitHash;
 
+@property (nonatomic, readwrite, strong) NSNumber *nextVersionNum;
+
+@property (nonatomic, readwrite, strong) NSString *nextCommitHash;
+
 @property (nonatomic, readwrite, strong) NSNumber *isIncrementalAvailable;
+
+@property (nonatomic, readwrite, strong) NSNumber *isBundleAvailable;
 
 @property (nonatomic, readwrite, strong) NSArray<NSString *> *incrementalsToApply;
 

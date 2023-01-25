@@ -17,9 +17,12 @@
         self.useOriginal = dictionary[@"useOriginal"];
         self.versionNum = dictionary[@"versionNum"];
         self.commitHash = dictionary[@"commitHash"];
+        self.nextVersionNum = dictionary[@"nextVersionNum"];
+        self.nextCommitHash = dictionary[@"nextCommitHash"];
         self.originalCommitHash = dictionary[@"originalCommitHash"];
         self.originalVersionNum = dictionary[@"originalVersionNum"];
         self.isIncrementalAvailable = dictionary[@"isIncrementalAvailable"] ? dictionary[@"isIncrementalAvailable"] : @0;
+        self.isBundleAvailable = dictionary[@"isBundleAvailable"] ? dictionary[@"isBundleAvailable"] : @0;
         self.incrementalsToApply = dictionary[@"incrementalsToApply"] ? dictionary[@"incrementalsToApply"] : @[];
     }
 
@@ -32,9 +35,12 @@
                                      @"useOriginal": self.useOriginal,
                                      @"versionNum": self.versionNum,
                                      @"commitHash": self.commitHash,
+                                     @"nextVersionNum": self.nextVersionNum,
+                                     @"nextCommitHash": self.nextCommitHash,
                                      @"originalCommitHash": self.originalCommitHash,
                                      @"originalVersionNum": self.originalVersionNum,
                                      @"isIncrementalAvailable": self.isIncrementalAvailable,
+                                     @"isBundleAvailable": self.isBundleAvailable,
                                      @"incrementalsToApply": self.incrementalsToApply
                                  } mutableCopy];
 

@@ -31,8 +31,8 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void recordNewestVersion(ReadableMap params, Callback callback) {
-    moduleImpl.recordNewestVersion(params, callback);
+  public void setVersionConfigValues(ReadableMap params, Callback callback) {
+    moduleImpl.setVersionConfigValues(params, callback);
   }
 
   @ReactMethod

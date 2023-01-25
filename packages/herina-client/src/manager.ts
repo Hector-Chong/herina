@@ -55,16 +55,21 @@ class UpdateManager implements UpdateManagerInterface {
       throw new Error("No need to update.");
     }
 
-    await this.__app.downloadBundleToUpdate(this.__baseUrl);
+    try {
+      await this.__app.downloadBundleToUpdate(this.__baseUrl);
 
-    const versions = await this.getVersionsFromRemote();
+      const versions = await this.getVersionsFromRemote();
 
-    await this.__app.recordNewestVersion(
-      versions.currentVersionNum,
-      versions.currentCommitHash
-    );
+      await this.__app.setVersionConfigValues({
+        nextVersionNum: versions.currentVersionNum,
+        nextCommitHash: versions.currentCommitHash,
+        isBundleAvailable: true
+      });
 
-    return true;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   async requestIncrementalUpdates() {
@@ -86,7 +91,10 @@ class UpdateManager implements UpdateManagerInterface {
 
     await this.__app.downloadIncrementalUpdates(this.__baseUrl, newerVersions);
 
-    await this.__app.recordNewestVersion(currentVersionNum, currentCommitHash);
+    await this.__app.setVersionConfigValues({
+      nextVersionNum: currentVersionNum,
+      nextCommitHash: currentCommitHash
+    });
 
     return true;
   }
@@ -112,11 +120,15 @@ class UpdateManager implements UpdateManagerInterface {
   }
 
   async isBundleUpdateAvailable() {
-    return true;
+    const config = await this.__app.getVersionConfig();
+
+    return !!config.isBundleAvailable;
   }
 
   async isIncrementalUpdateAvailable() {
-    return true;
+    const config = await this.__app.getVersionConfig();
+
+    return !!config.isIncrementalAvailable;
   }
 
   clearCache() {
