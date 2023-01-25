@@ -26,7 +26,7 @@ RCT_EXPORT_METHOD(initVersionJson:
     callback(@[[NSNumber numberWithBool:config==nil]]);
 }
 
-RCT_EXPORT_METHOD(getCurrentVersion:
+RCT_EXPORT_METHOD(getVersionConfig:
                       (RCTResponseSenderBlock)callback
                   ) {
     AppVersionConfig *versionConfig = [VersionUtils getVersionJson];

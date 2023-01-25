@@ -1,7 +1,7 @@
 import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina-rn/shared";
 
 interface AppCapacityInterface {
-  getCurrentVersion(): Promise<AppVersionConfig>;
+  getVersionConfig(): Promise<AppVersionConfig>;
 
   downloadIncrementalUpdates(
     baseUrl: string,

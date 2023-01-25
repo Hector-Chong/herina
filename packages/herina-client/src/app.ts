@@ -15,10 +15,10 @@ class AppCapacityImplements implements AppCapacityInterface {
     )(config);
   }
 
-  async getCurrentVersion() {
+  async getVersionConfig() {
     const versionFromNative = await promisifyNativeFunction<
       AppVersionConfig | undefined
-    >(this.__nativeModule.getCurrentVersion)();
+    >(this.__nativeModule.getVersionConfig)();
 
     if (!versionFromNative) {
       const versionFromLocal: AppVersionConfig = require("./assets/version.json");

@@ -26,8 +26,8 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getCurrentVersion(Callback callback) {
-    moduleImpl.getCurrentVersion(callback);
+  public void getVersionConfig(Callback callback) {
+    moduleImpl.getVersionConfig(callback);
   }
 
   @ReactMethod

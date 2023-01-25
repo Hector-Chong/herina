@@ -44,7 +44,7 @@ class UpdateManager implements UpdateManagerInterface {
   }
 
   async checkForUpdate() {
-    const versionConfig = await this.__app.getCurrentVersion();
+    const versionConfig = await this.__app.getVersionConfig();
     const versionsFromRemote = await this.getVersionsFromRemote();
 
     return versionConfig.versionNum < versionsFromRemote.currentVersionNum;
@@ -68,7 +68,7 @@ class UpdateManager implements UpdateManagerInterface {
   }
 
   async requestIncrementalUpdates() {
-    const { versionNum } = await this.__app.getCurrentVersion();
+    const { versionNum } = await this.__app.getVersionConfig();
     const { currentVersionNum, currentCommitHash, history } =
       await this.getVersionsFromRemote();
 

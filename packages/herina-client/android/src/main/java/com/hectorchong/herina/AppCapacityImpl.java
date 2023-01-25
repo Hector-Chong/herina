@@ -54,7 +54,7 @@ public class AppCapacityImpl {
     callback.invoke(config == null);
   }
 
-  public void getCurrentVersion(Callback callback) {
+  public void getVersionConfig(Callback callback) {
     AppVersionConfig versionConfig = VersionUtils.getVersionJson(reactContext);
 
     if (versionConfig != null) {
