@@ -1,6 +1,6 @@
 # getUpdateManager
 
-Get the instance of [UpdateManager](/guide/packages/client/updateManager.html) that [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html) returns.
+Get the instance of [UpdateManager](/guide/packages/client/updateManager/introduction.html) that [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html) returns.
 
 :::warning
 

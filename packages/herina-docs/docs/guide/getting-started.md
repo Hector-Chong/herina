@@ -28,7 +28,7 @@ export default defineHerinaConfig({
 ```
 
 ::: info
-For more details of config, refer to [Configuration](/configuraion).
+For more details of config, refer to [Configuration](/configuration/introduction).
 :::
 
 ## Step. 2: Build update

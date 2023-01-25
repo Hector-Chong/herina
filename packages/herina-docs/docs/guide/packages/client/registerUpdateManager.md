@@ -1,6 +1,6 @@
 # registerUpdateManager()
 
-Returns the singleton instance of [UpdateManager](/guide/packages/client/updateManager.html).
+Returns the singleton instance of [UpdateManager](/guide/packages/client/updateManager/introduction.html).
 
 ## Arguments
 

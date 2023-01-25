@@ -6,7 +6,7 @@ If the `version.json` was built before, this function will also write the latest
 
 :::warning
 
-Make sure your project is in a Git repository. You might refer to [Incremental Update](/update/incremental.html).
+Make sure your project is in a Git repository. You might refer to [Incremental Update](/guide/update/incremental.html).
 
 :::
 
