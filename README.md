@@ -12,7 +12,7 @@
 
 Herina is a toolkit providing dynamic ability for React Native App. It provides simple JS APIs that you can easily intergrate hot-update into your App. Also, you can use `import()` to dynamically import modules from remote without any configuration with Herina.
 
-At the low level, Herina has Metro as bundler to build bundle. It is like Vite to Rollup or ESBuild. After the build is done, it generates AST of the bundle to analyse the code to separate modules into different kinds of chunks.
+Under the hood, Herina has Metro as bundler to build bundle. It is like Vite to Rollup or ESBuild. After the build is done, it generates AST of the bundle to analyse the code to separate modules into different kinds of chunks.
 
 # Features
 
@@ -98,7 +98,7 @@ Currently, Herina only works on production mode and does not output sourcemaps. 
 
 Herina is provideed *as is.* For your information, Herina is part of my work now, but it does not mean this is permanently. I will try to find time to provide technical support if I am transferred to another job.
 
-Do not hesitate to open an issue or pull reqeust. If you have some ideas to share with me, you may [**contact me**](https://www.notion.so/AutoLayout-3d45b0277a2e4b9d9d3d01c83b4df4e0) and I will reply assp.
+Do not hesitate to open an issue or pull reqeust. If you have some ideas to share with me, you may [**contact me**](mailto:i@hector.im) and I will reply assp.
 
 # License
 
