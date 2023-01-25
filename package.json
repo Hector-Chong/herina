@@ -14,7 +14,8 @@
   },
   "homepage": "https://github.com/Hector-Chong/herina#readme",
   "scripts": {
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
@@ -35,8 +36,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "exec < /dev/tty && npx cz --hook || true",
-      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+      "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"
     }
   }
 }
