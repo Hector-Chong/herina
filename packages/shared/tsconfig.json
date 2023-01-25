@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+  },
+  "include": [
+    "src"
+  ],
+}

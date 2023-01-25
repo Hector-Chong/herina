@@ -1,0 +1,25 @@
+{
+  "name": "@herina/cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "bin": {
+    "herina": "./bin/herina"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-json": "^6.0.0",
+    "commander": "^9.4.1",
+    "rollup": "^3.9.1",
+    "rollup-plugin-ts": "^3.0.2"
+  },
+  "dependencies": {
+    "react-native": "^0.70.6"
+  }
+}

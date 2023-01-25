@@ -1,0 +1,10 @@
+{
+  "name": "@herina/shared",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "types": "dist/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin esbuild"
+  }
+}

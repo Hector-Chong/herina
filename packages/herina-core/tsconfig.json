@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "es2021",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "target": "ESNext",
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "strict": true,
+    "jsx": "react-jsx",
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./typings"
+    ],
+    "allowJs": true
+  },
+  "include": [
+    "src",
+    "rollup.config.ts",
+    "typings"
+  ],
+}
