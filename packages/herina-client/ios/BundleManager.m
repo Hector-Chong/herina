@@ -15,7 +15,7 @@
 
 + (NSURL *)getBundleURL
 {
-#if !DEBUG
+#if DEBUG
     return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
     NSFileManager *manager = [NSFileManager defaultManager];
@@ -32,9 +32,7 @@
         }
     }
 
-    return [NSURL URLWithString:@"http://127.0.0.1:8080/bundle.js"];
-
-//    return baseBundleUrl;
+    return baseBundleUrl;
 
 #endif /* if DEBUG */
 }
