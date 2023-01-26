@@ -1,12 +1,12 @@
-# Introduction
+# 介绍
 
-Created a file named `herina.config.ts` (recommended) or `herina.config.js` in your project dictionary. This file specifies the configuration of Herina.
+在项目根目录，创建一个名为 `herina.config.ts`（推荐）或 `herina.config.js` 的文件。此文件用于声明 Herina 配置。
 
-## Config Intellisense
+## 配置智能提示
 
-### TypeScript (Recommended)
+### TypeScript（推荐）
 
-Name your configuration file to `herina.config.ts`. import `defineHerinaConfig` from `@herina-rn/core` like this:
+将配置文件命名为 `herina.config.ts`，并从 `@herina-rn/core` 导入 `defineHerinaConfig` 如下：
 
 ```typescript
 import { defineHerinaConfig } from "@herina-rn/core";
@@ -25,7 +25,7 @@ export default defineHerinaConfig({
 
 ### JSDOC
 
-If this does not work on your IDE, make sure you've installed JSDOC-specific plugins.
+若此配置无法在你的 IDE 正常使用，请确保已安装 JSDOC 相关插件。
 
 ```js
 /**

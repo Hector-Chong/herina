@@ -5,7 +5,7 @@
 - **Required**
 - Type: `'development' | 'production'`
 
-The bundle is being built in which mode.
+The bundle will be built in which mode.
 
 In production mode, code for profiling may be removed and the bundle will be minified by Terser.
 
@@ -14,7 +14,7 @@ In production mode, code for profiling may be removed and the bundle will be min
 - **Required**
 - Type: `string`
 
-The base URL for your resouces. This will be used to concat resource file name. If you called `requestBundleUpdate`, Herina would try to concat the bundle name with `baseUrl`. Let's say the baseUrl is `https://hector.im`, and the full URL for the main chunk will be `https://hector.im/main.chunk.js`.
+The base URL for your resouces. This will be used to concat resource file name. When you called `requestBundleUpdate`, Herina would try to concat the bundle name with `baseUrl`. Let's say the `baseUrl` is `https://hector.im`, and the full URL for the business chunk will be `https://hector.im/main.chunk.js`.
 
 You should use https as the protocol. Otherwise, your connection will be seen as unsecured to the OS.
 
@@ -23,29 +23,21 @@ You should use https as the protocol. Otherwise, your connection will be seen as
 - **Required**
 - Type: `string`
 
-The path for your project entry file. Usually, it's `index.js` in the root dictionary.
+The path of your project entry file. Usually, it's `index.js` in the root dictionary.
 
 ## outputPath
 
 - **Required**
 - Type: `string`
 
-The location to place output files.
-
-## outputPath
-
-- **Required**
-- Type: `string`
-
-The location to place output files.
+The path of place output files.
 
 ## manifestPath
 
 - **Required**
 - Type: `string`
 
-The location to place [`manifest.json`](/guide/concepts.html#manifest-json).
-
+The path of place [`manifest.json`](/guide/concepts.html#manifest-json).
 
 ## platform
 
@@ -90,4 +82,3 @@ The number of workers to use for parallel processing in Metro.
 
 - Type: `number`
 - Default: `cpus().length`
-

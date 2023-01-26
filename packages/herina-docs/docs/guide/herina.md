@@ -43,7 +43,7 @@ Before updating, you must register `UpdateManager` by invoking `registerUpdateMa
 ```tsx
 import {registerUpdateManager} from '@herina-rn/client';
 
-const manager = registerUpdateManager('http://127.0.0.1:8080');
+const manager = registerUpdateManager('https://hector.im');
 ```
 
 ### Full

@@ -43,7 +43,7 @@ Herina 提供两种更新方式：全量更新、递增式更新。
 ```tsx
 import { registerUpdateManager } from "@herina-rn/client";
 
-const manager = registerUpdateManager("http://127.0.0.1:8080");
+const manager = registerUpdateManager("https://hector.im");
 ```
 
 ### 全量更新

@@ -1,6 +1,6 @@
-# Incremental Config
+# 递增式更新配置
 
-By adding `incremental` key to customize configuration.
+通过添加 `incremental` 属性配置。
 
 ```typescript
 import { defineHerinaConfig } from "@herina-rn/core";
@@ -10,7 +10,7 @@ export default defineHerinaConfig({
   baseUrl: "https://hector.im",
   //...
 
-  // Incremental-related configurations.
+  // 递增式更新相关配置
   incremental: {
     previousCommitHash: "",
     currentCommitHash: "",
@@ -22,28 +22,28 @@ export default defineHerinaConfig({
 
 ## previousCommitHash
 
-- Type: `string`
-- Default: the last commit hash of your project
+- 类型：`string`
+- 默认值：上一个 Commit 的哈希值
 
-From which Git commit to build incremental update.
+从某一个 Commit 开始构建递增式更新。
 
 ## currentCommitHash
 
-- Type: `string`
-- Default: the current commit hash of your project
+- 类型：`string`
+- 默认值：当前 Commit 的哈希值
 
-To which Git commit to build incremental update.
+截止到某一个 Commit 构建递增式更新。
 
 ## pure
 
-- Type: `boolean`
-- Default: `false`
+- 类型：`boolean`
+- 默认值：`false`
 
-This option works with `incremental.filePath`. If it is `true`, after the incremental update is built, version info won't be recorded in versions.json, and the output file will be placed at `incremental.filePath`.
+此配置项与 `incremental.filePath` 搭配使用。如果为 `true`，在递增式更新构建完后，版本信息不会被写入 `versions.json`，输出的文件会被存放在 `incremental.filePath` 指定的路径。
 
 ## filePath
 
-- Type: `string`
-- Default: `''`
+- 类型：`string`
+- 默认值：`''`
 
-Where to place output file when `incremental.pure` is true.
+当 `incremental.pure` 为 `true`，输出的递增式更新文件存放路径。

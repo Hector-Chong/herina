@@ -46,4 +46,4 @@ This option works with `incremental.filePath`. If it is `true`, after the increm
 - Type: `string`
 - Default: `''`
 
-Where to place output file when `incremental.pure` is true.
+Where to place output file when `incremental.pure` is `true`.
