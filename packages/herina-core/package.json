@@ -17,7 +17,7 @@
     "build": "rollup --config rollup.config.ts --configPlugin esbuild"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@babel/generator": "^7.20.5",
     "@babel/node": "^7.20.7",

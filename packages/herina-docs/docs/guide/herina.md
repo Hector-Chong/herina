@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Herina is a toolkit providing dynamic ability for React Native App. It provides simple JS APIs that you can easily intergrate hot-update into your App. Also, you can use `import()` to dynamically import modules from remote without any configuration with Herina.
+Herina is a toolkit providing dynamic ability for React Native App. It provides simple JS APIs that you can easily integrate hot-update into your App. Also, you can use `import()` to dynamically import modules from remote without any configuration with Herina.
 
 Under the hood, Herina has Metro as bundler to build bundle. It is like Vite to Rollup or ESBuild. After the build is done, it generates AST of the bundle to analyse the code to separate modules into different kinds of chunks.
 
@@ -36,7 +36,7 @@ Herina divides bundle into three types of chunks:
 
 ## Usage
 
-There two types of updates: full and incremental updates.
+There are two types of updates: full and incremental updates.
 
 Before updating, you must register `UpdateManager` by invoking `registerUpdateManager`. The first argument indicating the base URL for your resources to be downloaded is optional. If this argument is undefined, it will read base URL from the original bundle.
 
@@ -82,7 +82,7 @@ const onUpdateByIncremental = async () => {
 
 ## Requirement
 
-To use Herina, you should modify the naitve code. If you have no exeperience in iOS or Android developing, You might refer to the `configuration` in the docs.
+To use Herina, you should modify the native code. If you have no exeperience in iOS or Android development, You might refer to the `configuration` in the docs.
 
 ## Limitation
 

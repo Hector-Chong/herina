@@ -1,6 +1,6 @@
 # Getting Started
 
-There two types of update: [full and incremental](/guide/concepts#full-update).
+There are two types of update: [full and incremental](/guide/concepts#full-update).
 
 To save space, the full update will be introduced here.
 

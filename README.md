@@ -52,7 +52,7 @@ Herina divides bundle into three types of chunks:
 
 # Usage
 
-There two types of updates: full and incremental updates.
+There are two types of updates: full and incremental updates.
 
 Before updating, you must register `UpdateManager` by invoking `registerUpdateManager`. The first argument which indicates the base URL for your resource to be downloaded is optional. If this argument is undefined, it will read base URL from the original bundle.
 
@@ -98,7 +98,7 @@ const onUpdateByIncremental = async () => {
 
 # Requirement
 
-To use Herina, you should modify the naitve code. If you have no exeperiences in iOS or Android developing, You might refer to the `configuration` in the docs.
+To use Herina, you should modify the native code. If you have no exeperience in iOS or Android development, You might refer to the `configuration` in the docs.
 
 # Limitation
 
