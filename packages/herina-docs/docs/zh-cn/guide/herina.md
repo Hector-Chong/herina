@@ -80,20 +80,20 @@ const onUpdateByIncremental = async () => {
 };
 ```
 
-# 使用要求
+## 使用要求
 
 为使用 Herina，需要对原生代码进行修改。若你没有 iOS 或 Android 的原生开发经验，你可参考文档中的`配置`章节。
 
-# 使用限制
+## 使用限制
 
 目前，Herina 仅限用于生产模式，并且不会输出 Sourcemap。若你正在使用如 Sentry 这样的性能监控，我正在开发为它提供支持。
 
-# 联系 & 支持
+## 联系 & 支持
 
 Herina 按现状提供。供您参考，Herina 目前是我工作的一部分，但这不意味这是永久性的。如果我被安排到其它工作，我将仍尽量抽出时间提供技术支持。
 
 不必犹豫提交 Issue 或 Pull Request。如果你有想法要和我分享，你可以[**联系我**](mailto:i@hector.im)，我会尽快回复。
 
-# License
+## License
 
 MIT
