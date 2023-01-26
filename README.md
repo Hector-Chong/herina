@@ -12,6 +12,12 @@
   <strong>Build bundle with Herina.</strong>
 </p>
 
+<p align="center">
+  <a href="https://github.com/Hector-Chong/herina/blob/main/README_CN.md">
+    简体中文
+  </a>
+</p>
+
 # Introduction
 
 Herina is a toolkit providing dynamic ability for React Native App. It provides simple JS APIs that you can easily intergrate hot-update into your App. Also, you can use `import()` to dynamically import modules from remote without any configuration with Herina.
