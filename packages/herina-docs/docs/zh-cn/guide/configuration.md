@@ -1,20 +1,20 @@
-# Configuration
+# 配置
 
-## Code Modifications
+## 代码修改
 
-Herina requires you to modify the native code for managing bundle. If you find it difficult to do, you may refer to the [`example`](https://github1s.com/Hector-Chong/herina/blob/HEAD/packages/herina-client/example)..
+Herina 需要你对 Bundle 管理部分的原生代码进行修改。如果这对你来说是比较困难的，你可以参考[`案例文件`](https://github1s.com/Hector-Chong/herina/blob/HEAD/packages/herina-client/example)
 
 ## Android
 
 ::: warning
-Before modifying the code, make sure you've installed `@herina-rn/client` and sync your project with Gradle, otherwise an error may be encountered.
+在修改代码之前，请确保已安装 `@herina-rn/client`，并且使用 Gradle 对项目进行了同步。否则，你可能会遇到错误。
 :::
 
-### Legacy Architecture
+### 旧架构
 
-First, find `MainApplication.java` inside `android` folder.
+首先在 `android` 目录找到 `MainApplication.java`。
 
-And import `BundleManager` from the packge of Herina.
+然后从 Herina 包导入 `BundleManager`。
 
 ```java
 package com.project.name;
@@ -35,7 +35,7 @@ import com.facebook.soloader.SoLoader;
 import com.hectorchong.herina.BundleManager; // [!code ++]
 ```
 
-Find the private and final property named `mReactNativeHost`, and create a method called `getJSBundleFile` with the code below.
+找到名为 `mReactNativeHost` 的私有并有 `final` 修饰符的属性，并使用以下代码在里面创建一个名为 `getJSBundleFile` 的方法。
 
 ```java
 public class MainApplication extends Application implements ReactApplication {
@@ -67,11 +67,11 @@ public class MainApplication extends Application implements ReactApplication {
 };
 ```
 
-### New Architecture
+### 新架构
 
-First, find `MainApplicationReactNativeHost.java` inside `android` folder.
+首先在 `android` 目录找到 `MainApplicationReactNativeHost.java`。
 
-And import `BundleManager` from the packge of Herina.
+然后从 Herina 包导入 `BundleManager`。
 
 ```java
 package com.project.name;
@@ -92,7 +92,7 @@ import com.facebook.soloader.SoLoader;
 import com.hectorchong.herina.BundleManager; // [!code ++]
 ```
 
-Finally, create a method called `getJSBundleFile` with the code below.
+最后，使用以下代码在里面创建一个名为 `getJSBundleFile` 的方法。
 
 ```java
 public class MainApplicationReactNativeHost extends ReactNativeHost {
@@ -112,12 +112,12 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
 ## iOS
 
 ::: warning
-Before modifying the code, make sure you've installed `@herina-rn/client` and executed `pod install`, otherwise an error may be encountered.
+在修改代码之前，请确保已安装 `@herina-rn/client`，并执行了 `pod install`。否则，你可能会遇到错误。
 :::
 
-First, open `AppDelegate.m` or `AppDelegate.mm` inside `ios` foloder.
+首先打开 `ios` 目录的 `AppDelegate.m` 或 `AppDelegate.mm`。
 
-Import `RNHerina/BundleManager.h` at the top of the file.
+从文件顶部导入 `RNHerina/BundleManager.h`。
 
 ```objective-c
 #import "AppDelegate.h"
@@ -134,7 +134,7 @@ Import `RNHerina/BundleManager.h` at the top of the file.
 
 ```
 
-Find the method named `sourceURLForBridge`, and overwrite it with the code below.
+找到名为 `sourceURLForBridge` 的方法，并使用以下代码重写实现。
 
 ```objective-c
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

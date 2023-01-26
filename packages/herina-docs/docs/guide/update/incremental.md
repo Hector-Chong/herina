@@ -36,9 +36,9 @@ The files to upload include:
 - `incremental/*.js`
 - `versions.json`
 
-## Download Bundle
+## Download Updates
 
-Before downloading the update, you are supposed to check whether an update is available by calling `checkForUpdate`.
+Before downloading the updates, you are supposed to check whether an update is available by calling `checkForUpdate`.
 
 ```typescript
 checkForUpdate(): Promise<boolean>

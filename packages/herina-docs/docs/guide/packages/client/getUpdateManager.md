@@ -4,7 +4,7 @@ Get the instance of [UpdateManager](/guide/packages/client/updateManager/introdu
 
 :::warning
 
-This function can not be called before `registerUpdateManager`.
+This function can not be called before [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html).
 
 :::
 

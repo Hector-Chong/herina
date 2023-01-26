@@ -92,7 +92,7 @@ const onUpdateByIncremental = async () => {
 
 # Requirement
 
-To use Herina, you should modify the naitve code. If you have no exeperience in iOS or Android developing, You might refer to the `configuration` in the docs.
+To use Herina, you should modify the naitve code. If you have no exeperiences in iOS or Android developing, You might refer to the `configuration` in the docs.
 
 # Limitation
 
@@ -100,9 +100,9 @@ Currently, Herina only works on production mode and does not output sourcemaps. 
 
 # Contact & Support
 
-Herina is provideed _as is._ For your information, Herina is part of my work now, but it does not mean this is permanently. I will try to find time to provide technical support if I am transferred to another job.
+Herina is provided _as is._ For your information, Herina is part of my work now, but it does not mean this is permanent. I will try to find time to provide technical support if I am transferred to another job.
 
-Do not hesitate to open an issue or pull reqeust. If you have some ideas to share with me, you may [**contact me**](mailto:i@hector.im) and I will reply assp.
+Do not hesitate to open an issue or pull request. If you have some ideas to share with me, you may [**contact me**](mailto:i@hector.im) and I will reply asap.
 
 # License
 

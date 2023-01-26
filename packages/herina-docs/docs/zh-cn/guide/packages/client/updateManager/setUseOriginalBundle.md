@@ -1,20 +1,20 @@
 # setUseOriginalBundle()
 
-Determines whether to use the original bundle or not.
+决定是否要使用原始 Bundle。
 
-## Arguments
+## 参数
 
-| Name | Required | Type    | Default Value | Note |
-| ---- | -------- | ------- | ------------- | ---- |
-| use  | YES      | boolean | /             | /    |
+| 参数名 | 必填 | 类型    | 默认值 | 备注 |
+| ------ | ---- | ------- | ------ | ---- |
+| use    | 是   | boolean | /      | App  |
 
-## Returns
+## 返回值
 
 ```typescript
 Promise<boolean>;
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { registerUpdateManager } from "@herina-rn/client";
