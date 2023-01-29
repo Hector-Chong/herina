@@ -1,9 +1,6 @@
-const process = require("process");
-const { resolve } = require("path");
+import { resolve } from "path";
 
-import { build } from "herina";
-
-interface BuildArgs {
+export interface BuildArgs {
   baseUrl?: string;
   root?: string;
   entryFile?: string;
@@ -13,7 +10,7 @@ interface BuildArgs {
   projectConfig?: string;
 }
 
-const validateArgs = (args: BuildArgs) => {
+export const validateBuildArgs = (args: BuildArgs) => {
   const useProjetConfig = !!args.projectConfig;
 
   const requiredKeys: (keyof BuildArgs)[] = [
@@ -45,10 +42,14 @@ const validateArgs = (args: BuildArgs) => {
   }
 };
 
-const buildCommand = (args: BuildArgs) => {
-  const newArgs = validateArgs(args);
-
-  build(newArgs);
+export const injectBuildCommandOptions = (command: any) => {
+  return command
+    .option("--base-url <url>", "Base url for dynamic chunks")
+    .option("--root <root>", "Path to project root")
+    .option("--entry-file <path>", "Path to the root JS file")
+    .option("--output-path <path>", "Path where to store chunks")
+    .option("--minify", "If true, outputs are minified")
+    .option("--platform <platform>", "Building target platform. ios or android")
+    .option("--manifest-path <path>", "Path to manifest.json")
+    .option("--project-config <path>", "Path to a Herina configuration file");
 };
-
-export default buildCommand;

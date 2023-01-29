@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-import build from "./build";
+import buildChunksCommand from "./buildChunks";
 import { version } from "../package.json";
+import buildVersionsJsonCommand from "./buildVersionsJson";
+import { injectBuildCommandOptions } from "./shared";
 
 const { Command } = require("commander");
 
@@ -8,20 +10,23 @@ const program = new Command();
 
 program
   .name("herina")
-  .description("CLI to use Herina to split code.")
+  .description("CLI for using Herina to split bundle.")
   .version(version);
 
+injectBuildCommandOptions(
+  program.command("build-chunks").description("Buidling chunks")
+).action(buildChunksCommand);
+
+injectBuildCommandOptions(
+  program
+    .command("build-incremental")
+    .description("Buidling Incremental Update")
+).action(buildVersionsJsonCommand);
+
 program
-  .command("build")
-  .description("Buidling chunks")
-  .option("--base-url <url>", "Base url for dynamic chunks")
-  .option("--root <root>", "Path to project root")
-  .option("--entry-file <path>", "Path to the root JS file")
-  .option("--output-path <path>", "Path where to store chunks")
-  .option("--minify", "If true, outputs are minified")
-  .option("--platform <platform>", "Building target platform. ios or android")
-  .option("--manifest-path <path>", "Path to manifest.json")
-  .option("--project-config <path>", "Path to a Herina configuration file")
-  .action(build);
+  .command("build-versions-json")
+  .description("Buidling versions.json")
+  .argument("<projectConfig>", "Path to a Herina configuration file")
+  .action(buildVersionsJsonCommand);
 
 program.parse(process.argv);
