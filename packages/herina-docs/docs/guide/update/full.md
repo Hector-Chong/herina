@@ -20,9 +20,7 @@ start(herinaConfig);
 ```
 
 ```bash [CLI]
-npx herina build -f herina.config.ts
-# or
-npx herina build --full herina.config.ts
+npx herina build-chunks herina.config.js
 ```
 
 :::
@@ -47,9 +45,7 @@ start(herinaConfig);
 ```
 
 ```bash [CLI]
-npx herina build -v herina.config.ts
-# or
-npx herina build --version-json herina.config.ts
+npx herina build-versions-json herina.config.js
 ```
 
 :::

@@ -9,6 +9,9 @@
   "bin": {
     "herina": "./bin/herina"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "author": "Héctor Chong",
   "license": "MIT",

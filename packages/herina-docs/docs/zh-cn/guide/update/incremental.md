@@ -20,9 +20,7 @@ start();
 ```
 
 ```bash [CLI]
-npx herina build -i herina.config.ts
-# or
-npx herina build --incremental herina.config.ts
+npx herina build-incremental herina.config.js
 ```
 
 :::
