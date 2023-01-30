@@ -3,9 +3,15 @@ import loadChunk from "./loadChunk";
 
 const context = getGlobalContext();
 
+const loadedDynamicModuleIds = new Set<number>();
+
 const loadDynamicModule = async (moduleId: number, chunkName: string) => {
-  if (!context.modules[moduleId]) {
-    await loadChunk(chunkName);
+  if (!context.modules[moduleId] || chunkName.endsWith("dynamic.chunk.js")) {
+    if (!loadedDynamicModuleIds.has(moduleId)) {
+      await loadChunk(chunkName);
+
+      loadedDynamicModuleIds.add(moduleId);
+    }
   }
 
   return context.__r(moduleId);
