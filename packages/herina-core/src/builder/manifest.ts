@@ -1,5 +1,8 @@
 import { HerinaManifest } from "@herina-rn/shared";
+import { createManifestIfNotExist } from "../utils/manifest";
 import { getManifestChunks } from "../utils/file";
+
+export const manifest: HerinaManifest = createManifestIfNotExist();
 
 export const removeDuplicatedDependencies = (manifest: HerinaManifest) => {
   const dynamicChunk = manifest.chunks.dynamic;

@@ -1,6 +1,6 @@
 import traverse from "@babel/traverse";
 import { Identifier, Node, NumericLiteral } from "@babel/types";
-import { manifest } from "../builder/buildChunks";
+import { manifest } from "../builder/manifest";
 
 const removeDynamicFromBundleTransformer = (ast: Node) => {
   traverse(ast, {

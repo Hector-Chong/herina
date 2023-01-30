@@ -31,13 +31,13 @@ const createPoliyfillsPath = (isProduction: boolean) =>
   );
 
 const createDefaultMetroConfig = (config: HerinaConfig) => {
-  const isDev = config.environment === "development";
+  const isRuntimeDev = config.environment === "development";
 
   return {
     transformer: {
       getTransformOptions: async () => ({
         transform: {
-          dev: isDev,
+          dev: isRuntimeDev,
           experimentalImportSupport: true,
           inlineRequires: true
         }

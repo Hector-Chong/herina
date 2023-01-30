@@ -1,5 +1,5 @@
 import { HerinaConfig } from "@herina-rn/shared";
-import { manifest } from "../builder/buildChunks";
+import { manifest } from "../builder/manifest";
 
 const globalVariable = `var globalContext = "undefined" != typeof globalThis
 ? globalThis

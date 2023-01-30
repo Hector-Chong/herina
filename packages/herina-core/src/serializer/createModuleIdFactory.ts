@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
-import { manifest } from "../builder/buildChunks";
+import { manifest } from "../builder/manifest";
 
 const getChunkName = (config: HerinaConfig, modulePath: string) => {
   let chunkNameValue = "main";

@@ -16,7 +16,7 @@ import {
   computeDifferentFiles,
   isGitRepository
 } from "../utils/git";
-import { manifest } from "./buildChunks";
+import { manifest } from "./manifest";
 import {
   addVersionHistory,
   createVersiosnJsonIfNotExist,

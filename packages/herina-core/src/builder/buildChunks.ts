@@ -11,19 +11,18 @@ import {
 import minifyCode from "./minifyCode";
 import {
   addDynamicChunkReversedToManifest,
+  manifest,
   removeDuplicatedDependencies
 } from "./manifest";
 import bundleTransformer from "../bundleTransformer";
 import { createManifestIfNotExist } from "../utils/manifest";
 import { writeJsonSync } from "fs-extra";
 import { prepareToBuild } from "./prerequisite";
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
+import { HerinaConfig } from "@herina-rn/shared";
 import path from "path";
-import removeDynamicFromBundleTransformer from "src/bundleTransformer/removeDynamicFromBundleTransformer";
+import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
 
 const ora = require("ora");
-
-export const manifest: HerinaManifest = createManifestIfNotExist();
 
 const writeAssets = (assets: Record<string, ChunkAsset[]>) => {
   for (const [_, modules] of Object.entries(assets)) {

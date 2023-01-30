@@ -1,14 +1,9 @@
 import generate from "@babel/generator";
-import traverse, { Node, NodePath } from "@babel/traverse";
+import traverse, { Node } from "@babel/traverse";
 import { idToFileMap } from "../serializer/createModuleIdFactory";
-import {
-  Identifier,
-  NumericLiteral,
-  ArrayExpression,
-  CallExpression
-} from "@babel/types";
+import { Identifier, NumericLiteral, ArrayExpression } from "@babel/types";
 import { HerinaConfig } from "@herina-rn/shared";
-import { manifest } from "../builder/buildChunks";
+import { manifest } from "../builder/manifest";
 
 const bundleTransformer = (config: HerinaConfig, ast: Node) => {
   const mainChunkModules = manifest.chunks.main || {};
