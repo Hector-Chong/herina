@@ -31,7 +31,6 @@ const getChunkName = (config: HerinaConfig, modulePath: string) => {
 };
 
 const recordModule = (chunk: string, moduleName: string, moduleId: number) => {
-  manifest.maxId = moduleId;
   manifest.chunks[chunk] = manifest.chunks[chunk] || {};
   manifest.chunks[chunk][moduleName] = moduleId;
 

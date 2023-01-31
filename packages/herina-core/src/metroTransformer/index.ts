@@ -1,4 +1,4 @@
-import { HerinaConfig } from "@herina-rn/shared";
+import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 import {
   JsTransformerConfig,
   JsTransformOptions,
@@ -6,10 +6,15 @@ import {
   transform as metroTransform,
   getCacheKey
 } from "metro-transform-worker";
+import fs from "fs-extra";
+import { createDefaultManifest, getCacheManifestDir } from "../utils/manifest";
 import { getParsedConfig } from "../utils/file";
 import appVersionConfigTransformer from "./appVersionConfigTransformer";
 import changeDynamicNameTransformer from "./changeDynamicNameTransformer";
+import collectAssetTransformer from "./collectAssetTransformer";
 import collectDynamicTransformer from "./collectDynamicTransformer";
+import { generateRandomStr } from "src/utils/str";
+import path from "path";
 
 export interface MetroTranformerParams {
   herinaConfig: HerinaConfig;
@@ -19,7 +24,14 @@ export interface MetroTranformerParams {
   data: Buffer;
   options: JsTransformOptions;
   res: TransformResponse;
+  manifest: HerinaManifest;
 }
+
+const manifestDir = getCacheManifestDir();
+const manifestFilePath = path.join(manifestDir, `${generateRandomStr(5)}.json`);
+const manifest = createDefaultManifest();
+
+fs.ensureDirSync(manifestDir);
 
 const transform = async (
   config: JsTransformerConfig,
@@ -43,7 +55,8 @@ const transform = async (
     filename,
     data,
     options,
-    res
+    res,
+    manifest
   };
 
   collectDynamicTransformer(params);
@@ -51,6 +64,12 @@ const transform = async (
   changeDynamicNameTransformer(params);
 
   await appVersionConfigTransformer(params);
+
+  if (options.type === "asset") {
+    collectAssetTransformer(params);
+  }
+
+  fs.writeJsonSync(manifestFilePath, manifest);
 
   return res;
 };

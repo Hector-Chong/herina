@@ -3,7 +3,7 @@ import { parse } from "@babel/parser";
 import traverse, { Node } from "@babel/traverse";
 import { ObjectProperty, StringLiteral } from "@babel/types";
 import { isGitRepository } from "../utils/git";
-import { MetroTranformerParams } from ".";
+import { MetroTranformerParams } from "../metroTransformer";
 import { getPrevAndCurCommitHashes } from "src/builder/buildIncremental";
 
 const appVersionConfigTransformer = async ({

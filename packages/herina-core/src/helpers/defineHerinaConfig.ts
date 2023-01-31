@@ -3,7 +3,7 @@ import { cpus } from "os";
 import { HerinaConfig } from "@herina-rn/shared";
 
 const defaultConfig: Partial<HerinaConfig> = {
-  extensions: ["js", "jsx", "ts", "tsx"],
+  extensions: ["js", "jsx", "ts", "tsx", "json"],
   minify: true,
   manifestPath: resolve(__dirname, "../.herina/manifest.json"),
   maxWorkers: cpus().length,

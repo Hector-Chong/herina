@@ -10,17 +10,18 @@ import {
 } from "./chunkAssetAnalysers";
 import minifyCode from "./minifyCode";
 import {
-  addDynamicChunkReversedToManifest,
+  combineManifestFromMetroWorkers,
   manifest,
-  removeDuplicatedDependencies
+  removeDuplicatedDependencies,
+  removeSplittingChunkFromMain
 } from "./manifest";
 import bundleTransformer from "../bundleTransformer";
-import { createManifestIfNotExist } from "../utils/manifest";
-import { writeJsonSync } from "fs-extra";
+import { emptyDirSync, writeJsonSync } from "fs-extra";
 import { prepareToBuild } from "./prerequisite";
 import { HerinaConfig } from "@herina-rn/shared";
 import path from "path";
 import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
+import { getCacheManifestDir } from "src/utils/manifest";
 
 const ora = require("ora");
 
@@ -53,16 +54,19 @@ const buildChunks = async (config: HerinaConfig) => {
   const bundlePath = await buildBundle(config);
   const bundleStream = readFileSync(bundlePath);
 
-  const manifistFromDisk = createManifestIfNotExist(config);
+  const manifistFromDisk = combineManifestFromMetroWorkers(config);
 
   if (manifistFromDisk.chunks.dynamic) {
     manifest.chunks.dynamic = manifistFromDisk.chunks.dynamic;
   }
 
-  if (manifest.chunks.dynamic) {
-    addDynamicChunkReversedToManifest(manifest);
-    removeDuplicatedDependencies(manifest);
+  if (manifistFromDisk.chunks.assets) {
+    manifest.chunks.assets = manifistFromDisk.chunks.assets;
   }
+
+  removeSplittingChunkFromMain(manifest);
+
+  removeDuplicatedDependencies(manifest);
 
   const { ast, dynamicModulesGraph, mainChunkCode } = bundleTransformer(
     config,
@@ -86,6 +90,8 @@ const buildChunks = async (config: HerinaConfig) => {
   writeJsonSync(config.manifestPath, manifest);
 
   rewriteBundle(config);
+
+  emptyDirSync(getCacheManifestDir());
 
   spinner.succeed("Bundle is built successfully.").stop();
 

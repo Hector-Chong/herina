@@ -4,19 +4,16 @@ import {
   readJsonSync,
   writeFileSync
 } from "fs-extra";
-import { resolve } from "path";
+import { join, resolve } from "path";
 import { isProd } from "./runtime";
 import { md5 } from "./str";
 import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 
-export const getConfigFilePath = () => {
-  const filePath = resolve(
-    __dirname,
-    isProd() ? "../src/.herina/config.json" : "../.herina/config.json"
-  );
+export const getHerinaCachePath = () =>
+  resolve(__dirname, isProd() ? "../src/.herina" : "../.herina");
 
-  return filePath;
-};
+export const getConfigFilePath = () =>
+  join(getHerinaCachePath(), "config.json");
 
 export const getParsedConfig = (): HerinaConfig => {
   return readJsonSync(getConfigFilePath());
@@ -31,10 +28,12 @@ export const getManifestChunks = (manifest: HerinaManifest) => {
   return {
     mainChunk: chunks.main || {},
     dynamicChunk: chunks.dynamic || {},
-    vendorChunk: chunks.vendorChunk || {},
+    vendorChunk: chunks.vendor || {},
+    assetsChunk: chunks.assets || {},
     mainChunkReversed: chunksReversed.main || {},
     dynamicChunkReversed: chunksReversed.dynamic || {},
-    vendorChunkReversed: chunksReversed.vendor || {}
+    vendorChunkReversed: chunksReversed.vendor || {},
+    assetsChunkReversed: chunksReversed.assets || {}
   };
 };
 

@@ -50,6 +50,9 @@ const bundleTransformer = (config: HerinaConfig, ast: Node) => {
               path.remove();
             }
 
+            manifest.chunksReversed.dynamic =
+              manifest.chunksReversed.dynamic || {};
+
             if (manifest.chunksReversed.dynamic[moduleId]) {
               dynamicModulesGraph.set(absolutePath, {
                 moduleId,
