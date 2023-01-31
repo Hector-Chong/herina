@@ -23,7 +23,7 @@ const getRunModuleStatement = (config: HerinaConfig) => {
   return (moduleId: number) => {
     if (!herinaModuleId) {
       Object.keys(manifest.chunks.vendor).forEach((key) => {
-        if (key.match(/herina\/client\/src\/index/)) {
+        if (key.match(/@herina\-rn\/client\/src\/index/)) {
           herinaModuleId = manifest.chunks.vendor[key];
         }
       });

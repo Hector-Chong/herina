@@ -14,7 +14,7 @@ const appVersionConfigTransformer = async ({
 }: MetroTranformerParams) => {
   const filePath = `${projectRoot}/${filename}`;
 
-  if (filePath.match(/@herina\/client\/src\/assets\/version.json/)) {
+  if (filePath.match(/@herina\-rn\/client\/src\/assets\/version.json/)) {
     if (!isGitRepository(herinaConfig.root)) {
       return;
     }

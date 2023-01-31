@@ -7,11 +7,7 @@ const getChunkName = (config: HerinaConfig, modulePath: string) => {
   const { manualChunks } = config;
   const filePath = resolve(config.root, modulePath);
 
-  if (
-    filePath.match(
-      /(node_modules|herina\/src\/runtime|herina\/src\/utils|@herina\/client\/src)/
-    )
-  ) {
+  if (filePath.match(/(node_modules|@herina-rn)/)) {
     chunkNameValue = "vendor";
   } else {
     if (typeof manualChunks === "function") {
