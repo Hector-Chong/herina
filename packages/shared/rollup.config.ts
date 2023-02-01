@@ -1,18 +1,25 @@
-import { join } from "path";
-import { fileURLToPath } from "url";
 import dts from "rollup-plugin-dts";
-
-const cwd = fileURLToPath(new URL(".", import.meta.url));
-
-const basicPlugins = [dts()];
+import typescript from "@rollup/plugin-typescript";
 
 const config = [
   {
-    input: join(cwd, "src/index.ts"),
+    input: "src/index.ts",
     output: {
-      file: join(cwd, "dist/index.ts")
+      file: "dist/index.d.ts"
     },
-    plugins: basicPlugins
+    plugins: [dts()]
+  },
+  {
+    input: "src/index.ts",
+    output: {
+      file: "dist/index.js",
+      format: "commonjs"
+    },
+    plugins: [
+      typescript({
+        exclude: ["rollup.config.ts"]
+      })
+    ]
   }
 ];
 

@@ -27,6 +27,13 @@ import path from "path";
 import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
 import { getCacheManifestDir } from "../utils/manifest";
 import { defaultsDeep } from "lodash";
+import { existsSync } from "fs";
+import {
+  addAssetsToVersionsJson,
+  addVersionHistory,
+  getVersionsJson,
+  getVersionsJsonPath
+} from "../utils/version";
 
 const writeAssets = (assets: Record<string, ChunkAsset[]>) => {
   for (const [_, modules] of Object.entries(assets)) {
@@ -78,6 +85,15 @@ const buildChunks = async (config: HerinaConfig) => {
 
   if (config.minify) {
     await minifyCode(assets);
+  }
+
+  const versions = getVersionsJson(config);
+
+  if (versions) {
+    addVersionHistory(versions);
+    addAssetsToVersionsJson(versions);
+
+    writeJsonSync(getVersionsJsonPath(config), versions);
   }
 
   checkNativeChange(config);

@@ -1,3 +1,5 @@
+import { HerinaUpdateType } from "packages/shared/src";
+
 type HerinaSupportPlatforms = "ios" | "android";
 
 type HerinaBuildEnvironment = "production" | "development";
@@ -42,6 +44,7 @@ export interface HerinaVersionsHistoryItem {
   versionNum: number;
   commitHash: string;
   filePath: string;
+  assets: Record<number, string>;
 }
 
 export interface HerinaVersions {
@@ -49,6 +52,7 @@ export interface HerinaVersions {
   currentCommitHash: string;
   previousCommitHash: string;
   releaseVersionNum: number[];
+  assets: Record<number, string>;
   history: HerinaVersionsHistoryItem[];
 }
 
@@ -63,10 +67,4 @@ export interface AppVersionConfig {
   isBundleAvailable: boolean;
   isIncrementalAvailable: boolean;
   incrementalsToApply: string[];
-}
-
-export enum HerinaUpdateType {
-  FULL,
-  INCREMENTAL,
-  ALL
 }

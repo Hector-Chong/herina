@@ -14,7 +14,8 @@
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
-    "build": "rollup --config rollup.config.ts --configPlugin esbuild"
+    "build": "rollup --config rollup.config.ts --configPlugin esbuild",
+    "publish:local": "yarn build && yalc push"
   },
   "author": "",
   "license": "MIT",

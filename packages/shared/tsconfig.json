@@ -3,10 +3,11 @@
   "compilerOptions": {
     "module": "ESNext",
     "target": "ESNext",
-    "declaration": true,
     "emitDecoratorMetadata": true,
+    "strict": true
   },
   "include": [
-    "src"
+    "src",
+    "rollup.config.ts"
   ],
 }

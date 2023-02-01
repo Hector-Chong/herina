@@ -18,7 +18,9 @@ import {
 } from "../utils/git";
 import { manifest } from "./manifest";
 import {
+  addAssetsToVersionsJson,
   addVersionHistory,
+  createIncrementalFileNameViaCommitHashes,
   createVersiosnJsonIfNotExist,
   getVersionsJsonPath
 } from "../utils/version";
@@ -100,11 +102,15 @@ const buildIncremental = async (config: HerinaConfig) => {
     config.outputPath = path.resolve(incrementalPath, "..");
 
     const versions = createVersiosnJsonIfNotExist(config);
-    const incrementalFileName = addVersionHistory(
+    addVersionHistory(versions, currentCommitHash, previousCommitHash);
+    addAssetsToVersionsJson(versions);
+
+    const incrementalFileName = createIncrementalFileNameViaCommitHashes(
       currentCommitHash,
-      previousCommitHash,
-      versions
+      previousCommitHash
     );
+
+    versions.history[0].filePath = incrementalFileName;
 
     if (incrementalFileName) {
       writeFileSync(getVersionsJsonPath(config), JSON.stringify(versions));

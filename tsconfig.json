@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "strict": true,
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
   "exclude": [
     "node_modules"

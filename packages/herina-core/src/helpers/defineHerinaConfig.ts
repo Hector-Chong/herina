@@ -1,6 +1,6 @@
 import { join, resolve } from "path";
 import { cpus } from "os";
-import { HerinaConfig } from "@herina-rn/shared";
+import { HerinaConfig, HerinaUpdateType } from "@herina-rn/shared";
 import { defaultsDeep } from "lodash";
 
 const defineHerinaConfig = (config: HerinaConfig) => {
@@ -15,7 +15,8 @@ const defineHerinaConfig = (config: HerinaConfig) => {
     checkNativeChange: true,
     androidSourcePath: join(projectRoot, "android"),
     iosSourcePath: join(projectRoot, "ios"),
-    isRelease: false
+    isRelease: false,
+    updateType: HerinaUpdateType.ALL
   };
 
   return defaultsDeep(config, defaultConfig);
