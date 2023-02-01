@@ -21,6 +21,11 @@ export interface HerinaConfig {
   extensions?: string[];
   manualChunks?: HerinaConfigManualChunks;
   maxWorkers?: number;
+  updateType?: HerinaUpdateType;
+  checkNativeChange?: boolean;
+  iosSourcePath?: string;
+  androidSourcePath?: string;
+  isRelease?: boolean;
 }
 
 export interface HerinaManifest {
@@ -58,4 +63,10 @@ export interface AppVersionConfig {
   isBundleAvailable: boolean;
   isIncrementalAvailable: boolean;
   incrementalsToApply: string[];
+}
+
+export enum HerinaUpdateType {
+  FULL,
+  INCREMENTAL,
+  ALL
 }

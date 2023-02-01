@@ -7,7 +7,7 @@ import {
 } from "fs-extra";
 import { parse } from "@babel/parser";
 import generate from "@babel/generator";
-import { prepareToBuild } from "./prerequisite";
+import { checkNativeChange, prepareToBuild } from "./prerequisite";
 import buildBundle from "./buildBundle";
 import incrementalTransformer from "../bundleTransformer/incrementalTransformer";
 import {
@@ -111,6 +111,8 @@ const buildIncremental = async (config: HerinaConfig) => {
     }
 
     const filePath = path.join(incrementalPath, incrementalFileName);
+
+    checkNativeChange(config);
 
     writeFileSync(filePath, code);
 
