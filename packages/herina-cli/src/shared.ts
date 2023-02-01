@@ -8,6 +8,7 @@ export interface BuildArgs {
   platform?: "ios" | "android";
   manifestPath?: string;
   projectConfig?: string;
+  checkNativeChange?: boolean;
 }
 
 export const validateBuildArgs = (args: BuildArgs) => {
@@ -51,5 +52,6 @@ export const injectBuildCommandOptions = (command: any) => {
     .option("--minify", "If true, outputs are minified")
     .option("--platform <platform>", "Building target platform. ios or android")
     .option("--manifest-path <path>", "Path to manifest.json")
-    .option("--project-config <path>", "Path to a Herina configuration file");
+    .option("--project-config <path>", "Path to a Herina configuration file")
+    .option("--check-native-change", "Check the native change");
 };
