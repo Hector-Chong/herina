@@ -71,12 +71,20 @@ export const createIncrementalFileNameViaCommitHashes = (
 ) => md5(`${newCommitHash}-${oldCommitHash}`) + ".js";
 
 export const addVersionHistory = (
+  config: HerinaConfig,
   versions: HerinaVersions,
   newCommitHash = "",
   oldCommitHash = ""
 ) => {
-  const { currentCommitHash: commitHash, currentVersionNum: versionNum } =
-    versions;
+  const {
+    currentCommitHash: commitHash,
+    currentVersionNum: versionNum,
+    metaInfo
+  } = versions;
+
+  versions.metaInfo = config.metaInfo
+    ? JSON.stringify(config.metaInfo)
+    : undefined;
 
   versions.currentCommitHash = newCommitHash;
   versions.previousCommitHash = oldCommitHash;
@@ -87,7 +95,8 @@ export const addVersionHistory = (
     commitHash,
     versionNum,
     filePath: "",
-    assets: []
+    assets: [],
+    metaInfo
   });
 };
 

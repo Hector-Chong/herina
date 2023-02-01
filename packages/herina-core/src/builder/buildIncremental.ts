@@ -102,7 +102,7 @@ const buildIncremental = async (config: HerinaConfig) => {
     config.outputPath = path.resolve(incrementalPath, "..");
 
     const versions = createVersiosnJsonIfNotExist(config);
-    addVersionHistory(versions, currentCommitHash, previousCommitHash);
+    addVersionHistory(config, versions, currentCommitHash, previousCommitHash);
     addAssetsToVersionsJson(versions);
 
     const incrementalFileName = createIncrementalFileNameViaCommitHashes(

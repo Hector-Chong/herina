@@ -27,7 +27,6 @@ import path from "path";
 import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
 import { getCacheManifestDir } from "../utils/manifest";
 import { defaultsDeep } from "lodash";
-import { existsSync } from "fs";
 import {
   addAssetsToVersionsJson,
   addVersionHistory,
@@ -90,7 +89,7 @@ const buildChunks = async (config: HerinaConfig) => {
   const versions = getVersionsJson(config);
 
   if (versions) {
-    addVersionHistory(versions);
+    addVersionHistory(config, versions);
     addAssetsToVersionsJson(versions);
 
     writeJsonSync(getVersionsJsonPath(config), versions);

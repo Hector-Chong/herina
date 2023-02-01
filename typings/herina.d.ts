@@ -28,6 +28,7 @@ export interface HerinaConfig {
   iosSourcePath?: string;
   androidSourcePath?: string;
   isRelease?: boolean;
+  metaInfo?: any;
 }
 
 export interface HerinaManifest {
@@ -45,6 +46,7 @@ export interface HerinaVersionsHistoryItem {
   commitHash: string;
   filePath: string;
   assets: Record<number, string>;
+  metaInfo?: string;
 }
 
 export interface HerinaVersions {
@@ -54,6 +56,7 @@ export interface HerinaVersions {
   releaseVersionNum: number[];
   assets: Record<number, string>;
   history: HerinaVersionsHistoryItem[];
+  metaInfo?: string;
 }
 
 export interface AppVersionConfig {
