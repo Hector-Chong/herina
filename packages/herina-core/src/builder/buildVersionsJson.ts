@@ -1,11 +1,11 @@
 import { HerinaConfig } from "@herina-rn/shared";
 import { ensureFileSync, writeFileSync } from "fs-extra";
-import { isGitRepository } from "../utils/git";
+import { isArrayWithLength } from "../utils/arr";
+import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
 import {
   createVersiosnJsonIfNotExist,
   getVersionsJsonPath
 } from "../utils/version";
-import { getPrevAndCurCommitHashes } from "./buildIncremental";
 
 const buildVersionsJson = async (config: HerinaConfig) => {
   if (!isGitRepository(config.root)) {
@@ -21,6 +21,13 @@ const buildVersionsJson = async (config: HerinaConfig) => {
     currentCommitHash,
     previousCommitHash
   );
+
+  if (!isArrayWithLength(versions.history)) {
+    versions.releaseVersionNum = [1];
+  } else {
+    config.isRelease &&
+      versions.releaseVersionNum.push(versions.currentVersionNum);
+  }
 
   const path = getVersionsJsonPath(config);
 

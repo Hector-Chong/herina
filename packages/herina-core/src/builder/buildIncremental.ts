@@ -1,11 +1,10 @@
 import path from "path";
-import fs, {
+import {
   ensureDirSync,
   readFileSync,
   removeSync,
   writeFileSync
 } from "fs-extra";
-import git from "isomorphic-git";
 import { parse } from "@babel/parser";
 import generate from "@babel/generator";
 import { prepareToBuild } from "./prerequisite";
@@ -14,6 +13,7 @@ import incrementalTransformer from "../bundleTransformer/incrementalTransformer"
 import {
   CommitDifferentFile,
   computeDifferentFiles,
+  getPrevAndCurCommitHashes,
   isGitRepository
 } from "../utils/git";
 import { manifest } from "./manifest";
@@ -24,30 +24,8 @@ import {
 } from "../utils/version";
 import { HerinaConfig } from "@herina-rn/shared";
 
-const clearResult = (config: HerinaConfig) => {
+const clearResult = (config: HerinaConfig) =>
   removeSync(path.join(config.outputPath, "bundle.js"));
-};
-
-export const getPrevAndCurCommitHashes = async (config: HerinaConfig) => {
-  const dir = config.root;
-
-  let { previousCommitHash, currentCommitHash } = config.incremental || {};
-
-  const commits = await git.log({
-    fs,
-    dir
-  });
-
-  if (!previousCommitHash) {
-    previousCommitHash = commits[1].oid;
-  }
-
-  if (!currentCommitHash) {
-    currentCommitHash = commits[0].oid;
-  }
-
-  return { previousCommitHash, currentCommitHash };
-};
 
 const filterFiles = (config: HerinaConfig, files: CommitDifferentFile[]) => {
   const filtered = files.filter((file) =>

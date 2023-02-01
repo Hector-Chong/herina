@@ -1,6 +1,5 @@
 import { parse } from "@babel/parser";
 import generate from "@babel/generator";
-import { readFileSync, writeFileSync } from "fs";
 import buildBundle from "./buildBundle";
 import {
   ChunkAsset,
@@ -16,14 +15,18 @@ import {
   removeSplittingChunkFromMain
 } from "./manifest";
 import bundleTransformer from "../bundleTransformer";
-import { emptyDirSync, writeJsonSync } from "fs-extra";
-import { prepareToBuild } from "./prerequisite";
+import {
+  emptyDirSync,
+  writeJsonSync,
+  readFileSync,
+  writeFileSync
+} from "fs-extra";
+import { checkNativeChange, prepareToBuild } from "./prerequisite";
 import { HerinaConfig } from "@herina-rn/shared";
 import path from "path";
 import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
-import { getCacheManifestDir } from "src/utils/manifest";
-
-const ora = require("ora");
+import { getCacheManifestDir } from "../utils/manifest";
+import { defaultsDeep } from "lodash";
 
 const writeAssets = (assets: Record<string, ChunkAsset[]>) => {
   for (const [_, modules] of Object.entries(assets)) {
@@ -49,20 +52,12 @@ const rewriteBundle = (config: HerinaConfig) => {
 const buildChunks = async (config: HerinaConfig) => {
   config = prepareToBuild(config);
 
-  const spinner = ora("Building bundle...").start();
-
   const bundlePath = await buildBundle(config);
   const bundleStream = readFileSync(bundlePath);
 
   const manifistFromDisk = combineManifestFromMetroWorkers(config);
 
-  if (manifistFromDisk.chunks.dynamic) {
-    manifest.chunks.dynamic = manifistFromDisk.chunks.dynamic;
-  }
-
-  if (manifistFromDisk.chunks.assets) {
-    manifest.chunks.assets = manifistFromDisk.chunks.assets;
-  }
+  defaultsDeep(manifest.chunks, manifistFromDisk.chunks);
 
   removeSplittingChunkFromMain(manifest);
 
@@ -85,6 +80,8 @@ const buildChunks = async (config: HerinaConfig) => {
     await minifyCode(assets);
   }
 
+  checkNativeChange(config);
+
   writeAssets(assets);
 
   writeJsonSync(config.manifestPath, manifest);
@@ -92,8 +89,6 @@ const buildChunks = async (config: HerinaConfig) => {
   rewriteBundle(config);
 
   emptyDirSync(getCacheManifestDir());
-
-  spinner.succeed("Bundle is built successfully.").stop();
 
   return assets;
 };

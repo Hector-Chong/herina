@@ -1,17 +1,24 @@
-import { resolve } from "path";
+import { join, resolve } from "path";
 import { cpus } from "os";
 import { HerinaConfig } from "@herina-rn/shared";
-
-const defaultConfig: Partial<HerinaConfig> = {
-  extensions: ["js", "jsx", "ts", "tsx", "json"],
-  minify: true,
-  manifestPath: resolve(__dirname, "../.herina/manifest.json"),
-  maxWorkers: cpus().length,
-  root: process.cwd()
-};
+import { defaultsDeep } from "lodash";
 
 const defineHerinaConfig = (config: HerinaConfig) => {
-  return Object.assign(defaultConfig, config);
+  const projectRoot = resolve(config.root) || process.cwd();
+
+  const defaultConfig: Partial<HerinaConfig> = {
+    extensions: ["js", "jsx", "ts", "tsx", "json"],
+    minify: true,
+    manifestPath: resolve(__dirname, "../.herina/manifest.json"),
+    maxWorkers: cpus().length,
+    root: projectRoot,
+    checkNativeChange: true,
+    androidSourcePath: join(projectRoot, "android"),
+    iosSourcePath: join(projectRoot, "ios"),
+    isRelease: false
+  };
+
+  return defaultsDeep(config, defaultConfig);
 };
 
 export default defineHerinaConfig;

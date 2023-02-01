@@ -1,11 +1,23 @@
-import { existsSync, readJsonSync, writeFileSync } from "fs-extra";
+import {
+  existsSync,
+  readJSONSync,
+  readJsonSync,
+  writeFileSync
+} from "fs-extra";
 import path from "path";
 import { HerinaConfig, HerinaVersions } from "@herina-rn/shared";
 import { md5 } from "./str";
 
-export const getVersionsJsonPath = (config: HerinaConfig) => {
-  return path.resolve(config.outputPath, "versions.json");
-};
+export const getVersionsJsonPath = (config: HerinaConfig) =>
+  path.resolve(config.outputPath, "versions.json");
+
+export const versionsJsonExists = (config: HerinaConfig) =>
+  existsSync(getVersionsJsonPath(config));
+
+export const getVersionsJson = (config: HerinaConfig): HerinaVersions =>
+  versionsJsonExists(config)
+    ? readJSONSync(getVersionsJsonPath(config))
+    : undefined;
 
 export const createVersiosnJsonIfNotExist = (
   config: HerinaConfig,
@@ -14,10 +26,11 @@ export const createVersiosnJsonIfNotExist = (
   previousCommitHash?: string
 ): HerinaVersions => {
   const filePath = getVersionsJsonPath(config);
-  const basicData = {
+  const basicData: HerinaVersions = {
     currentVersionNum: currentVersionNum || 1,
     currentCommitHash: currentCommitHash || "",
     previousCommitHash: previousCommitHash || "",
+    releaseVersionNum: [],
     history: []
   };
 

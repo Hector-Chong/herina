@@ -1,6 +1,7 @@
+import { HerinaConfig } from "@herina-rn/shared";
 import fs, { pathExistsSync } from "fs-extra";
 import git, { walk } from "isomorphic-git";
-import path from "path";
+import path, { resolve } from "path";
 
 export interface CommitDifferentFile {
   filename: string;
@@ -27,7 +28,7 @@ export const computeDifferentFiles = async (
       const aMode = await A?.mode();
 
       const data: CommitDifferentFile = {
-        filename,
+        filename: resolve(dir, filename),
         type: "same"
       };
 
@@ -56,4 +57,36 @@ export const isGitRepository = (rootPath: string) => {
   const plainGitPath = path.join(rootPath, ".git");
 
   return pathExistsSync(plainGitPath);
+};
+
+export const getPrevAndCurCommitHashes = async (config: HerinaConfig) => {
+  const dir = config.root;
+
+  let { previousCommitHash, currentCommitHash } = config.incremental || {};
+
+  const commits = await git.log({
+    fs,
+    dir
+  });
+
+  if (!previousCommitHash) {
+    previousCommitHash = commits[1].oid;
+  }
+
+  if (!currentCommitHash) {
+    currentCommitHash = commits[0].oid;
+  }
+
+  return { previousCommitHash, currentCommitHash };
+};
+
+export const getCurrentCommitHash = async (config: HerinaConfig) => {
+  const dir = config.root;
+
+  const commits = await git.log({
+    fs,
+    dir
+  });
+
+  return commits[0]?.oid;
 };

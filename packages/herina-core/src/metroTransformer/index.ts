@@ -13,7 +13,7 @@ import appVersionConfigTransformer from "./appVersionConfigTransformer";
 import changeDynamicNameTransformer from "./changeDynamicNameTransformer";
 import collectAssetTransformer from "./collectAssetTransformer";
 import collectDynamicTransformer from "./collectDynamicTransformer";
-import { generateRandomStr } from "src/utils/str";
+import { generateRandomStr } from "../utils/str";
 import path from "path";
 
 export interface MetroTranformerParams {

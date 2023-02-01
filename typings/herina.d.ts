@@ -43,6 +43,7 @@ export interface HerinaVersions {
   currentVersionNum: number;
   currentCommitHash: string;
   previousCommitHash: string;
+  releaseVersionNum: number[];
   history: HerinaVersionsHistoryItem[];
 }
 

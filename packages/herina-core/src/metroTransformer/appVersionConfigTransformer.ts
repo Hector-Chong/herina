@@ -2,9 +2,10 @@ import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import traverse, { Node } from "@babel/traverse";
 import { ObjectProperty, StringLiteral } from "@babel/types";
-import { isGitRepository } from "../utils/git";
+import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
 import { MetroTranformerParams } from "../metroTransformer";
-import { getPrevAndCurCommitHashes } from "src/builder/buildIncremental";
+import { getParsedConfig } from "../utils/file";
+import { getVersionsJson } from "../utils/version";
 
 const appVersionConfigTransformer = async ({
   herinaConfig,
@@ -40,14 +41,18 @@ const appVersionConfigTransformer = async ({
 };
 
 const injectVersionConfigWithAST = (currentCommitHash: string, ast: Node) => {
+  const config = getParsedConfig();
+  const versions = getVersionsJson(config);
+  const versionNum = versions ? versions.currentVersionNum + 1 : 1;
+
   traverse(ast, {
     ObjectExpression(path) {
       const { properties } = path.node;
 
       const data = {
-        versionNum: 1,
+        versionNum,
         commitHash: currentCommitHash,
-        originalVersionNum: 1,
+        originalVersionNum: versionNum,
         originalCommitHash: currentCommitHash
       };
 
