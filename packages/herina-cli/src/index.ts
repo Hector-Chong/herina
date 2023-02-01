@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import buildChunksCommand from "./buildChunks";
+import buildIncrementalCommand from "./buildIncremental";
 import { version } from "../package.json";
-import buildVersionsJsonCommand from "./buildVersionsJson";
 import { injectBuildCommandOptions } from "./shared";
 
 const { Command } = require("commander");
@@ -21,12 +21,6 @@ injectBuildCommandOptions(
   program
     .command("build-incremental")
     .description("Buidling Incremental Update")
-).action(buildVersionsJsonCommand);
-
-program
-  .command("build-versions-json")
-  .description("Buidling versions.json")
-  .argument("<projectConfig>", "Path to a Herina configuration file")
-  .action(buildVersionsJsonCommand);
+).action(buildIncrementalCommand);
 
 program.parse(process.argv);
