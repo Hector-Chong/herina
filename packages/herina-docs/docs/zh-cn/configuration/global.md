@@ -12,11 +12,13 @@ Bundle 的构建模式。
 ## baseUrl
 
 - **必填**
-- 类型：`string`
+- 类型：`string` | `Record<'android' | 'ios', string>`
 
 用于访问资源的基础 URL。此配置项将用于拼接资源文件名。
 
 当你调用 `requestBundleUpdate` 时，Herina 会把 Bundle 的文件名和 `baseUrl` 拼接起来。假设 `baseUrl` 为 `https://hector.im`，获取业务包的完整 URL 为 `https://hector.im/main.chunk.js`。
+
+若 `baseUrl` 为对象，可以为各个平台配置不同的基础 URL。
 
 你应该使用 HTTPS 协议。否则，你的请求会被系统视为不安全的连接。
 

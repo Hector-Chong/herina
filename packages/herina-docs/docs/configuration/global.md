@@ -12,9 +12,11 @@ In production mode, code for profiling may be removed and the bundle will be min
 ## baseUrl
 
 - **Required**
-- Type: `string`
+- Type: `string` | `Record<'android' | 'ios', string>`
 
 The base URL for your resouces. This will be used to concat resource file name. When you called `requestBundleUpdate`, Herina would try to concat the bundle name with `baseUrl`. Let's say the `baseUrl` is `https://hector.im`, and the full URL for the business chunk will be `https://hector.im/main.chunk.js`.
+
+If `baseUrl` is an object, each key represents a different base URL for each platform.
 
 You should use https as the protocol. Otherwise, your connection will be seen as unsecured to the OS.
 

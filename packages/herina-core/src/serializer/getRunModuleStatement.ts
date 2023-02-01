@@ -11,11 +11,19 @@ const globalVariable = `var globalContext = "undefined" != typeof globalThis
 
 const insertTag = `${JSON.stringify("#HERINAINSERTTAG#")};`;
 
+const getBaseUrl = (config: HerinaConfig) => {
+  if (typeof config.baseUrl === "string") {
+    return config.baseUrl;
+  } else {
+    return config.baseUrl[config.platform];
+  }
+};
+
 const getRunModuleStatement = (config: HerinaConfig) => {
   let inserted = false;
 
   const globalConfig = `globalContext.baseUrl = ${JSON.stringify(
-    config.baseUrl
+    getBaseUrl(config)
   )};`;
 
   let herinaModuleId: number;

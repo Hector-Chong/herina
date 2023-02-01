@@ -1,6 +1,10 @@
+type HerinaSupportPlatforms = "ios" | "android";
+
+type HerinaBuildEnvironment = "production" | "development";
+
 export interface HerinaConfig {
-  environment: "production" | "development";
-  baseUrl: string;
+  environment: HerinaBuildEnvironment;
+  baseUrl: string | Record<HerinaSupportPlatforms, string>;
   entryFile: string;
   outputPath: string;
   clean?: boolean;
