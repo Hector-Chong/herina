@@ -1,6 +1,5 @@
 import path from "path";
-import { ensureDirSync, readFileSync, removeSync } from "fs-extra";
-import { parse } from "@babel/parser";
+import { ensureDirSync } from "fs-extra";
 import generate from "@babel/generator";
 import { checkNativeChange } from "./prerequisite";
 import incrementalTransformer from "../bundleTransformer/incrementalTransformer";
@@ -11,8 +10,12 @@ import { HerinaConfig } from "@herina-rn/shared";
 import { HerinaUpdateBuiilder } from ".";
 
 const filterFiles = (config: HerinaConfig, files: CommitDifferentFile[]) => {
-  const filtered = files.filter((file) =>
-    config.extensions!.some((ext) => file.filename.endsWith("." + ext))
+  const filtered = files.filter(
+    (file) =>
+      config.extensions!.some((ext) => file.filename.endsWith("." + ext)) ||
+      Object.keys(manifest.chunks.assets).some((filePath) =>
+        filePath.match(file.filename)
+      )
   );
 
   return filtered.map((file) => {
@@ -25,9 +28,10 @@ const filterFiles = (config: HerinaConfig, files: CommitDifferentFile[]) => {
 const buildIncremental: HerinaUpdateBuiilder = async (
   config,
   _,
-  bundlePath,
+  _bundlePath,
   currentCommitHash,
-  previousCommitHash
+  previousCommitHash,
+  originalAst
 ) => {
   const dir = config.root;
   const incrementalPath = path.resolve(config.outputPath, "incremental");
@@ -41,10 +45,6 @@ const buildIncremental: HerinaUpdateBuiilder = async (
   );
 
   const incrementalFiles = filterFiles(config, differentFiles);
-
-  const bundleStream = readFileSync(bundlePath);
-
-  const originalAst = parse(bundleStream.toString());
 
   const { ast } = incrementalTransformer(
     manifest,

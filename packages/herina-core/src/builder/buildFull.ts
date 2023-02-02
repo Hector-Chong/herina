@@ -1,4 +1,3 @@
-import { parse } from "@babel/parser";
 import generate from "@babel/generator";
 import {
   ChunkAsset,
@@ -6,58 +5,28 @@ import {
   dynamicChunkAnalyser
 } from "./chunkAssetAnalysers";
 import minifyCode from "./minifyCode";
-import {
-  combineManifestFromMetroWorkers,
-  manifest,
-  removeDuplicatedDependencies,
-  removeSplittingChunkFromMain
-} from "./manifest";
-import bundleTransformer from "../bundleTransformer";
-import {
-  emptyDirSync,
-  writeJsonSync,
-  readFileSync,
-  writeFileSync,
-  ensureDirSync
-} from "fs-extra";
-import { HerinaConfig } from "@herina-rn/shared";
+import { manifest } from "./manifest";
+import { emptyDirSync, writeJsonSync, ensureDirSync } from "fs-extra";
 import path from "path";
-import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
 import { getCacheManifestDir } from "../utils/manifest";
-import { defaultsDeep } from "lodash";
 import { HerinaUpdateBuiilder } from ".";
+import fullTransformer from "../bundleTransformer/fullTransformer";
 
-const rewriteBundle = (config: HerinaConfig) => {
-  const bundlePath = path.resolve(config.outputPath, "bundle.js");
-  const bundleStream = readFileSync(bundlePath);
-
-  const ast = parse(bundleStream.toString());
-
-  removeDynamicFromBundleTransformer(ast);
-
-  const { code } = generate(ast);
-
-  writeFileSync(bundlePath, code);
-};
-
-const buildFull: HerinaUpdateBuiilder = async (config, _, bundlePath) => {
+const buildFull: HerinaUpdateBuiilder = async (
+  config,
+  _,
+  _bundlePath,
+  _currentCommitHash,
+  _previousCommitHash,
+  originalAst
+) => {
   const fullPath = path.resolve(config.outputPath, "full");
 
   ensureDirSync(fullPath);
 
-  const bundleStream = readFileSync(bundlePath);
-
-  const manifistFromDisk = combineManifestFromMetroWorkers(config);
-
-  defaultsDeep(manifest.chunks, manifistFromDisk.chunks);
-
-  removeSplittingChunkFromMain(manifest);
-
-  removeDuplicatedDependencies(manifest);
-
-  const { ast, dynamicModulesGraph, mainChunkCode } = bundleTransformer(
+  const { ast, dynamicModulesGraph, mainChunkCode } = fullTransformer(
     config,
-    parse(bundleStream.toString())
+    originalAst
   );
 
   const { code: vendorCode } = generate(ast);
@@ -73,8 +42,6 @@ const buildFull: HerinaUpdateBuiilder = async (config, _, bundlePath) => {
   }
 
   writeJsonSync(config.manifestPath, manifest);
-
-  rewriteBundle(config);
 
   emptyDirSync(getCacheManifestDir());
 

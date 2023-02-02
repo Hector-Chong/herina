@@ -1,3 +1,4 @@
+import { parse } from "@babel/parser";
 import {
   HerinaConfig,
   HerinaUpdateType,
@@ -5,13 +6,16 @@ import {
 } from "@herina-rn/shared";
 import {
   ensureFileSync,
+  readFileSync,
   removeSync,
   writeFileSync,
   writeJsonSync
 } from "fs-extra";
+import { defaultsDeep } from "lodash";
 import { HerinaUpdateBuiilder } from ".";
 import { isArrayWithLength } from "../utils/arr";
 import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
+import { overloadManifest } from "../utils/manifest";
 import {
   addAssetsToVersionsJson,
   addVersionHistory,
@@ -22,6 +26,12 @@ import buildBundle from "./buildBundle";
 import buildFull from "./buildFull";
 import buildIncremental from "./buildIncremental";
 import { ChunkAsset } from "./chunkAssetAnalysers";
+import {
+  combineManifestFromMetroWorkers,
+  manifest,
+  removeDuplicatedDependencies,
+  removeSplittingChunkFromMain
+} from "./manifest";
 import { checkNativeChange, prepareToBuild } from "./prerequisite";
 import splitAssets from "./splitAssets";
 
@@ -95,23 +105,45 @@ const buildUpdate = async (config: HerinaConfig) => {
     info
   );
 
+  overloadManifest(config, manifest);
+
   addVersionHistory(config, info, currentCommitHash);
 
   writeJsonSync(getVersionsJsonPath(config), info);
 
   const bundlePath = await buildBundle(config);
 
-  const { updateType } = config;
+  const bundleStream = readFileSync(bundlePath);
 
+  const bundleAst = parse(bundleStream.toString());
+
+  const manifistFromDisk = combineManifestFromMetroWorkers(config);
+
+  defaultsDeep(manifest.chunks, manifistFromDisk.chunks);
+
+  removeSplittingChunkFromMain(manifest);
+
+  removeDuplicatedDependencies(manifest);
+
+  addAssetsToVersionsJson(info);
+
+  splitAssets(config, info);
+
+  const { updateType } = config;
   const builders = buildRules[updateType];
 
   const buildResults = await Promise.all(
     builders.map((build) =>
-      build(config, info, bundlePath, currentCommitHash, previousCommitHash)
+      build(
+        config,
+        info,
+        bundlePath,
+        currentCommitHash,
+        previousCommitHash,
+        bundleAst
+      )
     )
   );
-
-  addAssetsToVersionsJson(info);
 
   const buildAssets: Record<string, ChunkAsset[]> = buildResults.reduce(
     (prev, item) => {
@@ -123,8 +155,6 @@ const buildUpdate = async (config: HerinaConfig) => {
   checkNativeChange(config);
 
   updateVersionsJson(config, info, buildAssets);
-
-  splitAssets(config, info);
 
   writeJsonSync(getVersionsJsonPath(config), info);
 

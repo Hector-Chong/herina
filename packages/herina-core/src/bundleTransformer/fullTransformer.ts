@@ -5,11 +5,16 @@ import { Identifier, NumericLiteral, ArrayExpression } from "@babel/types";
 import { HerinaConfig } from "@herina-rn/shared";
 import { manifest } from "../builder/manifest";
 
-const bundleTransformer = (config: HerinaConfig, ast: Node) => {
+const fullTransformer = (config: HerinaConfig, ast: Node) => {
   const mainChunkModules = manifest.chunks.main || {};
+  const assetsChunkModules = manifest.chunks.assets || {};
   const dynamicChunkModules = manifest.chunks.dynamic || {};
   const dynamicModulesGraph = new Map();
-  const splitChunks = [mainChunkModules, dynamicChunkModules];
+  const splitChunks = [
+    mainChunkModules,
+    assetsChunkModules,
+    dynamicChunkModules
+  ];
 
   let mainChunkCode = "";
 
@@ -44,7 +49,10 @@ const bundleTransformer = (config: HerinaConfig, ast: Node) => {
             shouldSplit(absolutePath) &&
             config.extensions!.some((e) => absolutePath.endsWith(e))
           ) {
-            if (mainChunkModules[absolutePath]) {
+            if (
+              mainChunkModules[absolutePath] ||
+              assetsChunkModules[absolutePath]
+            ) {
               mainChunkCode += code + ";";
 
               path.remove();
@@ -59,6 +67,8 @@ const bundleTransformer = (config: HerinaConfig, ast: Node) => {
                 dependenciesId,
                 code
               });
+
+              path.remove();
             }
           }
         }
@@ -75,4 +85,4 @@ const bundleTransformer = (config: HerinaConfig, ast: Node) => {
   return { ast, dynamicModulesGraph, mainChunkCode };
 };
 
-export default bundleTransformer;
+export default fullTransformer;

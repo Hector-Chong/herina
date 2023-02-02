@@ -4,7 +4,7 @@ import {
   getCacheManifestDir
 } from "../utils/manifest";
 import { getManifestChunks } from "../utils/file";
-import { readdirSync, readJsonSync } from "fs-extra";
+import { existsSync, readdirSync, readJsonSync } from "fs-extra";
 import { join } from "path";
 import { defaultsDeep } from "lodash";
 
@@ -27,8 +27,7 @@ export const removeDuplicatedDependencies = (manifest: HerinaManifest) => {
 const chunkToSplit = ["dynamic", "assets"];
 
 export const removeSplittingChunkFromMain = (manifest: HerinaManifest) => {
-  const { mainChunk, dynamicChunk, mainChunkReversed } =
-    getManifestChunks(manifest);
+  const { mainChunk, mainChunkReversed } = getManifestChunks(manifest);
 
   chunkToSplit.forEach((chunkName) => {
     const chunk = manifest.chunks[chunkName];
@@ -57,6 +56,9 @@ export const combineManifestFromMetroWorkers = (config: HerinaConfig) => {
   const manifest = createManifestIfNotExist(config);
 
   const manifestDir = getCacheManifestDir();
+
+  if (!existsSync(manifestDir)) return manifest;
+
   const workerManifests = readdirSync(manifestDir);
 
   workerManifests

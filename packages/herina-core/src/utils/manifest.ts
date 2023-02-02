@@ -1,7 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
-import { getHerinaCachePath } from "./file";
+import { getHerinaCachePath, getParsedConfig } from "./file";
+import { defaultsDeep } from "lodash";
 
 export const createManifestIfNotExist = (
   config?: HerinaConfig
@@ -19,6 +20,13 @@ export const createManifestIfNotExist = (
 
     return manifest;
   }
+};
+
+export const overloadManifest = (
+  config: HerinaConfig,
+  manifest: HerinaManifest
+) => {
+  return defaultsDeep(manifest, createManifestIfNotExist(config));
 };
 
 export const createDefaultManifest = () => ({

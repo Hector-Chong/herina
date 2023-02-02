@@ -1,3 +1,4 @@
+import { Node } from "@babel/types";
 import { HerinaConfig, HerinaVersionsInfo } from "..";
 import { ChunkAsset } from "./chunkAssetAnalysers";
 
@@ -8,5 +9,6 @@ export type HerinaUpdateBuiilder = (
   info: HerinaVersionsInfo,
   bundlePath: string,
   currentCommitHash: string,
-  previousCommitHash: string
+  previousCommitHash: string,
+  ast: Node
 ) => Promise<Record<string, ChunkAsset[]>>;
