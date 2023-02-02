@@ -15,7 +15,6 @@ const defineHerinaConfig = (config: HerinaConfig) => {
     checkNativeChange: true,
     androidSourcePath: join(projectRoot, "android"),
     iosSourcePath: join(projectRoot, "ios"),
-    isRelease: false,
     updateType: HerinaUpdateType.ALL
   };
 

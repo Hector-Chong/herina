@@ -12,22 +12,18 @@ export interface HerinaConfig {
   clean?: boolean;
   minify?: boolean;
   root?: string;
-  platform: "ios" | "android";
+  platform: HerinaSupportPlatforms;
   manifestPath: string;
-  incremental?: {
-    previousCommitHash?: string;
-    currentCommitHash?: string;
-    pure?: boolean;
-    filePath?: string;
-  };
+  previousCommitHash?: string;
+  currentCommitHash?: string;
   extensions?: string[];
   manualChunks?: HerinaConfigManualChunks;
   maxWorkers?: number;
   updateType?: HerinaUpdateType;
+  currentReleaseVersionNum?: number;
   checkNativeChange?: boolean;
   iosSourcePath?: string;
   androidSourcePath?: string;
-  isRelease?: boolean;
   metaInfo?: any;
 }
 
@@ -41,22 +37,22 @@ export type HerinaConfigManualChunks =
   | Record<string, string[]>
   | ((path: string) => string);
 
-export interface HerinaVersionsHistoryItem {
+export interface HerinaVersionsItem {
   versionNum: number;
   commitHash: string;
-  filePath: string;
+  lastCommitHash: string;
+  filePath: {
+    full: string;
+    incremental: string;
+    vendor: string;
+  };
   assets: Record<number, string>;
   metaInfo?: string;
 }
 
-export interface HerinaVersions {
-  currentVersionNum: number;
-  currentCommitHash: string;
-  previousCommitHash: string;
-  releaseVersionNum: number[];
-  assets: Record<number, string>;
-  history: HerinaVersionsHistoryItem[];
-  metaInfo?: string;
+export interface HerinaVersionsInfo {
+  releaseVersionNums: number[];
+  versions: HerinaVersionsItem[];
 }
 
 export interface AppVersionConfig {

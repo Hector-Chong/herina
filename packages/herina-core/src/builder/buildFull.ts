@@ -1,11 +1,9 @@
 import { parse } from "@babel/parser";
 import generate from "@babel/generator";
-import buildBundle from "./buildBundle";
 import {
   ChunkAsset,
-  dynamicChunkAnalyser,
-  mainChunkAnalyser,
-  vendorChunkAnalyser
+  defaultAnalyser,
+  dynamicChunkAnalyser
 } from "./chunkAssetAnalysers";
 import minifyCode from "./minifyCode";
 import {
@@ -19,28 +17,15 @@ import {
   emptyDirSync,
   writeJsonSync,
   readFileSync,
-  writeFileSync
+  writeFileSync,
+  ensureDirSync
 } from "fs-extra";
-import { checkNativeChange, prepareToBuild } from "./prerequisite";
 import { HerinaConfig } from "@herina-rn/shared";
 import path from "path";
 import removeDynamicFromBundleTransformer from "../bundleTransformer/removeDynamicFromBundleTransformer";
 import { getCacheManifestDir } from "../utils/manifest";
 import { defaultsDeep } from "lodash";
-import {
-  addAssetsToVersionsJson,
-  addVersionHistory,
-  getVersionsJson,
-  getVersionsJsonPath
-} from "../utils/version";
-
-const writeAssets = (assets: Record<string, ChunkAsset[]>) => {
-  for (const [_, modules] of Object.entries(assets)) {
-    for (const module of modules) {
-      writeFileSync(module.path, module.code);
-    }
-  }
-};
+import { HerinaUpdateBuiilder } from ".";
 
 const rewriteBundle = (config: HerinaConfig) => {
   const bundlePath = path.resolve(config.outputPath, "bundle.js");
@@ -55,10 +40,11 @@ const rewriteBundle = (config: HerinaConfig) => {
   writeFileSync(bundlePath, code);
 };
 
-const buildChunks = async (config: HerinaConfig) => {
-  config = prepareToBuild(config);
+const buildFull: HerinaUpdateBuiilder = async (config, _, bundlePath) => {
+  const fullPath = path.resolve(config.outputPath, "full");
 
-  const bundlePath = await buildBundle(config);
+  ensureDirSync(fullPath);
+
   const bundleStream = readFileSync(bundlePath);
 
   const manifistFromDisk = combineManifestFromMetroWorkers(config);
@@ -78,26 +64,13 @@ const buildChunks = async (config: HerinaConfig) => {
 
   const assets: Record<string, ChunkAsset[]> = {
     dynamic: dynamicChunkAnalyser(config, manifest, dynamicModulesGraph),
-    main: mainChunkAnalyser(config, mainChunkCode),
-    vendor: vendorChunkAnalyser(config, vendorCode)
+    full: defaultAnalyser("full", config, mainChunkCode),
+    vendor: defaultAnalyser("vendor", config, vendorCode)
   };
 
   if (config.minify) {
     await minifyCode(assets);
   }
-
-  const versions = getVersionsJson(config);
-
-  if (versions) {
-    addVersionHistory(config, versions);
-    addAssetsToVersionsJson(versions);
-
-    writeJsonSync(getVersionsJsonPath(config), versions);
-  }
-
-  checkNativeChange(config);
-
-  writeAssets(assets);
 
   writeJsonSync(config.manifestPath, manifest);
 
@@ -108,4 +81,4 @@ const buildChunks = async (config: HerinaConfig) => {
   return assets;
 };
 
-export default buildChunks;
+export default buildFull;

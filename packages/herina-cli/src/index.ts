@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import buildChunksCommand from "./buildChunks";
+import buildFullCommand from "./buildFull";
 import buildIncrementalCommand from "./buildIncremental";
 import { version } from "../package.json";
 import { injectBuildCommandOptions } from "./shared";
@@ -15,7 +15,7 @@ program
 
 injectBuildCommandOptions(
   program.command("build-chunks").description("Buidling chunks")
-).action(buildChunksCommand);
+).action(buildFullCommand);
 
 injectBuildCommandOptions(
   program

@@ -6,6 +6,14 @@ import getReactNativePolyfills from "@react-native/js-polyfills";
 import { isProd } from "../utils/runtime";
 import { createModuleIdFactory } from "../serializer/createModuleIdFactory";
 import getRunModuleStatement from "../serializer/getRunModuleStatement";
+import { prepareToBuild } from "../builder/prerequisite";
+import {
+  addAssetsToVersionsJson,
+  addVersionHistory,
+  createVersiosnJsonIfNotExist,
+  getVersionsJsonPath
+} from "../utils/version";
+import { writeJsonSync } from "fs-extra";
 
 const getBaseDir = (isProduction: boolean) => (isProduction ? "." : "../src");
 
@@ -64,9 +72,23 @@ const createDefaultMetroConfig = (config: HerinaConfig) => {
 
 const createMetroConfig = (
   config: HerinaConfig,
-  userMetroConfig?: MetroConfig
+  userMetroConfig?: MetroConfig,
+  isBuilding?: boolean
 ) => {
   const defaultMetroConfig = createDefaultMetroConfig(config);
+
+  prepareToBuild(config);
+
+  if (isBuilding) {
+    const info = createVersiosnJsonIfNotExist(config);
+
+    addVersionHistory(config, info);
+    addAssetsToVersionsJson(info);
+
+    info.releaseVersionNums.push(info.versions[0].versionNum);
+
+    writeJsonSync(getVersionsJsonPath(config), info);
+  }
 
   return merge(userMetroConfig, defaultMetroConfig);
 };

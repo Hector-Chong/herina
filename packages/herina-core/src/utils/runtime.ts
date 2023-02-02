@@ -3,10 +3,8 @@ export const getGlobalContext = (): any =>
     ? globalThis
     : typeof global !== "undefined"
     ? global
-    : // @ts-ignore
-    typeof window !== "undefined"
-    ? // @ts-ignore
-      window
+    : typeof window !== "undefined"
+    ? window
     : this;
 
 // @ts-ignore

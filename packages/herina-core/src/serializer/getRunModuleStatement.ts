@@ -1,5 +1,7 @@
 import { HerinaConfig } from "@herina-rn/shared";
 import { manifest } from "../builder/manifest";
+import { isArrayWithLength } from "../utils/arr";
+import { getVersionsJson } from "../utils/version";
 
 const globalVariable = `var globalContext = "undefined" != typeof globalThis
 ? globalThis
@@ -19,12 +21,22 @@ const getBaseUrl = (config: HerinaConfig) => {
   }
 };
 
+const getReleaseVersionNumber = (config: HerinaConfig) => {
+  const info = getVersionsJson(config);
+
+  if (info && isArrayWithLength(info.versions)) {
+    return info.versions[0].versionNum + 1;
+  } else {
+    return 1;
+  }
+};
+
 const getRunModuleStatement = (config: HerinaConfig) => {
   let inserted = false;
 
   const globalConfig = `globalContext.baseUrl = ${JSON.stringify(
     getBaseUrl(config)
-  )};`;
+  )}; globalContext.releaseVersionNums = ${getReleaseVersionNumber(config)};`;
 
   let herinaModuleId: number;
 

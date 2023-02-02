@@ -62,7 +62,7 @@ export const isGitRepository = (rootPath: string) => {
 export const getPrevAndCurCommitHashes = async (config: HerinaConfig) => {
   const dir = config.root;
 
-  let { previousCommitHash, currentCommitHash } = config.incremental || {};
+  let { previousCommitHash, currentCommitHash } = config || {};
 
   const commits = await git.log({
     fs,

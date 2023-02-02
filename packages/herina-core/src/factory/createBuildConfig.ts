@@ -15,7 +15,8 @@ const createArgs = (config: HerinaConfig) => ({
   verbose: false,
   generateStaticViewConfigs: true,
   entryFile: config.entryFile,
-  bundleOutput: path.resolve(config.outputPath, "bundle.js")
+  bundleOutput: path.resolve(config.outputPath, "bundle.js"),
+  assetsDest: config.outputPath
 });
 
 const createBuildConfig = async (config: HerinaConfig) => {
@@ -26,11 +27,16 @@ const createBuildConfig = async (config: HerinaConfig) => {
 
   const userDefinedConfigPath = path.resolve(config.root, "metro.config.js");
   const userDefinedMetroExist = fs.existsSync(userDefinedConfigPath);
-  const userDefinedMetro = userDefinedMetroExist
+  const userDefinedMetroFactory = userDefinedMetroExist
     ? require(userDefinedConfigPath)
-    : {};
+    : () => ({});
 
-  const metroConfig = createMetroConfig(config, userDefinedMetro);
+  const userDefinedMetro =
+    typeof userDefinedMetroFactory === "function"
+      ? userDefinedMetroFactory({}, false)
+      : userDefinedMetroFactory;
+
+  const metroConfig = createMetroConfig(config, userDefinedMetro, false);
 
   Object.keys(metroConfig).forEach((categoryKey) => {
     const category = (metroConfig as Recordable)[categoryKey];

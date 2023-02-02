@@ -2,8 +2,8 @@ export type {
   HerinaConfig,
   HerinaManifest,
   HerinaConfigManualChunks,
-  HerinaVersionsHistoryItem,
-  HerinaVersions,
+  HerinaVersionsItem,
+  HerinaVersionsInfo,
   AppVersionConfig
 } from "../../../typings/herina";
 

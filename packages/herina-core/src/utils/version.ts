@@ -1,13 +1,11 @@
-import {
-  existsSync,
-  readJSONSync,
-  readJsonSync,
-  writeFileSync
-} from "fs-extra";
+import { existsSync, readJSONSync, writeJSONSync } from "fs-extra";
 import path from "path";
-import { HerinaConfig, HerinaVersions } from "@herina-rn/shared";
+import {
+  HerinaConfig,
+  HerinaVersionsInfo,
+  HerinaVersionsItem
+} from "@herina-rn/shared";
 import { md5 } from "./str";
-import { isArrayWithLength } from "./arr";
 import { manifest } from "../builder/manifest";
 import { defaults } from "lodash";
 
@@ -19,49 +17,24 @@ export const versionsJsonExists = (config: HerinaConfig) =>
 
 export const getVersionsJson = (
   config: HerinaConfig
-): HerinaVersions | undefined =>
+): HerinaVersionsInfo | undefined =>
   versionsJsonExists(config)
     ? readJSONSync(getVersionsJsonPath(config))
     : undefined;
 
 export const createVersiosnJsonIfNotExist = (
-  config: HerinaConfig,
-  currentVersionNum?: number,
-  currentCommitHash?: string,
-  previousCommitHash?: string
-): HerinaVersions => {
-  const filePath = getVersionsJsonPath(config);
-  const basicData: HerinaVersions = {
-    currentVersionNum: currentVersionNum || 1,
-    currentCommitHash: currentCommitHash || "",
-    previousCommitHash: previousCommitHash || "",
-    releaseVersionNum: [],
-    history: [],
-    assets: {}
+  config: HerinaConfig
+): HerinaVersionsInfo => {
+  const basicData: HerinaVersionsInfo = {
+    releaseVersionNums: [],
+    versions: []
   };
 
-  if (existsSync(filePath)) {
-    try {
-      const versions: HerinaVersions = readJsonSync(filePath);
-
-      if (
-        currentCommitHash &&
-        previousCommitHash &&
-        currentCommitHash !== previousCommitHash
-      ) {
-        versions.currentCommitHash = currentCommitHash;
-        versions.previousCommitHash = previousCommitHash;
-        versions.currentVersionNum += 1;
-      }
-
-      return versions;
-    } catch (e) {
-      return basicData;
-    }
-  } else {
-    writeFileSync(filePath, JSON.stringify(basicData));
-
+  if (!versionsJsonExists(config)) {
+    writeJSONSync(getVersionsJsonPath(config), basicData);
     return basicData;
+  } else {
+    return getVersionsJson(config);
   }
 };
 
@@ -72,53 +45,43 @@ export const createIncrementalFileNameViaCommitHashes = (
 
 export const addVersionHistory = (
   config: HerinaConfig,
-  versions: HerinaVersions,
-  newCommitHash = "",
-  oldCommitHash = ""
+  info: HerinaVersionsInfo,
+  newCommitHash = ""
 ) => {
-  const {
-    currentCommitHash: commitHash,
-    currentVersionNum: versionNum,
-    metaInfo
-  } = versions;
+  const lastVersionItem = info.versions[0];
 
-  versions.metaInfo = config.metaInfo
-    ? JSON.stringify(config.metaInfo)
-    : undefined;
+  const version: HerinaVersionsItem = {
+    commitHash: newCommitHash,
+    versionNum: lastVersionItem ? lastVersionItem.versionNum + 1 : 1,
+    lastCommitHash: lastVersionItem ? lastVersionItem.commitHash : "",
+    filePath: {
+      full: "",
+      incremental: "",
+      vendor: ""
+    },
+    assets: {},
+    metaInfo: config.metaInfo ? JSON.stringify(config.metaInfo) : undefined
+  };
 
-  versions.currentCommitHash = newCommitHash;
-  versions.previousCommitHash = oldCommitHash;
+  info.versions.unshift(version);
 
-  versions.currentVersionNum += 1;
-
-  versions.history.unshift({
-    commitHash,
-    versionNum,
-    filePath: "",
-    assets: [],
-    metaInfo
-  });
+  return info;
 };
 
-export const addAssetsToVersionsJson = (versions: HerinaVersions) => {
+export const addAssetsToVersionsJson = (info: HerinaVersionsInfo) => {
   const manifestAssets = manifest.chunksReversed.assets || {};
-  const currentAssets = versions.assets;
+  const latestVersions = info.versions[0];
 
-  if (isArrayWithLength(versions.history)) {
-    versions.history[0].assets = currentAssets;
-  }
-
-  const previousAssets: Record<number, string> = versions.history.reduce(
-    (prev, cur) => {
+  const previousAssets: Record<number, string> = info.versions
+    .slice(1)
+    .reduce((prev, cur) => {
       const assets = cur.assets;
 
       return defaults(prev, assets);
-    },
-    {}
-  );
+    }, {});
 
   const previousAssetsKeys = new Set(Object.keys(previousAssets).map(Number));
-  const newAssets = (versions.assets = {});
+  const newAssets = (latestVersions.assets = {});
 
   Object.keys(manifestAssets).map((id) => {
     if (!previousAssetsKeys.has(+id)) {

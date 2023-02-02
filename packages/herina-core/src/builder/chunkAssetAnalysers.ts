@@ -2,6 +2,7 @@ import { resolve } from "path";
 import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
 
 import { getChunkHashedName, getManifestChunks } from "../utils/file";
+import { generateRandomStr, md5 } from "../utils/str";
 
 export interface ChunkAsset {
   filename: string;
@@ -9,32 +10,13 @@ export interface ChunkAsset {
   path: string;
 }
 
-export const mainChunkAnalyser = (
+export const defaultAnalyser = (
+  chunkName: string,
   config: HerinaConfig,
   code: string
-): ChunkAsset[] => {
-  const filename = "main.chunk.js";
-  const path = resolve(config.outputPath, filename);
-
-  return [{ filename, code, path }];
-};
-
-export const vendorChunkAnalyser = (
-  config: HerinaConfig,
-  code: string
-): ChunkAsset[] => {
-  const filename = "vendor.chunk.js";
-  const path = resolve(config.outputPath, filename);
-
-  if (config.environment === "production") {
-    const declaration = "var e=o(),t={}";
-
-    code = code.replace(declaration, `var e=o();r.modules=e;var t={}`);
-  } else {
-    const declaration = "var modules = clear();";
-
-    code = code.replace(declaration, `${declaration}global.modules = modules;`);
-  }
+) => {
+  const filename = `${generateRandomStr(8)}.${chunkName}.chunk.js`;
+  const path = resolve(config.outputPath, chunkName, filename);
 
   return [{ filename, code, path }];
 };
@@ -81,7 +63,7 @@ export const dynamicChunkAnalyser = (
       }
     });
 
-    const path = resolve(config.outputPath, chunkName);
+    const path = resolve(config.outputPath, "dynamic", chunkName);
     const chunkCode = insertModuleToChunk(moduleId, code, filePath);
 
     assets.push({ filename: chunkName, code: chunkCode, path });

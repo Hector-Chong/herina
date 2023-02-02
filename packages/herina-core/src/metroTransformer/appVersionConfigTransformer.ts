@@ -42,8 +42,8 @@ const appVersionConfigTransformer = async ({
 
 const injectVersionConfigWithAST = (currentCommitHash: string, ast: Node) => {
   const config = getParsedConfig();
-  const versions = getVersionsJson(config);
-  const versionNum = versions ? versions.currentVersionNum + 1 : 1;
+  const info = getVersionsJson(config);
+  const versionNum = info ? info.versions[0].versionNum + 1 : 1;
 
   traverse(ast, {
     ObjectExpression(path) {
