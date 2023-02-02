@@ -72,7 +72,7 @@ const updateVersionsJson = async (
   const chunks = ["incremental", "full", "vendor"];
 
   chunks.forEach((chunk) => {
-    info.versions[0].filePath[chunk] = buildAssets.incremental[0].path.replace(
+    info.versions[0].filePath[chunk] = buildAssets[chunk][0].path.replace(
       config.outputPath,
       ""
     );
