@@ -10,9 +10,6 @@ import { createIncrementalFileNameViaCommitHashes } from "../utils/version";
 import { HerinaConfig } from "@herina-rn/shared";
 import { HerinaUpdateBuiilder } from ".";
 
-const clearResult = (config: HerinaConfig) =>
-  removeSync(path.join(config.outputPath, "bundle.js"));
-
 const filterFiles = (config: HerinaConfig, files: CommitDifferentFile[]) => {
   const filtered = files.filter((file) =>
     config.extensions!.some((ext) => file.filename.endsWith("." + ext))
@@ -56,8 +53,6 @@ const buildIncremental: HerinaUpdateBuiilder = async (
   );
 
   const { code } = generate(ast);
-
-  clearResult(config);
 
   const incrementalFileName = createIncrementalFileNameViaCommitHashes(
     currentCommitHash,

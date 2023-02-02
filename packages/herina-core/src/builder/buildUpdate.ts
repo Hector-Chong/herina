@@ -3,7 +3,13 @@ import {
   HerinaUpdateType,
   HerinaVersionsInfo
 } from "@herina-rn/shared";
-import { ensureFileSync, writeFileSync, writeJsonSync } from "fs-extra";
+import {
+  ensureFileSync,
+  removeSync,
+  writeFileSync,
+  writeJsonSync
+} from "fs-extra";
+import { join } from "path";
 import { HerinaUpdateBuiilder } from ".";
 import { isArrayWithLength } from "../utils/arr";
 import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
@@ -121,6 +127,8 @@ const buildUpdate = async (config: HerinaConfig) => {
   writeJsonSync(getVersionsJsonPath(config), info);
 
   writeAssets(buildAssets);
+
+  removeSync(bundlePath);
 
   return buildAssets;
 };

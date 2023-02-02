@@ -1,7 +1,7 @@
 import { HerinaConfig } from "@herina-rn/shared";
 import fs, { pathExistsSync } from "fs-extra";
 import git, { walk } from "isomorphic-git";
-import path, { resolve } from "path";
+import path from "path";
 
 export interface CommitDifferentFile {
   filename: string;
@@ -28,7 +28,7 @@ export const computeDifferentFiles = async (
       const aMode = await A?.mode();
 
       const data: CommitDifferentFile = {
-        filename: resolve(dir, filename),
+        filename: filename,
         type: "same"
       };
 
