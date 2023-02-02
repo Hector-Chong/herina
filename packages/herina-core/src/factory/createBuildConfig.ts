@@ -15,8 +15,7 @@ const createArgs = (config: HerinaConfig) => ({
   verbose: false,
   generateStaticViewConfigs: true,
   entryFile: config.entryFile,
-  bundleOutput: path.resolve(config.outputPath, "bundle.js"),
-  assetsDest: config.outputPath
+  bundleOutput: path.resolve(config.outputPath, "bundle.js")
 });
 
 const createBuildConfig = async (config: HerinaConfig) => {

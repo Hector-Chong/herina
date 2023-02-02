@@ -9,7 +9,6 @@ import {
   writeFileSync,
   writeJsonSync
 } from "fs-extra";
-import { join } from "path";
 import { HerinaUpdateBuiilder } from ".";
 import { isArrayWithLength } from "../utils/arr";
 import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
@@ -24,6 +23,7 @@ import buildFull from "./buildFull";
 import buildIncremental from "./buildIncremental";
 import { ChunkAsset } from "./chunkAssetAnalysers";
 import { checkNativeChange, prepareToBuild } from "./prerequisite";
+import splitAssets from "./splitAssets";
 
 export const validateConfig = async (
   config: HerinaConfig,
@@ -123,6 +123,8 @@ const buildUpdate = async (config: HerinaConfig) => {
   checkNativeChange(config);
 
   updateVersionsJson(config, info, buildAssets);
+
+  splitAssets(config, info);
 
   writeJsonSync(getVersionsJsonPath(config), info);
 
