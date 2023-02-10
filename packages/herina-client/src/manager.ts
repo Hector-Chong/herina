@@ -235,6 +235,10 @@ class UpdateManager implements UpdateManagerInterface {
     return true;
   }
 
+  async isUpdateAvailable() {
+    return this.isIncrementalUpdateAvailable() || this.isFullUpdateAvailable();
+  }
+
   async isFullUpdateAvailable() {
     const config = await this.__app.getVersionConfig();
 

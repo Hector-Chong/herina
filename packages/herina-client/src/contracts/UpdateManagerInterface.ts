@@ -17,6 +17,8 @@ interface UpdateManagerInterface {
 
   applyUpdate(immediate: boolean): Promise<boolean>;
 
+  isUpdateAvailable(): Promise<boolean>;
+
   isFullUpdateAvailable(): Promise<boolean>;
 
   isIncrementalUpdateAvailable(): Promise<boolean>;
