@@ -23,15 +23,15 @@
 
     AppVersionConfig *versionConfig = [VersionUtils getVersionJson];
 
-    if (versionConfig && [versionConfig.useOriginal isEqualToNumber:@0]) {
+    if (versionConfig && !versionConfig.useOriginal) {
         NSString *bundleDir = [FileUtils getBundleStoreDirPath];
-        NSString *bundlePath = [bundleDir stringByAppendingPathComponent:@"bundle.js"];
+        NSString *bundlePath = [bundleDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.js", versionConfig.versionNum]];
 
         if ([manager fileExistsAtPath:bundlePath]) {
             return [NSURL fileURLWithPath:bundlePath];
         }
     }
-
+    
     return baseBundleUrl;
 
 #endif /* if DEBUG */
@@ -47,3 +47,4 @@
 }
 
 @end
+

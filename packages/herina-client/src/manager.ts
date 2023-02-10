@@ -1,106 +1,202 @@
-import { HerinaVersions } from "@herina-rn/shared";
+import {
+  HerinaVersionsInfo,
+  isArrayWithLength,
+  removeArrDuplicatedItems
+} from "@herina-rn/shared";
 import AppCapacityInterface from "./contracts/AppCapacityInterface";
 import UpdateManagerInterface from "./contracts/UpdateManagerInterface";
 
 class UpdateManager implements UpdateManagerInterface {
   private __baseUrl: string;
   private __app: AppCapacityInterface;
-  private __versionsCache: HerinaVersions;
+  private __ignoreRelease: boolean;
+  private __versionsJsonCache: HerinaVersionsInfo;
   private static __instance: UpdateManager;
 
-  private constructor(baseUrl: string, app: AppCapacityInterface) {
+  private constructor(
+    baseUrl: string,
+    app: AppCapacityInterface,
+    ignoreRelease = false
+  ) {
     this.__baseUrl = baseUrl;
     this.__app = app;
+    this.__ignoreRelease = ignoreRelease;
   }
 
-  static getInstance(app: AppCapacityInterface, baseUrl = "") {
+  static getInstance(
+    app: AppCapacityInterface,
+    baseUrl = "",
+    ignoreRelease = false
+  ) {
     if (!UpdateManager.__instance) {
       UpdateManager.__instance = new UpdateManager(
         baseUrl || global.baseUrl,
-        app
+        app,
+        ignoreRelease
       );
     }
 
     return UpdateManager.__instance;
   }
 
-  async getVersionsFromRemote() {
-    if (this.__versionsCache) {
-      return this.__versionsCache;
+  async getVersionsJsonFromRemote() {
+    if (this.__versionsJsonCache) {
+      return this.__versionsJsonCache;
     }
 
     const url = `${this.__baseUrl}/versions.json`;
 
     const response = await fetch(url, { cache: "no-store" });
-    const versions: HerinaVersions = await response.json();
+    const versions: HerinaVersionsInfo = await response.json();
 
     if (!versions) {
       throw new Error("versions.json from remote is empty.");
     }
 
-    this.__versionsCache = versions;
+    this.__versionsJsonCache = versions;
 
     return versions;
   }
 
-  async checkForUpdate() {
+  async getNextReleaseVersionNum() {
     const versionConfig = await this.__app.getVersionConfig();
-    const versionsFromRemote = await this.getVersionsFromRemote();
+    const info = await this.getVersionsJsonFromRemote();
 
-    return versionConfig.versionNum < versionsFromRemote.currentVersionNum;
+    const { originalVersionNum } = versionConfig;
+    const { releaseVersionNums } = info;
+    const originalVersionNumIdx = releaseVersionNums.findIndex(
+      (num) => num === originalVersionNum
+    );
+    const nextReleaseVersionIdx = originalVersionNumIdx - 1;
+    const nextReleaseVersionNum = releaseVersionNums[nextReleaseVersionIdx];
+
+    return nextReleaseVersionNum;
   }
 
-  async requestBundleUpdate() {
-    if (!(await this.checkForUpdate())) {
-      throw new Error("No need to update.");
-    }
+  async getAvailableVersions() {
+    const versionConfig = await this.__app.getVersionConfig();
+    const info = await this.getVersionsJsonFromRemote();
+    const nextReleaseNum = await this.getNextReleaseVersionNum();
 
-    try {
-      await this.__app.downloadBundleToUpdate(this.__baseUrl);
+    const nextReleaseVersionNum =
+      this.__ignoreRelease || !nextReleaseNum
+        ? info.versions[0].versionNum + 1
+        : nextReleaseNum;
 
-      const versions = await this.getVersionsFromRemote();
+    const { versionNum } = versionConfig;
 
-      await this.__app.setVersionConfigValues({
-        nextVersionNum: versions.currentVersionNum,
-        nextCommitHash: versions.currentCommitHash,
-        isBundleAvailable: true
-      });
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  async requestIncrementalUpdates() {
-    const { versionNum } = await this.__app.getVersionConfig();
-    const { currentVersionNum, currentCommitHash, history } =
-      await this.getVersionsFromRemote();
-
-    if (!(await this.checkForUpdate())) {
-      throw new Error("No need to update.");
-    }
-
-    const newerVersions = history.filter(
-      (item) => item.versionNum >= versionNum
+    const availableVersions = info.versions.filter(
+      (item) =>
+        item.versionNum > versionNum && item.versionNum < nextReleaseVersionNum
     );
 
-    if (!newerVersions.length) {
-      throw new Error("No newer versions found.");
+    return availableVersions;
+  }
+
+  async checkForUpdate() {
+    return isArrayWithLength(await this.getAvailableVersions());
+  }
+
+  async requestFullUpdate() {
+    if (!(await this.checkForUpdate())) {
+      throw new Error("No need to update.");
     }
 
-    await this.__app.downloadIncrementalUpdates(this.__baseUrl, newerVersions);
+    const versions = await this.getAvailableVersions();
+    const firstVersion = versions[0];
+
+    if (!firstVersion) throw new Error("No availble versions.");
+
+    await this.__app.downloadBundleToUpdate(this.__baseUrl, firstVersion);
 
     await this.__app.setVersionConfigValues({
-      nextVersionNum: currentVersionNum,
-      nextCommitHash: currentCommitHash
+      nextVersionNum: firstVersion.versionNum,
+      nextCommitHash: firstVersion.commitHash,
+      isFullAvailable: true,
+      fullToApply: firstVersion
     });
 
     return true;
   }
 
+  async requestIncrementalUpdates() {
+    if (!(await this.checkForUpdate())) {
+      throw new Error("No need to update.");
+    }
+
+    const versions = await this.getAvailableVersions();
+    const firstVersion = versions[0];
+
+    if (!firstVersion) throw new Error("No availble versions.");
+
+    await this.__app.downloadIncrementalUpdates(this.__baseUrl, versions);
+
+    await this.__app.setVersionConfigValues({
+      nextVersionNum: firstVersion.versionNum,
+      nextCommitHash: firstVersion.commitHash,
+      isIncrementalAvailable: true,
+      incrementalsToApply: removeArrDuplicatedItems(
+        versions.map((ver) => ver.fileNames.incremental).reverse()
+      )
+    });
+
+    return true;
+  }
+
+  async requestUpdate() {
+    if (!(await this.checkForUpdate())) {
+      throw new Error("No need to update.");
+    }
+
+    try {
+      const res = await this.requestIncrementalUpdates();
+
+      if (!res) {
+        return this.requestFullUpdate();
+      }
+    } catch (e) {
+      return this.requestFullUpdate();
+    }
+
+    return true;
+  }
+
+  async applyUpdate(immediate: boolean) {
+    const versionConfig = await this.__app.getVersionConfig();
+
+    if (versionConfig.isIncrementalAvailable) {
+      return this.applyIncrementalUpdate(immediate);
+    }
+
+    if (versionConfig.isFullAvailable) {
+      return this.applyFullUpdate(immediate);
+    }
+
+    throw new Error("No update is available.");
+  }
+
   async applyIncrementalUpdate(immediate: boolean) {
-    await this.__app.applyIncrementalUpdate(immediate);
+    const versionConfig = await this.__app.getVersionConfig();
+
+    if (!versionConfig.isIncrementalAvailable) {
+      throw new Error("No incremental update is available.");
+    }
+
+    await this.__app.applyIncrementalUpdate();
+
+    await this.__app.setVersionConfigValues({
+      versionNum: versionConfig.nextVersionNum,
+      commitHash: versionConfig.nextCommitHash,
+      nextVersionNum: 0,
+      nextCommitHash: "",
+      isIncrementalAvailable: false,
+      incrementalsToApply: [],
+      isFullAvailable: false,
+      useOriginal: false,
+      appliedVersionNums: (versionConfig.appliedVersionNums || []).concat(
+        versionConfig.nextVersionNum
+      )
+    });
 
     if (immediate) {
       this.reloadApp();
@@ -109,8 +205,28 @@ class UpdateManager implements UpdateManagerInterface {
     return true;
   }
 
-  async applyBundleUpdate(immediate: boolean) {
-    await this.__app.applyBundleUpdate(immediate);
+  async applyFullUpdate(immediate: boolean) {
+    const versionConfig = await this.__app.getVersionConfig();
+
+    if (!versionConfig.isFullAvailable) {
+      throw new Error("No full update is available.");
+    }
+
+    await this.__app.applyFullUpdate();
+
+    await this.__app.setVersionConfigValues({
+      versionNum: versionConfig.fullToApply.versionNum,
+      commitHash: versionConfig.fullToApply.commitHash,
+      nextCommitHash: "",
+      nextVersionNum: 0,
+      useOriginal: false,
+      isIncrementalAvailable: false,
+      isFullAvailable: false,
+      fullToApply: null,
+      appliedVersionNums: (versionConfig.appliedVersionNums || []).concat(
+        versionConfig.nextVersionNum
+      )
+    });
 
     if (immediate) {
       this.reloadApp();
@@ -119,20 +235,20 @@ class UpdateManager implements UpdateManagerInterface {
     return true;
   }
 
-  async isBundleUpdateAvailable() {
+  async isFullUpdateAvailable() {
     const config = await this.__app.getVersionConfig();
 
-    return !!config.isBundleAvailable;
+    return config.isFullAvailable;
   }
 
   async isIncrementalUpdateAvailable() {
     const config = await this.__app.getVersionConfig();
 
-    return !!config.isIncrementalAvailable;
+    return config.isIncrementalAvailable;
   }
 
   clearCache() {
-    this.__versionsCache = undefined;
+    this.__versionsJsonCache = undefined;
   }
 
   setUseOriginalBundle(original: boolean) {
@@ -140,7 +256,7 @@ class UpdateManager implements UpdateManagerInterface {
   }
 
   reloadApp() {
-    return this.__app.reloadApp();
+    this.__app.reloadApp();
   }
 }
 

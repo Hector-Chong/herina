@@ -6,6 +6,7 @@
 //
 
 #import "AppVersionConfig.h"
+#import "HerinaVersionsHistoryItem.h"
 
 @implementation AppVersionConfig
 
@@ -14,16 +15,18 @@
     self = [super init];
 
     if (self) {
-        self.useOriginal = dictionary[@"useOriginal"];
+        self.useOriginal = [dictionary[@"useOriginal"] isEqual:@YES];
         self.versionNum = dictionary[@"versionNum"];
         self.commitHash = dictionary[@"commitHash"];
         self.nextVersionNum = dictionary[@"nextVersionNum"];
         self.nextCommitHash = dictionary[@"nextCommitHash"];
         self.originalCommitHash = dictionary[@"originalCommitHash"];
         self.originalVersionNum = dictionary[@"originalVersionNum"];
-        self.isIncrementalAvailable = dictionary[@"isIncrementalAvailable"] ? dictionary[@"isIncrementalAvailable"] : @0;
-        self.isBundleAvailable = dictionary[@"isBundleAvailable"] ? dictionary[@"isBundleAvailable"] : @0;
+        self.isIncrementalAvailable = [dictionary[@"isIncrementalAvailable"] isEqual:@YES];
+        self.isFullAvailable = [dictionary[@"isFullAvailable"] isEqual:@YES];
         self.incrementalsToApply = dictionary[@"incrementalsToApply"] ? dictionary[@"incrementalsToApply"] : @[];
+        self.appliedVersionNums = dictionary[@"appliedVersionNums"] ? dictionary[@"appliedVersionNums"] : @[];
+        self.fullToApply = [dictionary objectForKey:@"fullToApply"] ? [[HerinaVersionsHistoryItem alloc] initWithDictionary: dictionary[@"fullToApply"]] : nil;
     }
 
     return self;
@@ -32,24 +35,21 @@
 - (NSMutableDictionary *)getVersionConfigDict
 {
     NSMutableDictionary *dict = [@{
-                                     @"useOriginal": self.useOriginal,
+                                     @"useOriginal": @(self.useOriginal),
                                      @"versionNum": self.versionNum,
                                      @"commitHash": self.commitHash,
                                      @"nextVersionNum": self.nextVersionNum,
                                      @"nextCommitHash": self.nextCommitHash,
                                      @"originalCommitHash": self.originalCommitHash,
                                      @"originalVersionNum": self.originalVersionNum,
-                                     @"isIncrementalAvailable": self.isIncrementalAvailable,
-                                     @"isBundleAvailable": self.isBundleAvailable,
-                                     @"incrementalsToApply": self.incrementalsToApply
+                                     @"isIncrementalAvailable": @(self.isIncrementalAvailable),
+                                     @"isFullAvailable": @(self.isFullAvailable),
+                                     @"incrementalsToApply": self.incrementalsToApply,
+                                     @"appliedVersionNums": self.appliedVersionNums,
+                                     @"fullToApply": self.fullToApply != nil? [self.fullToApply getDict] : [NSNull null]
                                  } mutableCopy];
 
     return dict;
-}
-
-- (BOOL)shouUseOriginalBundle
-{
-    return [self.useOriginal isEqualToNumber:@1];
 }
 
 @end

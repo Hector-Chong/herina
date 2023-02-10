@@ -16,9 +16,14 @@ const incrementalTransformer = (
   ast: Node,
   files: CommitDifferentFile[]
 ) => {
-  const { mainChunkReversed, assetsChunkReversed } =
+  const { mainChunkReversed, assetsChunkReversed, vendorChunkReversed } =
     getManifestChunks(manifest);
   const statements: ExpressionStatement[] = [];
+  const splitChunks = [
+    mainChunkReversed,
+    assetsChunkReversed,
+    vendorChunkReversed
+  ];
 
   traverse(ast, {
     ExpressionStatement(path) {
@@ -35,7 +40,7 @@ const incrementalTransformer = (
           const absolutePath = idToFileMap.get(moduleId);
 
           if (
-            (mainChunkReversed[moduleId] || assetsChunkReversed[moduleId]) &&
+            splitChunks.some((modules) => modules[moduleId]) &&
             files.some((file) => file.filename === absolutePath)
           ) {
             statements.push(node);

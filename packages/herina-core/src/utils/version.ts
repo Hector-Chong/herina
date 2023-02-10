@@ -1,29 +1,29 @@
 import { existsSync, readJSONSync, writeJSONSync } from "fs-extra";
-import path from "path";
+import path, { resolve } from "path";
 import {
-  HerinaConfig,
+  HerinaConfigInternal,
+  HerinaManifest,
   HerinaVersionsInfo,
   HerinaVersionsItem
 } from "@herina-rn/shared";
-import { md5 } from "./str";
-import { manifest } from "../builder/manifest";
-import { defaults } from "lodash";
+import { md5 } from "@herina-rn/shared";
+import { computeDifferentFiles } from "./git";
 
-export const getVersionsJsonPath = (config: HerinaConfig) =>
+export const getVersionsJsonPath = (config: HerinaConfigInternal) =>
   path.resolve(config.outputPath, "versions.json");
 
-export const versionsJsonExists = (config: HerinaConfig) =>
+export const versionsJsonExists = (config: HerinaConfigInternal) =>
   existsSync(getVersionsJsonPath(config));
 
 export const getVersionsJson = (
-  config: HerinaConfig
+  config: HerinaConfigInternal
 ): HerinaVersionsInfo | undefined =>
   versionsJsonExists(config)
     ? readJSONSync(getVersionsJsonPath(config))
     : undefined;
 
 export const createVersiosnJsonIfNotExist = (
-  config: HerinaConfig
+  config: HerinaConfigInternal
 ): HerinaVersionsInfo => {
   const basicData: HerinaVersionsInfo = {
     releaseVersionNums: [],
@@ -34,7 +34,15 @@ export const createVersiosnJsonIfNotExist = (
     writeJSONSync(getVersionsJsonPath(config), basicData);
     return basicData;
   } else {
-    return getVersionsJson(config);
+    const info = getVersionsJson(config);
+
+    if (info && !info.isSuccessFul) {
+      info.versions.shift();
+    }
+
+    info.isSuccessFul = false;
+
+    return info;
   }
 };
 
@@ -44,7 +52,7 @@ export const createIncrementalFileNameViaCommitHashes = (
 ) => md5(`${newCommitHash}-${oldCommitHash}`) + ".js";
 
 export const addVersionHistory = (
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   info: HerinaVersionsInfo,
   newCommitHash = ""
 ) => {
@@ -54,8 +62,8 @@ export const addVersionHistory = (
     commitHash: newCommitHash,
     versionNum: lastVersionItem ? lastVersionItem.versionNum + 1 : 1,
     lastCommitHash: lastVersionItem ? lastVersionItem.commitHash : "",
-    filePath: {
-      full: "",
+    fileNames: {
+      main: "",
       incremental: "",
       vendor: ""
     },
@@ -68,24 +76,31 @@ export const addVersionHistory = (
   return info;
 };
 
-export const addAssetsToVersionsJson = (info: HerinaVersionsInfo) => {
-  const manifestAssets = manifest.chunksReversed.assets || {};
+export const addAssetsToVersionsJson = async (
+  config: HerinaConfigInternal,
+  info: HerinaVersionsInfo,
+  manifest: HerinaManifest,
+  currentCommitHash: string,
+  previousCommitHash: string
+) => {
+  const manifestAssets = manifest.chunks.assets || {};
   const latestVersions = info.versions[0];
 
-  const previousAssets: Record<number, string> = info.versions
-    .slice(1)
-    .reduce((prev, cur) => {
-      const assets = cur.assets;
+  const differentFiles = await computeDifferentFiles(
+    config.root,
+    previousCommitHash,
+    currentCommitHash
+  );
 
-      return defaults(prev, assets);
-    }, {});
-
-  const previousAssetsKeys = new Set(Object.keys(previousAssets).map(Number));
   const newAssets = (latestVersions.assets = {});
 
-  Object.keys(manifestAssets).map((id) => {
-    if (!previousAssetsKeys.has(+id)) {
-      newAssets[id] = manifestAssets[id];
+  differentFiles.forEach((file) => {
+    const { filename } = file;
+    const fullPath = resolve(config.root, filename);
+    const id = manifestAssets[fullPath];
+
+    if (id) {
+      newAssets[id] = fullPath;
     }
   });
 };

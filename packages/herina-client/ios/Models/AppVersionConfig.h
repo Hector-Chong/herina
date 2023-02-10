@@ -5,11 +5,13 @@
 //  Created by Hector Chong on 1/12/23.
 //
 
-#import <Foundation/Foundation.h>
+#import <React/RCTConvert.h>
+
+@class HerinaVersionsHistoryItem;
 
 @interface AppVersionConfig : NSObject
 
-@property (nonatomic, readwrite, strong) NSNumber *useOriginal;
+@property (nonatomic, assign) BOOL useOriginal;
 
 @property (nonatomic, readwrite, strong) NSNumber *originalVersionNum;
 
@@ -23,16 +25,18 @@
 
 @property (nonatomic, readwrite, strong) NSString *nextCommitHash;
 
-@property (nonatomic, readwrite, strong) NSNumber *isIncrementalAvailable;
+@property (nonatomic, assign) BOOL isIncrementalAvailable;
 
-@property (nonatomic, readwrite, strong) NSNumber *isBundleAvailable;
+@property (nonatomic, assign) BOOL isFullAvailable;
 
 @property (nonatomic, readwrite, strong) NSArray<NSString *> *incrementalsToApply;
+
+@property (nonatomic, readwrite, strong) HerinaVersionsHistoryItem *fullToApply;
+
+@property (nonatomic, readwrite, strong) NSArray<NSNumber *>* appliedVersionNums;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
 - (NSMutableDictionary *)getVersionConfigDict;
-
-- (BOOL)shouUseOriginalBundle;
 
 @end

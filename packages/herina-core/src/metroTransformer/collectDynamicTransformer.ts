@@ -1,6 +1,5 @@
 import { MetroTranformerParams } from ".";
-import { isArrayWithLength } from "../utils/arr";
-import { Recordable } from "@herina-rn/shared";
+import { isArrayWithLength, Recordable } from "@herina-rn/shared";
 
 const collectDynamicTransformer = ({
   projectRoot,

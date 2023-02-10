@@ -1,10 +1,13 @@
 import { parse } from "@babel/parser";
 import {
   HerinaConfig,
+  HerinaConfigInternal,
   HerinaUpdateType,
-  HerinaVersionsInfo
+  HerinaVersionsInfo,
+  isArrayWithLength
 } from "@herina-rn/shared";
 import {
+  emptyDirSync,
   ensureFileSync,
   readFileSync,
   removeSync,
@@ -13,9 +16,9 @@ import {
 } from "fs-extra";
 import { defaultsDeep } from "lodash";
 import { HerinaUpdateBuiilder } from ".";
-import { isArrayWithLength } from "../utils/arr";
+import HerinaEventManager from "../events";
 import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
-import { overloadManifest } from "../utils/manifest";
+import { getCacheManifestDir, overloadManifest } from "../utils/manifest";
 import {
   addAssetsToVersionsJson,
   addVersionHistory,
@@ -25,8 +28,9 @@ import {
 import buildBundle from "./buildBundle";
 import buildFull from "./buildFull";
 import buildIncremental from "./buildIncremental";
-import { ChunkAsset } from "./chunkAssetAnalysers";
+import { ChunkAsset } from "./chunkAnalysers";
 import {
+  calculateMaxId,
   combineManifestFromMetroWorkers,
   manifest,
   removeDuplicatedDependencies,
@@ -61,11 +65,22 @@ export const validateConfig = async (
     );
   }
 
-  return { previousCommitHash, currentCommitHash };
+  const latestVersion = info.versions[0];
+
+  return {
+    previousCommitHash: latestVersion
+      ? latestVersion.commitHash
+      : previousCommitHash,
+    currentCommitHash
+  };
 };
 
+export const filterFile = (config: HerinaConfig, filePath: string) =>
+  config.extensions!.some((ext) => filePath.endsWith("." + ext)) ||
+  Object.keys(manifest.chunks.assets).some((path) => path.match(filePath));
+
 const buildRules: Record<HerinaUpdateType, HerinaUpdateBuiilder[]> = {
-  [HerinaUpdateType.ALL]: [buildFull, buildIncremental],
+  [HerinaUpdateType.ALL]: [buildIncremental, buildFull],
   [HerinaUpdateType.FULL]: [buildFull],
   [HerinaUpdateType.INCREMENTAL]: [buildIncremental]
 };
@@ -81,43 +96,52 @@ const writeAssets = (assets: Record<string, ChunkAsset[]>) => {
 };
 
 const updateVersionsJson = async (
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   info: HerinaVersionsInfo,
   buildAssets: Record<string, ChunkAsset[]>
 ) => {
-  const chunks = ["incremental", "full", "vendor"];
-
-  chunks.forEach((chunk) => {
-    info.versions[0].filePath[chunk] = buildAssets[chunk][0].path.replace(
-      config.outputPath,
-      ""
-    );
+  Object.keys(buildAssets).forEach((chunk) => {
+    if (chunk !== "dynamic") {
+      info.versions[0].fileNames[chunk] = buildAssets[chunk][0].filename;
+    }
   });
+
+  info.isSuccessFul = true;
+
+  writeJsonSync(getVersionsJsonPath(config), info);
+};
+
+const updateManifest = (config: HerinaConfigInternal) => {
+  manifest.maxId = calculateMaxId(manifest);
+
+  emptyDirSync(getCacheManifestDir());
+
+  writeJsonSync(config.manifestPath, manifest);
 };
 
 const buildUpdate = async (config: HerinaConfig) => {
-  config = prepareToBuild(config);
+  const internalConfig = prepareToBuild(config);
 
-  const info = createVersiosnJsonIfNotExist(config);
+  const info = createVersiosnJsonIfNotExist(internalConfig);
 
   const { currentCommitHash, previousCommitHash } = await validateConfig(
-    config,
+    internalConfig,
     info
   );
 
-  overloadManifest(config, manifest);
+  overloadManifest(internalConfig, manifest);
 
-  addVersionHistory(config, info, currentCommitHash);
+  addVersionHistory(internalConfig, info, currentCommitHash);
 
-  writeJsonSync(getVersionsJsonPath(config), info);
+  writeJsonSync(getVersionsJsonPath(internalConfig), info);
 
-  const bundlePath = await buildBundle(config);
+  const bundlePath = await buildBundle(internalConfig);
 
   const bundleStream = readFileSync(bundlePath);
 
   const bundleAst = parse(bundleStream.toString());
 
-  const manifistFromDisk = combineManifestFromMetroWorkers(config);
+  const manifistFromDisk = combineManifestFromMetroWorkers(internalConfig);
 
   defaultsDeep(manifest.chunks, manifistFromDisk.chunks);
 
@@ -125,25 +149,35 @@ const buildUpdate = async (config: HerinaConfig) => {
 
   removeDuplicatedDependencies(manifest);
 
-  addAssetsToVersionsJson(info);
+  await addAssetsToVersionsJson(
+    internalConfig,
+    info,
+    manifest,
+    currentCommitHash,
+    previousCommitHash
+  );
 
-  splitAssets(config, info);
+  HerinaEventManager.emit("afterBundleBuild", bundleAst);
 
-  const { updateType } = config;
+  await splitAssets(internalConfig, info);
+
+  const { updateType } = internalConfig;
   const builders = buildRules[updateType];
 
-  const buildResults = await Promise.all(
-    builders.map((build) =>
-      build(
-        config,
+  const buildResults = [];
+
+  for (const build of builders) {
+    buildResults.push(
+      await build(
+        internalConfig,
         info,
         bundlePath,
         currentCommitHash,
         previousCommitHash,
         bundleAst
       )
-    )
-  );
+    );
+  }
 
   const buildAssets: Record<string, ChunkAsset[]> = buildResults.reduce(
     (prev, item) => {
@@ -152,11 +186,11 @@ const buildUpdate = async (config: HerinaConfig) => {
     {}
   );
 
-  checkNativeChange(config);
+  await checkNativeChange(internalConfig);
 
-  updateVersionsJson(config, info, buildAssets);
+  updateVersionsJson(internalConfig, info, buildAssets);
 
-  writeJsonSync(getVersionsJsonPath(config), info);
+  updateManifest(internalConfig);
 
   writeAssets(buildAssets);
 

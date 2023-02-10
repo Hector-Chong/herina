@@ -3,40 +3,49 @@
   "version": "0.0.0",
   "private": true,
   "description": "A Toolkit providing dynamic ability for React Native App.",
-  "workspaces": [
-    "packages/*"
-  ],
-  "repository": "https://github.com/Hector-Chong/herina",
-  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
-  "license": "MIT",
+  "homepage": "https://github.com/Hector-Chong/herina#readme",
   "bugs": {
     "url": "https://github.com/Hector-Chong/herina/issues"
   },
-  "homepage": "https://github.com/Hector-Chong/herina#readme",
+  "repository": "https://github.com/Hector-Chong/herina",
+  "license": "MIT",
+  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install"
   },
-  "devDependencies": {
-    "@types/node": "^18.11.18",
-    "lerna": "^6.4.0",
-    "prettier": "latest",
-    "git-cz": "^4.9.0",
-    "husky": "^8.0.0",
-    "cz-conventional-changelog": "3.3.0",
-    "commitizen": "^4.2.4"
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"
+    }
   },
-  "engines": {
-    "node": ">=14.0.0"
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "config": {
     "commitizen": {
       "path": "node_modules/git-cz"
     }
   },
-  "husky": {
-    "hooks": {
-      "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"
-    }
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "3.3.0",
+    "git-cz": "^4.9.0",
+    "husky": "^8.0.0",
+    "lerna": "^6.4.0",
+    "lint-staged": "^13.1.1",
+    "prettier": "latest"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

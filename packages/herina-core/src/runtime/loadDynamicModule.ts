@@ -1,4 +1,4 @@
-import { getGlobalContext } from "../utils/runtime";
+import { getGlobalContext } from "@herina-rn/core/src/utils/runtime";
 import loadChunk from "./loadChunk";
 
 const context = getGlobalContext();

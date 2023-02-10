@@ -1,10 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "es2021",
-      "DOM"
-    ],
+    "lib": ["es2021", "DOM"],
     "module": "ESNext",
     "target": "ESNext",
     "declaration": true,
@@ -17,15 +14,8 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "jsx": "react-jsx",
-    "typeRoots": [
-      "./node_modules/@types/",
-      "./typings"
-    ],
+    "typeRoots": ["./node_modules/@types/", "./typings"],
     "allowJs": true
   },
-  "include": [
-    "src",
-    "rollup.config.ts",
-    "typings"
-  ],
+  "include": ["src", "rollup.config.ts", "typings"]
 }

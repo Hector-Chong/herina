@@ -1,24 +1,28 @@
-import { HerinaConfig, HerinaVersionsInfo } from "@herina-rn/shared";
-import { copyFileSync, ensureDirSync } from "fs-extra";
+import { HerinaConfigInternal, HerinaVersionsInfo } from "@herina-rn/shared";
+import { constants, copyFileSync, ensureDirSync, existsSync } from "fs-extra";
 import { extname, resolve } from "path";
-import { generateRandomStr, md5 } from "../utils/str";
 
 const transformAssetPathsToRelative = (
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   assets: Record<number, string>
 ) => {
   Object.keys(assets).forEach((id) => {
     const filePath = assets[+id];
 
-    assets[id] = filePath.replace(config.root, "");
+    if (filePath) {
+      assets[id] = filePath.replace(config.root, "");
 
-    if (assets[id][0] === "/") {
-      assets[id] = assets[id].slice(1);
+      if (assets[id][0] === "/") {
+        assets[id] = assets[id].slice(1);
+      }
     }
   });
 };
 
-const splitAssets = (config: HerinaConfig, info: HerinaVersionsInfo) => {
+const splitAssets = async (
+  config: HerinaConfigInternal,
+  info: HerinaVersionsInfo
+) => {
   const sourceDir = config.root;
   const assetsDir = resolve(config.outputPath, "assets");
 
@@ -29,19 +33,22 @@ const splitAssets = (config: HerinaConfig, info: HerinaVersionsInfo) => {
 
   transformAssetPathsToRelative(config, currentAssets);
 
-  Object.keys(currentAssets).map((id) => {
+  for (const id in currentAssets) {
     const filePath = currentAssets[id];
 
-    const tempFilePath = resolve(sourceDir, filePath);
-    const extension = extname(tempFilePath);
-    const newFileName = md5(generateRandomStr(10)) + extension;
+    if (filePath) {
+      const tempFilePath = resolve(sourceDir, filePath);
+      const extension = extname(tempFilePath);
+      const newFileName = id + extension;
+      const newFilePath = resolve(assetsDir, newFileName);
 
-    const newFilePath = resolve(assetsDir, newFileName);
+      if (existsSync(tempFilePath)) {
+        copyFileSync(tempFilePath, newFilePath, constants.COPYFILE_FICLONE);
+      }
 
-    copyFileSync(tempFilePath, newFilePath);
-
-    currentAssets[id] = newFileName;
-  });
+      currentAssets[id] = newFileName;
+    }
+  }
 };
 
 export default splitAssets;

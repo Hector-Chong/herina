@@ -4,6 +4,8 @@ import { idToFileMap } from "../serializer/createModuleIdFactory";
 import { Identifier, NumericLiteral, ArrayExpression } from "@babel/types";
 import { HerinaConfig } from "@herina-rn/shared";
 import { manifest } from "../builder/manifest";
+import { filterFile } from "../builder/buildUpdate";
+import { INCREMENTAL_INSERT_TAG } from "../consts";
 
 const fullTransformer = (config: HerinaConfig, ast: Node) => {
   const mainChunkModules = manifest.chunks.main || {};
@@ -45,10 +47,7 @@ const fullTransformer = (config: HerinaConfig, ast: Node) => {
             )
           ];
 
-          if (
-            shouldSplit(absolutePath) &&
-            config.extensions!.some((e) => absolutePath.endsWith(e))
-          ) {
+          if (shouldSplit(absolutePath) && filterFile(config, absolutePath)) {
             if (
               mainChunkModules[absolutePath] ||
               assetsChunkModules[absolutePath]
@@ -79,8 +78,17 @@ const fullTransformer = (config: HerinaConfig, ast: Node) => {
           path.remove();
         }
       }
+    },
+    StringLiteral(path) {
+      const node = path.node;
+
+      if (node.value === INCREMENTAL_INSERT_TAG) {
+        path.remove();
+      }
     }
   });
+
+  mainChunkCode += JSON.stringify(INCREMENTAL_INSERT_TAG);
 
   return { ast, dynamicModulesGraph, mainChunkCode };
 };

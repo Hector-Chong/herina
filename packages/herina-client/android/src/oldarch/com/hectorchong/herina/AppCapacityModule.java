@@ -6,6 +6,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
+import java.util.Map;
+
 public class AppCapacityModule extends ReactContextBaseJavaModule {
   private AppCapacityImpl moduleImpl;
 
@@ -18,6 +20,11 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   @Override
   public String getName() {
     return AppCapacityImpl.NAME;
+  }
+
+  @Override
+  public Map<String, Object> getConstants() {
+    return moduleImpl.getConstants();
   }
 
   @ReactMethod
@@ -46,8 +53,8 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void applyBundleUpdate(Callback callback) {
-    moduleImpl.applyBundleUpdate(callback);
+  public void applyFullUpdate(Callback callback) {
+    moduleImpl.applyFullUpdate(callback);
   }
 
   @ReactMethod

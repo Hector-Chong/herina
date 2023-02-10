@@ -2,30 +2,67 @@ package com.hectorchong.herina.models;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import com.hectorchong.herina.utils.JsonUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 public class AppVersionConfig {
-  private int useOriginal;
+  private boolean useOriginal;
   private int originalVersionNum;
   private String originalCommitHash;
   private int versionNum;
   private String commitHash;
   private int nextVersionNum;
   private String nextCommitHash;
-  private int isBundleAvailable;
-  private int isIncrementalAvailable;
+  private boolean isFullAvailable;
+  private boolean isIncrementalAvailable;
   private JSONArray incrementalsToApply;
+  private HerinaVersionsHistoryItem fullToApply;
+  private JSONArray appliedVersionNums;
 
-  public boolean getUseOriginal() {
-    return useOriginal == 1;
+  public boolean isUseOriginal() {
+    return useOriginal;
   }
 
-  public void setUseOriginal(int useOriginal) {
+  public void setUseOriginal(boolean useOriginal) {
+    this.useOriginal = useOriginal;
+  }
+
+  public boolean getIsFullAvailable() {
+    return isFullAvailable;
+  }
+
+  public void setIsFullAvailable(boolean fullAvailable) {
+    isFullAvailable = fullAvailable;
+  }
+
+  public boolean isIncrementalAvailable() {
+    return isIncrementalAvailable;
+  }
+
+  public HerinaVersionsHistoryItem getFullToApply() {
+    return fullToApply;
+  }
+
+  public void setFullToApply(HerinaVersionsHistoryItem fullToApply) {
+    this.fullToApply = fullToApply;
+  }
+
+  public JSONArray getAppliedVersionNums() {
+    return appliedVersionNums;
+  }
+
+  public void setAppliedVersionNums(JSONArray appliedVersionNums) {
+    this.appliedVersionNums = appliedVersionNums;
+  }
+
+  public boolean getUseOriginal() {
+    return useOriginal;
+  }
+
+  public void setUseOriginal(Boolean useOriginal) {
     this.useOriginal = useOriginal;
   }
 
@@ -70,19 +107,11 @@ public class AppVersionConfig {
   }
 
   public boolean getIsIncrementalAvailable() {
-    return isIncrementalAvailable == 1;
+    return isIncrementalAvailable;
   }
 
-  public void setIsIncrementalAvailable(int isIncrementalAvailable) {
+  public void setIsIncrementalAvailable(boolean isIncrementalAvailable) {
     this.isIncrementalAvailable = isIncrementalAvailable;
-  }
-
-  public boolean getIsBundleAvailable() {
-    return isBundleAvailable == 1;
-  }
-
-  public void setIsBundleAvailable(int isBundleAvailable) {
-    this.isBundleAvailable = isBundleAvailable;
   }
 
   public JSONArray getIncrementalsToApply() {
@@ -105,15 +134,20 @@ public class AppVersionConfig {
     AppVersionConfig config = new AppVersionConfig();
 
     try {
-      config.setUseOriginal(dictionary.getInt("useOriginal"));
+      config.setUseOriginal(dictionary.getBoolean("useOriginal"));
       config.setVersionNum(dictionary.getInt("versionNum"));
       config.setCommitHash(dictionary.getString("commitHash"));
       config.setNextVersionNum(dictionary.getInt("nextVersionNum"));
       config.setNextCommitHash(dictionary.getString("nextCommitHash"));
       config.setOriginalCommitHash(dictionary.getString("originalCommitHash"));
       config.setOriginalVersionNum(dictionary.getInt("originalVersionNum"));
-      config.setIsIncrementalAvailable(dictionary.getInt("isIncrementalAvailable"));
+      config.setIsIncrementalAvailable(dictionary.getBoolean("isIncrementalAvailable"));
       config.setIncrementalsToApply(dictionary.getJSONArray("incrementalsToApply"));
+      config.setIsFullAvailable(dictionary.getBoolean("isFullAvailable"));
+
+      if (!dictionary.isNull("fullToApply")) {
+        config.setFullToApply(HerinaVersionsHistoryItem.initWithJsonObject(dictionary.getJSONObject("fullToApply")));
+      }
     } catch (JSONException e) {
       e.printStackTrace();
 
@@ -127,16 +161,18 @@ public class AppVersionConfig {
     JSONObject object = new JSONObject();
 
     try {
-      object.put("useOriginal", useOriginal);
-      object.put("versionNum", versionNum);
-      object.put("commitHash", commitHash);
-      object.put("nextVersionNum", nextVersionNum);
-      object.put("nextCommitHash", nextCommitHash);
-      object.put("originalCommitHash", originalCommitHash);
-      object.put("originalVersionNum", originalVersionNum);
-      object.put("isBundleAvailable", isBundleAvailable);
-      object.put("isIncrementalAvailable", isIncrementalAvailable);
-      object.put("incrementalsToApply", incrementalsToApply);
+      object.put("useOriginal", getUseOriginal());
+      object.put("versionNum", getVersionNum());
+      object.put("commitHash", getCommitHash());
+      object.put("nextVersionNum", getNextVersionNum());
+      object.put("nextCommitHash", getNextCommitHash());
+      object.put("originalCommitHash", getOriginalCommitHash());
+      object.put("originalVersionNum", getOriginalVersionNum());
+      object.put("isFullAvailable", getIsFullAvailable());
+      object.put("isIncrementalAvailable", getIsIncrementalAvailable());
+      object.put("incrementalsToApply", getIncrementalsToApply());
+      object.put("appliedVersionNums", getAppliedVersionNums());
+      object.put("fullToApply", fullToApply != null ? fullToApply.getJsonObject() : null);
     } catch (JSONException e) {
       e.printStackTrace();
 
@@ -149,28 +185,18 @@ public class AppVersionConfig {
   public WritableMap getWritableMap() {
     WritableMap object = Arguments.createMap();
 
-    ArrayList<String> incrementalsToApplyArr = new ArrayList<>();
-
-    try {
-      for (int i = 0; i < incrementalsToApply.length(); i++) {
-        incrementalsToApplyArr.add(incrementalsToApply.getString(i));
-      }
-    } catch (JSONException e) {
-      e.printStackTrace();
-
-      return null;
-    }
-
-    object.putInt("useOriginal", useOriginal);
-    object.putInt("versionNum", versionNum);
-    object.putString("commitHash", commitHash);
-    object.putInt("nextVersionNum", nextVersionNum);
-    object.putString("nextCommitHash", nextCommitHash);
-    object.putString("originalCommitHash", originalCommitHash);
-    object.putInt("originalVersionNum", originalVersionNum);
-    object.putInt("isBundleAvailable", isBundleAvailable);
-    object.putInt("isIncrementalAvailable", isIncrementalAvailable);
-    object.putArray("incrementalsToApply", Arguments.fromList(incrementalsToApplyArr));
+    object.putBoolean("useOriginal", getUseOriginal());
+    object.putInt("versionNum", getVersionNum());
+    object.putString("commitHash", getCommitHash());
+    object.putInt("nextVersionNum", getNextVersionNum());
+    object.putString("nextCommitHash", getNextCommitHash());
+    object.putString("originalCommitHash", getOriginalCommitHash());
+    object.putInt("originalVersionNum", getOriginalVersionNum());
+    object.putBoolean("isFullAvailable", getIsFullAvailable());
+    object.putBoolean("isIncrementalAvailable", getIsIncrementalAvailable());
+    object.putArray("incrementalsToApply", incrementalsToApply == null ? null : Arguments.fromList(JsonUtils.jsonArrayToArrayList(incrementalsToApply)));
+    object.putArray("appliedVersionNums", appliedVersionNums == null ? null : Arguments.fromList(JsonUtils.jsonArrayToArrayList(appliedVersionNums)));
+    object.putMap("fullToApply", fullToApply == null ? null : fullToApply.getReadbleMap());
 
     return object;
   }

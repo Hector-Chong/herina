@@ -3,9 +3,9 @@ import { loadMetroConfig } from "@react-native-community/cli-plugin-metro";
 import createMetroConfig from "./createMetroConfig";
 import fs from "fs-extra";
 import path from "path";
-import { HerinaConfig, Recordable } from "@herina-rn/shared";
+import { HerinaConfigInternal, Recordable } from "@herina-rn/shared";
 
-const createArgs = (config: HerinaConfig) => ({
+const createArgs = (config: HerinaConfigInternal) => ({
   platform: config.platform as string,
   dev: config.environment === "development",
   bundleEncoding: "utf8",
@@ -18,7 +18,7 @@ const createArgs = (config: HerinaConfig) => ({
   bundleOutput: path.resolve(config.outputPath, "bundle.js")
 });
 
-const createBuildConfig = async (config: HerinaConfig) => {
+const createBuildConfig = async (config: HerinaConfigInternal) => {
   const buildConfig = await loadMetroConfig(loadConfig(config.root), {
     maxWorkers: config.maxWorkers,
     resetCache: true

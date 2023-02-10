@@ -1,4 +1,4 @@
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
+import { HerinaConfigInternal, HerinaManifest } from "@herina-rn/shared";
 import {
   createManifestIfNotExist,
   getCacheManifestDir
@@ -52,7 +52,9 @@ export const removeSplittingChunkFromMain = (manifest: HerinaManifest) => {
   return manifest;
 };
 
-export const combineManifestFromMetroWorkers = (config: HerinaConfig) => {
+export const combineManifestFromMetroWorkers = (
+  config: HerinaConfigInternal
+) => {
   const manifest = createManifestIfNotExist(config);
 
   const manifestDir = getCacheManifestDir();

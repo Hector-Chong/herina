@@ -1,6 +1,6 @@
-import { createHash } from "crypto";
+import CryptoJS from "crypto-js";
 
-export const md5 = (str: string) => createHash("md5").update(str).digest("hex");
+export const md5 = (str: string) => CryptoJS.MD5(str).toString();
 
 export const generateRandomStr = (length: number) => {
   const chars =

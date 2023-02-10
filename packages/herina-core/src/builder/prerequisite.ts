@@ -4,17 +4,22 @@ import {
   ensureFileSync,
   writeJsonSync
 } from "fs-extra";
-import defineHerinaConfig from "../helpers/defineHerinaConfig";
 import { getConfigFilePath } from "../utils/file";
-import { HerinaConfig } from "@herina-rn/shared";
+import {
+  getArrayLastOne,
+  isArrayWithLength,
+  HerinaConfigInternal,
+  HerinaConfig
+} from "@herina-rn/shared";
 import { getVersionsJson } from "../utils/version";
 import { computeDifferentFiles } from "../utils/git";
 import { warn } from "../utils/console";
-import { getArrayLastOne, isArrayWithLength } from "../utils/arr";
+import defineHerinaConfig from "../helpers/defineHerinaConfig";
 
-const cleanCache = (config: HerinaConfig) => emptyDirSync(config.outputPath);
+const cleanCache = (config: HerinaConfigInternal) =>
+  emptyDirSync(config.outputPath);
 
-const writeConfig = (config: HerinaConfig) => {
+const writeConfig = (config: HerinaConfigInternal) => {
   const filePath = getConfigFilePath();
 
   ensureFileSync(filePath);
@@ -22,19 +27,19 @@ const writeConfig = (config: HerinaConfig) => {
   writeJsonSync(filePath, config);
 };
 
-export const prepareToBuild = (config: HerinaConfig) => {
-  config.clean && cleanCache(config);
+export const prepareToBuild = (config: HerinaConfig | HerinaConfigInternal) => {
+  const internal = defineHerinaConfig(config);
 
-  config = defineHerinaConfig(config);
+  internal.clean && cleanCache(internal);
 
-  ensureDirSync(config.outputPath);
+  ensureDirSync(internal.outputPath);
 
-  writeConfig(config);
+  writeConfig(internal);
 
-  return config;
+  return internal;
 };
 
-export const checkNativeChange = async (config: HerinaConfig) => {
+export const checkNativeChange = async (config: HerinaConfigInternal) => {
   const info = getVersionsJson(config);
 
   if (!config.checkNativeChange || !info || !isArrayWithLength(info.versions))

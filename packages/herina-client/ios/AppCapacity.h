@@ -13,4 +13,8 @@
 
 @interface AppCapacity : NSObject <RCTBridgeModule>
 
+@property(nonatomic, readwrite, copy) NSURL *baseUrl;
+
+- (BOOL)downloadAssets:(NSDictionary *)assets;
+
 @end

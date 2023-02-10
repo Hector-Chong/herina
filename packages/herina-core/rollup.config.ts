@@ -16,7 +16,7 @@ const basicOutput = {
 };
 
 const basicPlugins = [
-  typescript({}),
+  typescript(),
   commonjs({
     include: ["./src/**", "node_modules/**"]
   })

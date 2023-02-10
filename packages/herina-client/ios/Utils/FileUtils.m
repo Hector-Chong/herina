@@ -28,22 +28,28 @@
     return herinaDir;
 }
 
-+ (NSString *)getBundleStoreDirPath
++ (NSString *)getChunkStoreDirPath:(NSString *)chunkType
 {
-    NSString *path = [[FileUtils getHerinaDir] stringByAppendingPathComponent:@"bundle"];
+    NSString *path = [[FileUtils getHerinaDir] stringByAppendingPathComponent:chunkType];
     
     [FileUtils createDirIfNotExists:path];
 
     return path;
 }
 
++ (NSString *)getBundleStoreDirPath
+{
+    return [FileUtils getChunkStoreDirPath:@"bundle"];
+}
+
 + (NSString *)getIncrementalStorePath
 {
-    NSString *path = [[FileUtils getHerinaDir] stringByAppendingPathComponent:@"incremental"];
-    
-    [FileUtils createDirIfNotExists:path];
+    return [FileUtils getChunkStoreDirPath:@"incremental"];
+}
 
-    return path;
++ (NSString *)getAssetStorePath
+{
+    return [FileUtils getChunkStoreDirPath:@"assets"];
 }
 
 + (void)createDirIfNotExists:(NSString *)path

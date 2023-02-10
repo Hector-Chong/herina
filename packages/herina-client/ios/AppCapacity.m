@@ -1,303 +1,418 @@
-//
-//  AppCapacity.m
-//  ReactNativeNewArch70
-//
-//  Created by Hector Chong on 1/12/23.
-//
+package com.hectorchong.herina;
 
-#import "AppCapacity.h"
-#import "AppVersionConfig.h"
-#import "BundleManager.h"
-#import "HerinaVersionsHistoryItem.h"
-#import "Utils/FileUtils.h"
-#import "Utils/VersionUtils.h"
+import androidx.annotation.MainThread;
 
-@implementation AppCapacity
+import com.facebook.react.ReactActivity;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
+import com.hectorchong.herina.models.AppVersionConfig;
+import com.hectorchong.herina.models.HerinaVersionsHistoryItem;
+import com.hectorchong.herina.utils.FileUtils;
+import com.hectorchong.herina.utils.JsonUtils;
+import com.hectorchong.herina.utils.VersionUtils;
 
-RCT_EXPORT_MODULE(Herina)
+import org.json.JSONException;
+import org.json.JSONObject;
 
-RCT_EXPORT_METHOD(initVersionJson:
-                      (NSDictionary *)params
-                      callback:(RCTResponseSenderBlock)callback
-                  ) {
-    AppVersionConfig *config = [VersionUtils createVersionJson:params];
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-    callback(@[[NSNumber numberWithBool:config == nil]]);
-}
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
-RCT_EXPORT_METHOD(getVersionConfig:
-                      (RCTResponseSenderBlock)callback
-                  ) {
-    AppVersionConfig *versionConfig = [VersionUtils getVersionJson];
+public class AppCapacityImpl {
+  public static final String NAME = "Herina";
 
-    if (versionConfig) {
-        callback(@[[NSNumber numberWithBool:NO], [versionConfig getVersionConfigDict]]);
+  private static AppCapacityImpl instance;
+  private static ReactApplicationContext reactContext;
+
+  private String baseUrl;
+
+  public AppCapacityImpl(ReactApplicationContext context) {
+    reactContext = context;
+    instance = this;
+  }
+
+  public Map<String, Object> getConstants() {
+    final Map<String, Object> constants = new HashMap<>();
+    constants.put("assetsURL", "file://" + FileUtils.getAssetStorePath(reactContext));
+    return constants;
+  }
+
+  public void initVersionJson(ReadableMap params, Callback callback) {
+    AppVersionConfig config = VersionUtils.createVersionJson(reactContext, params);
+
+    callback.invoke(config == null);
+  }
+
+  public void getVersionConfig(Callback callback) {
+    AppVersionConfig versionConfig = VersionUtils.getVersionJson(reactContext);
+
+    if (versionConfig != null) {
+      callback.invoke(false, versionConfig.getWritableMap());
     } else {
-        callback(@[[NSNumber numberWithBool:NO]]);
+      callback.invoke(false);
     }
-}
+  }
 
-RCT_EXPORT_METHOD(setVersionConfigValues:
-                      (NSDictionary *)params
-                      callback:(RCTResponseSenderBlock)callback
-                  ) {
-    NSFileManager *manager = [NSFileManager defaultManager];
+  public void setVersionConfigValues(ReadableMap params, Callback callback) {
+    AppVersionConfig versionConfig = VersionUtils.getVersionJson(reactContext);
 
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:params options:NSJSONWritingFragmentsAllowed error:nil];
-    NSString *plainData = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSData *dataToStore = [plainData dataUsingEncoding:NSUTF8StringEncoding];
+    if (versionConfig != null) {
+      JSONObject versionConfigJson = versionConfig.getJsonObject();
 
-    NSString *versionJsonPath = [VersionUtils getVersionJsonPath];
+      ReadableMapKeySetIterator iterator = params.keySetIterator();
 
-    AppVersionConfig *versionConfig = [VersionUtils getVersionJson];
+      while (iterator.hasNextKey()) {
+        String key = iterator.nextKey();
+        ReadableType type = params.getType(key);
 
-    if (versionConfig) {
-        for (NSString *key in params) {
-            id value = [params valueForKey:key];
+        try {
+          switch (type) {
+            case Null:
+              versionConfigJson.put(key, null);
+              break;
+            case Boolean:
+              versionConfigJson.put(key, params.getBoolean(key));
+              break;
+            case Number:
+              versionConfigJson.put(key, params.getDouble(key));
+              break;
+            case String:
+              versionConfigJson.put(key, params.getString(key));
+              break;
+            case Array:
+              versionConfigJson.put(key, JsonUtils.readableArrayToJsonArray(params.getArray(key)));
+              break;
+          }
 
-            [VersionUtils setVersionKeyValue:key value:value];
+          VersionUtils.writeVersionJson(reactContext, versionConfigJson);
+
+        } catch (JSONException e) {
+          e.printStackTrace();
+          callback.invoke(true);
+
+          return;
         }
+      }
 
-        return callback(@[[NSNumber numberWithBool:NO]]);
+      callback.invoke(false);
     } else {
-        [manager createFileAtPath:versionJsonPath contents:dataToStore attributes:nil];
-
-        return callback(@[[NSNumber numberWithBool:NO]]);
+      callback.invoke(true);
     }
-}
+  }
 
-RCT_EXPORT_METHOD(downloadBundleToUpdate:
-                      (NSDictionary *)params
-                      callback:(RCTResponseSenderBlock)callback
-                  ) {
-    NSString *baseUrl = params[@"baseUrl"];
+  public void downloadBundleToUpdate(ReadableMap params, Callback callback) {
+    String baseUrl = params.getString("baseUrl");
+    HerinaVersionsHistoryItem version = HerinaVersionsHistoryItem.initWithDictionary(params.getMap("version"));
 
-    NSArray<NSString *> *chunkTypes = @[@"vendor", @"main"];
+    ArrayList<String> chunkTypes = new ArrayList<>();
+    chunkTypes.add("vendor");
+    chunkTypes.add("main");
 
-    NSFileManager *manager = [NSFileManager defaultManager];
+    this.baseUrl = baseUrl;
 
-    NSString *baseStorePath = [FileUtils getBundleStoreDirPath];
-    NSString *nextBundleStorePath = [baseStorePath stringByAppendingPathComponent:@"bundle.next.js"];
+    OkHttpClient client = new OkHttpClient();
 
-    if (![manager fileExistsAtPath:nextBundleStorePath]) {
-        [manager createFileAtPath:nextBundleStorePath contents:nil attributes:nil];
-    }
+    for (int i = 0; i < chunkTypes.size(); i++) {
+      String chunkType = chunkTypes.get(i);
+      String chunkStoreDir = FileUtils.getChunkStoreDirPath(reactContext, chunkType);
+      String chunkName = version.getFileNames().getReadbleMap().getString(chunkType);
+      String chunkStorePath = chunkStoreDir + "/" + chunkName;
+      File chunkFile = new File(chunkStorePath);
 
-    NSFileHandle *nextBundleHandler = [NSFileHandle fileHandleForWritingAtPath:nextBundleStorePath];
+      String chunkUrl = baseUrl + "/" + chunkType + "/" + chunkName;
 
-    for (int i = 0; i < [chunkTypes count]; i++) {
-        NSString *chunkType = [chunkTypes objectAtIndex:i];
+      Request request = new Request.Builder().url(chunkUrl).build();
 
-        NSString *chunkName = [NSString stringWithFormat:@"%@.chunk.js", chunkType];
-        NSString *nextChunkName = [NSString stringWithFormat:@"%@.chunk.next.js", chunkType];
-        NSString *nextChunkStorePath = [baseStorePath stringByAppendingPathComponent:nextChunkName];
-
-        NSURL *chunkUrl = [[NSURL URLWithString:baseUrl] URLByAppendingPathComponent:chunkName];
-
-        NSError *error;
-
-        NSData *chunkData = [NSData dataWithContentsOfURL:chunkUrl options:NSDataReadingMappedIfSafe error:&error];
-
-        if (error) {
-            return callback(@[[NSNumber numberWithBool:YES], [NSString stringWithFormat:@"%@ downloading falied.", chunkUrl]]);
+      try (Response response = client.newCall(request).execute()) {
+        if (!response.isSuccessful()) {
+          callback.invoke(true, chunkUrl + " downloading failed.");
+          return;
         }
 
-        if (![manager fileExistsAtPath:nextChunkStorePath]) {
-            [manager createFileAtPath:nextChunkStorePath contents:chunkData attributes:nil];
-        } else {
-            NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:nextChunkStorePath];
+        ResponseBody body = response.body();
+        String chunkData = body.string();
 
-            [handle seekToFileOffset:0];
-            [handle writeData:chunkData];
-            [handle truncateFileAtOffset:chunkData.length];
-
-            [handle closeFile];
+        if (!chunkFile.exists()) {
+          chunkFile.createNewFile();
         }
 
-        [nextBundleHandler writeData:chunkData];
+        FileOutputStream handle = new FileOutputStream(chunkFile, false);
 
-        [nextBundleHandler seekToEndOfFile];
+        handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
+        handle.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, chunkUrl + " downloading failed.");
+
+        return;
+      }
     }
 
-    [nextBundleHandler closeFile];
+    if (version.getAssets() != null && downloadAssets(version.getAssets(), callback)) {
+      callback.invoke(false);
+    }
 
-    callback(@[[NSNumber numberWithBool:NO]]);
-}
+    callback.invoke(false);
+  }
 
-RCT_EXPORT_METHOD(downloadIncrementalUpdates:
-                      (NSDictionary *)params
-                      callback:(RCTResponseSenderBlock)callback
-                  ) {
-    NSString *baseUrl = params[@"baseUrl"];
-    NSArray<NSDictionary *> *versionDicts = params[@"versions"];
-    NSMutableArray<NSString *> *incrementals = [@[] mutableCopy];
+  public boolean downloadAssets(HashMap<String, Object> assets, Callback callback) {
+    String assetStoreDir = FileUtils.getAssetStorePath(reactContext);
+    Iterator<String> assetKeys = assets.keySet().iterator();
 
-    NSFileManager *manager = [NSFileManager defaultManager];
+    OkHttpClient client = new OkHttpClient();
 
-    for (int i = 0; i < versionDicts.count; i++) {
-        HerinaVersionsHistoryItem *item = [[HerinaVersionsHistoryItem alloc] initWithDictionary:[versionDicts objectAtIndex:i]];
+    while (assetKeys.hasNext()) {
+      String assetId = assetKeys.next();
+      String assetName = (String) assets.get(assetId);
+      String assetStorePath = assetStoreDir + "/" + assetName;
+      File assetFile = new File(assetStorePath);
 
-        NSURL *incrementalUrl = [[[NSURL URLWithString:baseUrl] URLByAppendingPathComponent:@"incremental"] URLByAppendingPathComponent:item.filePath];
+      String fullUrl = baseUrl + "/" + "assets" + "/" + assetName;
 
-        NSString *incrementalStorePath = [[FileUtils getIncrementalStorePath] stringByAppendingPathComponent:item.filePath];
+      Request request = new Request.Builder().url(fullUrl).build();
 
-        if ([manager fileExistsAtPath:incrementalStorePath]) {
-            [manager removeItemAtPath:incrementalStorePath error:nil];
+      try (Response response = client.newCall(request).execute()) {
+        if (!response.isSuccessful()) {
+          callback.invoke(true, fullUrl + " downloading failed.");
+          return false;
         }
 
-        NSError *downloadError;
+        ResponseBody body = response.body();
+        String chunkData = body.string();
 
-        NSData *incrementalData = [NSData dataWithContentsOfURL:incrementalUrl options:NSDataReadingMappedIfSafe error:&downloadError];
-
-        if (downloadError) {
-            return callback(@[[NSNumber numberWithBool:YES], [NSString stringWithFormat:@"`%@` incremental update download failed", incrementalUrl]]);
+        if (!assetFile.exists()) {
+          assetFile.createNewFile();
         }
 
-        [manager createFileAtPath:incrementalStorePath contents:incrementalData attributes:nil];
+        FileOutputStream handle = new FileOutputStream(assetFile, false);
 
-        [incrementals addObject:item.filePath];
+        handle.write(chunkData.getBytes());
+        handle.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, fullUrl + " downloading failed.");
+
+        return false;
+      }
     }
 
-    [VersionUtils setVersionKeyValue:@"isIncrementalAvailable" value:@1];
-    [VersionUtils setVersionKeyValue:@"incrementalsToApply" value:[incrementals reverseObjectEnumerator].allObjects];
+    return true;
+  }
 
-    return callback(@[[NSNumber numberWithBool:NO]]);
-}
+  public void downloadIncrementalUpdates(ReadableMap params, Callback callback) {
+    String baseUrl = params.getString("baseUrl");
+    this.baseUrl = baseUrl;
 
-RCT_EXPORT_METHOD(applyBundleUpdate:
-                      (RCTResponseSenderBlock)callback
-                  ) {
-    NSFileManager *manager = [NSFileManager defaultManager];
+    ReadableArray versionDicts = params.getArray("versions");
+    OkHttpClient client = new OkHttpClient();
 
-    NSString *baseStorePath = [FileUtils getBundleStoreDirPath];
-    NSString *oldBundleStorePath = [baseStorePath stringByAppendingPathComponent:@"bundle.old.js"];
-    NSString *nextBundleStorePath = [baseStorePath stringByAppendingPathComponent:@"bundle.next.js"];
-    NSString *bundleStorePath = [baseStorePath stringByAppendingPathComponent:@"bundle.js"];
+    for (int i = 0; i < versionDicts.size(); i++) {
+      HerinaVersionsHistoryItem item = HerinaVersionsHistoryItem.initWithDictionary(versionDicts.getMap(i));
 
-    if (![manager fileExistsAtPath:nextBundleStorePath]) {
-        callback(@[[NSNumber numberWithBool:YES], @"No downloaded bundle found. Please make sure you`ve invoked `downloadBundleToUpdate` or `requestIncrementalUpdates`."]);
-    }
+      String fileName = item.getFileNames().getIncremental();
+      String incrementalUrl = baseUrl + "/" + "incremental" + "/" + fileName;
+      String incrementalStorePath = FileUtils.getIncrementalStorePath(reactContext) + "/" + fileName;
 
-    NSArray<NSString *> *chunkTypes = @[@"vendor", @"main"];
+      File incrementalFile = new File(incrementalStorePath);
+      incrementalFile.deleteOnExit();
 
-    for (int i = 0; i < [chunkTypes count]; i++) {
-        NSString *chunkType = [chunkTypes objectAtIndex:i];
+      Request request = new Request.Builder().url(incrementalUrl).build();
 
-        NSString *chunkName = [NSString stringWithFormat:@"%@.chunk.js", chunkType];
-        NSString *chunkStorePath = [baseStorePath stringByAppendingPathComponent:chunkName];
-
-        NSString *oldChunkName = [NSString stringWithFormat:@"%@.chunk.next.js", chunkType];
-        NSString *oldChunkStorePath = [baseStorePath stringByAppendingPathComponent:oldChunkName];
-
-        if ([manager fileExistsAtPath:chunkStorePath]) {
-            [manager moveItemAtPath:chunkStorePath toPath:oldChunkStorePath error:nil];
-        }
-    }
-
-    if ([manager fileExistsAtPath:bundleStorePath]) {
-        [manager moveItemAtPath:bundleStorePath toPath:oldBundleStorePath error:nil];
-    }
-    
-    [manager moveItemAtPath:nextBundleStorePath toPath:bundleStorePath error:nil];
-    
-    AppVersionConfig *config = [VersionUtils getVersionJson];
-
-    if(config){
-        [VersionUtils setVersionKeyValue:@"versionNum" value:config.nextVersionNum];
-        [VersionUtils setVersionKeyValue:@"commitHash" value:config.nextCommitHash];
-    }
-
-    [VersionUtils setVersionKeyValue:@"nextVersionNum" value:@0];
-    [VersionUtils setVersionKeyValue:@"nextCommitHash" value:@""];
-
-    [VersionUtils setVersionKeyValue:@"useOriginal" value:@0];
-    [VersionUtils setVersionKeyValue:@"isBundleAvailable" value:@0];
-
-    callback(@[[NSNumber numberWithBool:NO]]);
-}
-
-RCT_EXPORT_METHOD(applyIncrementalUpdate:
-                      (RCTResponseSenderBlock)callback
-                  ) {
-    AppVersionConfig *config = [VersionUtils getVersionJson];
-
-    if (!config) {
-        return callback(@[[NSNumber numberWithBool:YES], @"No version.json found."]);
-    }
-
-    if (![config.isIncrementalAvailable isEqualToNumber:@1] || [config.incrementalsToApply count] == 0) {
-        return callback(@[[NSNumber numberWithBool:YES], @"No incremental updates found. Make sure you've invoked `requestIncrementalUpdates`"]);
-    }
-
-    NSString *incrementalCode = @"";
-
-    for (int i = 0; i < [config.incrementalsToApply count]; i++) {
-        NSString *filePath = [config.incrementalsToApply objectAtIndex:i];
-        NSString *fullFilePath = [[FileUtils getIncrementalStorePath] stringByAppendingPathComponent:filePath];
-
-        NSData *data = [NSData dataWithContentsOfFile:fullFilePath];
-        NSString *code = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
-        incrementalCode = [incrementalCode stringByAppendingString:code];
-    }
-
-    NSString *insertTag = @"\"#HERINAINSERTTAG#\"";
-
-    incrementalCode = [incrementalCode stringByAppendingString:insertTag];
-
-    NSString *bundleCode = [BundleManager getBundleCode];
-
-    bundleCode = [bundleCode stringByReplacingOccurrencesOfString:insertTag withString:incrementalCode];
-
-    NSFileManager *manager = [NSFileManager defaultManager];
-
-    NSString *oldBundlePath = [[FileUtils getBundleStoreDirPath] stringByAppendingPathComponent:@"old.bundle.js"];
-
-    NSString *bundlePath = [[FileUtils getBundleStoreDirPath] stringByAppendingPathComponent:@"bundle.js"];
-
-    if ([manager fileExistsAtPath:bundlePath]) {
-        if ([manager fileExistsAtPath:oldBundlePath]) {
-            [manager removeItemAtPath:oldBundlePath error:nil];
+      try (Response response = client.newCall(request).execute()) {
+        if (!response.isSuccessful()) {
+          callback.invoke(true, incrementalUrl + " downloading failed.");
+          return;
         }
 
-        [manager moveItemAtPath:bundlePath toPath:oldBundlePath error:nil];
+        ResponseBody body = response.body();
+        String chunkData = body.string();
+
+        incrementalFile.createNewFile();
+
+        FileOutputStream handle = new FileOutputStream(incrementalStorePath, false);
+
+        handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
+        handle.close();
+
+        if (item.getAssets() != null && !downloadAssets(item.getAssets(), callback)) {
+          break;
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, incrementalUrl + " downloading failed.");
+
+        return;
+      }
     }
 
-    [manager createFileAtPath:bundlePath contents:[bundleCode dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+    callback.invoke(false);
+  }
 
-    if(config){
-        [VersionUtils setVersionKeyValue:@"versionNum" value:config.nextVersionNum];
-        [VersionUtils setVersionKeyValue:@"commitHash" value:config.nextCommitHash];
+  public void applyFullUpdate(Callback callback) {
+    AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
+
+    if (config == null || config.getFullToApply() == null) {
+      callback.invoke(true, "No downloaded bundle found. Please make sure you've invoked `requestFullUpdate`.");
+
+      return;
     }
-    
-    [VersionUtils setVersionKeyValue:@"nextVersionNum" value:@0];
-    [VersionUtils setVersionKeyValue:@"nextCommitHash" value:@""];
 
-    [VersionUtils setVersionKeyValue:@"isIncrementalAvailable" value:@0];
-    [VersionUtils setVersionKeyValue:@"incrementalsToApply" value:@[]];
-    [VersionUtils setVersionKeyValue:@"useOriginal" value:@0];
+    String baseStorePath = FileUtils.getBundleStoreDirPath(reactContext);
+    String bundleStorePath = baseStorePath + "/" + config.getNextVersionNum() + ".js";
+    File bundleFile = new File(bundleStorePath);
+    PrintWriter bundleWriter = null;
 
-    return callback(@[[NSNumber numberWithBool:NO]]);
+    ArrayList<String> chunkTypes = new ArrayList<>();
+    chunkTypes.add("vendor");
+    chunkTypes.add("main");
+
+    bundleFile.deleteOnExit();
+
+    try {
+      bundleFile.createNewFile();
+      bundleWriter = new PrintWriter(bundleFile);
+    } catch (IOException e) {
+      callback.invoke(true, "Failed to create the new bundle file.");
+    }
+
+    for (int i = 0; i < chunkTypes.size(); i++) {
+      String chunkType = chunkTypes.get(i);
+
+      String chunkName = config.getFullToApply().getFileNames().getReadbleMap().getString(chunkType);
+      String chunkStorePath = FileUtils.getChunkStoreDirPath(reactContext, chunkType) + "/" + chunkName;
+      File chunkFile = new File(chunkStorePath);
+
+      try {
+        BufferedReader br = new BufferedReader(new FileReader(chunkFile));
+
+        String line = br.readLine();
+
+        while (line != null) {
+          bundleWriter.println(line);
+          line = br.readLine();
+        }
+
+        br.close();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, "Failed to find " + chunkStorePath + ".");
+        return;
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, "Failed to read " + chunkStorePath + ".");
+        return;
+      }
+    }
+
+    bundleWriter.flush();
+    bundleWriter.close();
+
+    callback.invoke(false);
+  }
+
+  public void applyIncrementalUpdate(Callback callback) {
+    AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
+
+    if (config == null) {
+      callback.invoke(true, "version.json is not found.");
+      return;
+    }
+
+    if (!config.getIsIncrementalAvailable() || config.getIncrementalsToApply().length() == 0) {
+      callback.invoke(true, "No incremental updates found. Make sure you've invoked `requestIncrementalUpdates`.");
+      return;
+    }
+
+    String incrementalCode = "";
+
+    for (int i = 0; i < config.getIncrementalsToApply().length(); i++) {
+      try {
+        String filePath = config.getIncrementalsToApply().getString(i);
+        String fullFilePath = FileUtils.getIncrementalStorePath(reactContext) + "/" + filePath;
+
+        FileInputStream is = new FileInputStream(fullFilePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+          incrementalCode += line;
+        }
+
+        is.close();
+      } catch (JSONException | IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, e.getMessage());
+        return;
+      }
+    }
+
+    String insertTag = "\"#HERINAINSERTTAG#\"";
+    String bundleCode = BundleManager.getBundleCode(reactContext, false);
+
+    incrementalCode += insertTag;
+    bundleCode = bundleCode.replace(insertTag, incrementalCode);
+
+    String bundlePath = FileUtils.getBundleStoreDirPath(reactContext) + "/" + config.getNextVersionNum() + ".js";
+    File bundleFile = new File(bundlePath);
+
+    try {
+      bundleFile.createNewFile();
+
+      FileOutputStream os = new FileOutputStream(bundleFile);
+      os.write(bundleCode.getBytes(StandardCharsets.UTF_8));
+      os.close();
+
+      callback.invoke(false);
+    } catch (IOException e) {
+      e.printStackTrace();
+
+      callback.invoke(true, e.getMessage());
+    }
+  }
+
+  public void setUseOriginalBundle(ReadableMap params, Callback callback) {
+    int isOriginal = params.getInt("original");
+
+    boolean res = VersionUtils.setVersionKey(reactContext, "useOriginal", isOriginal);
+
+    callback.invoke(!res);
+  }
+
+  @MainThread
+  public void reloadApp() {
+    ReactActivity activity = (ReactActivity) reactContext.getCurrentActivity();
+    ReactApplication application = (ReactApplication) activity.getApplication();
+    ReactInstanceManager manager = application.getReactNativeHost().getReactInstanceManager();
+
+    manager.recreateReactContextInBackground();
+  }
 }
-
-RCT_EXPORT_METHOD(setUseOriginalBundle:
-                      (NSDictionary *)params
-                      callback:(RCTResponseSenderBlock)callback
-                  ) {
-    NSNumber *isOriginal = params[@"original"];
-
-    [VersionUtils setVersionKeyValue:@"useOriginal" value:isOriginal];
-
-    callback(@[[NSNumber numberWithBool:NO]]);
-}
-
-RCT_EXPORT_METHOD(reloadApp) {
-    [self reloadAppViaCommand];
-}
-
-- (void)reloadAppViaCommand
-{
-    RCTTriggerReloadCommandListeners(@"Herina requests app reloading.");
-}
-
-@end

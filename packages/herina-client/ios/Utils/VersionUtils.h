@@ -16,7 +16,7 @@
 + (nullable AppVersionConfig *)getVersionJson;
 
 + (void)setVersionKeyValue:(nonnull NSString *)key
-                 value:(nonnull id)value;
+                 value:(nullable id)value;
 
 + (nullable AppVersionConfig *)createVersionJson:(nonnull NSDictionary *)params;
 

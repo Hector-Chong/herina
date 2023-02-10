@@ -1,8 +1,10 @@
 import { resolve } from "path";
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
-
+import {
+  HerinaConfigInternal,
+  HerinaManifest,
+  generateRandomStr
+} from "@herina-rn/shared";
 import { getChunkHashedName, getManifestChunks } from "../utils/file";
-import { generateRandomStr, md5 } from "../utils/str";
 
 export interface ChunkAsset {
   filename: string;
@@ -12,7 +14,7 @@ export interface ChunkAsset {
 
 export const defaultAnalyser = (
   chunkName: string,
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   code: string
 ) => {
   const filename = `${generateRandomStr(8)}.${chunkName}.chunk.js`;
@@ -22,7 +24,7 @@ export const defaultAnalyser = (
 };
 
 export const dynamicChunkAnalyser = (
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   manifest: HerinaManifest,
   dynamicModulesGraph: Map<
     string,

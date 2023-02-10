@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import traverse from "@babel/traverse";
-import { isArrayWithLength } from "../utils/arr";
+import { isArrayWithLength } from "@herina-rn/shared";
 import { getParsedConfig } from "../utils/file";
 import { resolve } from "path";
 import { HerinaBabelTransformerAfter } from ".";

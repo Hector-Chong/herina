@@ -107,7 +107,7 @@ const requestChunk = async (
   const timeout = setTimeout(onScriptComplete, 120000);
 
   try {
-    const res = await fetch(`${global.baseUrl}/${chunkName}`, {
+    const res = await fetch(`${global.baseUrl}/dynamic/${chunkName}`, {
       cache: "no-store"
     });
 

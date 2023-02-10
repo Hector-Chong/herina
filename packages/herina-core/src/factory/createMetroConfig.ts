@@ -8,7 +8,6 @@ import { createModuleIdFactory } from "../serializer/createModuleIdFactory";
 import getRunModuleStatement from "../serializer/getRunModuleStatement";
 import { prepareToBuild } from "../builder/prerequisite";
 import {
-  addAssetsToVersionsJson,
   addVersionHistory,
   createVersiosnJsonIfNotExist,
   getVersionsJsonPath
@@ -77,17 +76,20 @@ const createMetroConfig = (
 ) => {
   const defaultMetroConfig = createDefaultMetroConfig(config);
 
-  prepareToBuild(config);
+  const internalConfig = prepareToBuild(config);
 
   if (isBuilding) {
-    const info = createVersiosnJsonIfNotExist(config);
+    const info = createVersiosnJsonIfNotExist(internalConfig);
 
-    addVersionHistory(config, info);
-    addAssetsToVersionsJson(info);
+    addVersionHistory(internalConfig, info);
 
-    info.releaseVersionNums.push(info.versions[0].versionNum);
+    const releaseVersionNum = info.versions[0].versionNum;
 
-    writeJsonSync(getVersionsJsonPath(config), info);
+    if (info.releaseVersionNums.indexOf(releaseVersionNum) === -1) {
+      info.releaseVersionNums.unshift(releaseVersionNum);
+    }
+
+    writeJsonSync(getVersionsJsonPath(internalConfig), info);
   }
 
   return merge(userMetroConfig, defaultMetroConfig);

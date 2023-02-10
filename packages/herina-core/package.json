@@ -2,23 +2,20 @@
   "name": "@herina-rn/core",
   "version": "1.0.4",
   "description": "",
+  "license": "MIT",
+  "author": "Héctor Chong",
   "main": "dist/index.js",
+  "types": "./dist/src/index.d.ts",
   "files": [
     "src",
     "metro.config.js",
     "typings",
     "dist"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "types": "./dist/src/index.d.ts",
   "scripts": {
     "build": "rollup --config rollup.config.ts --configPlugin esbuild",
     "publish:local": "yarn build && yalc push"
   },
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@babel/generator": "^7.20.5",
     "@babel/node": "^7.20.7",
@@ -31,6 +28,7 @@
     "@react-native-community/cli-plugin-metro": "^10.1.0",
     "@react-native/js-polyfills": "^0.72.0",
     "lodash": "^4.17.21",
+    "md5-file": "^5.0.0",
     "metro": "^0.74.0",
     "metro-babel-transformer": "^0.73.6",
     "metro-hermes-compiler": "^0.74.0",
@@ -62,5 +60,8 @@
     "ts-node": "^10.9.1",
     "tsc": "^2.0.4",
     "typescript": "^4.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

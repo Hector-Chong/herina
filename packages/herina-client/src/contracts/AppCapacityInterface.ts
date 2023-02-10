@@ -1,24 +1,27 @@
-import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina-rn/shared";
+import { AppVersionConfig, HerinaVersionsItem } from "@herina-rn/shared";
 
 interface AppCapacityInterface {
   getVersionConfig(): Promise<AppVersionConfig>;
 
   downloadIncrementalUpdates(
     baseUrl: string,
-    versions: HerinaVersionsHistoryItem[]
+    versions: HerinaVersionsItem[]
+  ): Promise<boolean>;
+
+  downloadBundleToUpdate(
+    baseUrl: string,
+    version: HerinaVersionsItem
   ): Promise<boolean>;
 
   setVersionConfigValues(params: Partial<AppVersionConfig>): Promise<boolean>;
 
-  applyBundleUpdate(immediate: boolean): Promise<boolean>;
+  applyFullUpdate(): Promise<boolean>;
 
-  applyIncrementalUpdate(immediate: boolean): Promise<boolean>;
+  applyIncrementalUpdate(): Promise<boolean>;
 
-  downloadBundleToUpdate(baseUrl: string): Promise<boolean>;
+  setUseOriginalBundle(original: boolean): Promise<boolean>;
 
-  setUseOriginalBundle(original: boolean);
-
-  reloadApp();
+  reloadApp(): void;
 
   initVersionJson(config: AppVersionConfig): Promise<boolean>;
 }

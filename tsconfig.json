@@ -7,7 +7,6 @@
     "target": "ESNext",
     "moduleResolution": "node",
     "outDir": "./dist",
-    "baseUrl": "./",
     "sourceMap": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -15,9 +14,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "strict": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules", "packages/herina-admin", "packages/herina-server"]
 }

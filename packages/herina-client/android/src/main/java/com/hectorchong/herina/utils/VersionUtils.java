@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
 public class VersionUtils {
   public static String getVersionJsonPath(Context context) {
@@ -23,6 +22,22 @@ public class VersionUtils {
   }
 
   public static boolean setVersionKey(Context context, String key, int value) {
+    JSONObject jsonObject = getVersionJsonAsJson(context);
+
+    try {
+      jsonObject.put(key, value);
+
+      writeVersionJson(context, jsonObject);
+
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+
+      return false;
+    }
+  }
+
+  public static boolean setVersionKey(Context context, String key, boolean value) {
     JSONObject jsonObject = getVersionJsonAsJson(context);
 
     try {
@@ -103,18 +118,12 @@ public class VersionUtils {
 
     jsonFile.deleteOnExit();
 
-    AppVersionConfig config = new AppVersionConfig();
+    JSONObject jsonObject = JsonUtils.readableMapToJsonObject(params);
 
-    config.setUseOriginal(params.getBoolean("useOriginal") ? 1 : 0);
-    config.setOriginalVersionNum(params.getInt("originalVersionNum"));
-    config.setIsBundleAvailable(params.getInt("isBundleAvailable"));
-    config.setOriginalCommitHash(params.getString("originalCommitHash"));
-    config.setVersionNum(params.getInt("versionNum"));
-    config.setCommitHash(params.getString("commitHash"));
-    config.setNextVersionNum(params.getInt("nextVersionNum"));
-    config.setNextCommitHash(params.getString("nextCommitHash"));
-    config.setIsIncrementalAvailable(params.getInt("isIncrementalAvailable"));
-    config.setIncrementalsToApply(new JSONArray(params.getArray("incrementalsToApply").toArrayList()));
+    if (jsonObject == null)
+      return null;
+
+    AppVersionConfig config = AppVersionConfig.initWithJSON(jsonObject);
 
     try (PrintWriter out = new PrintWriter(new FileWriter(path))) {
       out.write(config.getJsonObject().toString());

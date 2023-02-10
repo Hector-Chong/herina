@@ -1,19 +1,23 @@
-import { HerinaVersions } from "@herina-rn/shared";
+import { HerinaVersionsInfo } from "@herina-rn/shared";
 
 interface UpdateManagerInterface {
-  getVersionsFromRemote(): Promise<HerinaVersions>;
+  getVersionsJsonFromRemote(): Promise<HerinaVersionsInfo>;
 
   checkForUpdate(): Promise<boolean>;
 
-  requestBundleUpdate(): Promise<boolean>;
+  requestUpdate(): Promise<boolean>;
+
+  requestFullUpdate(): Promise<boolean>;
 
   requestIncrementalUpdates(): Promise<boolean>;
 
-  applyBundleUpdate(immediate: boolean): Promise<boolean>;
+  applyFullUpdate(immediate: boolean): Promise<boolean>;
 
   applyIncrementalUpdate(immediate: boolean): Promise<boolean>;
 
-  isBundleUpdateAvailable(): Promise<boolean>;
+  applyUpdate(immediate: boolean): Promise<boolean>;
+
+  isFullUpdateAvailable(): Promise<boolean>;
 
   isIncrementalUpdateAvailable(): Promise<boolean>;
 
@@ -21,7 +25,7 @@ interface UpdateManagerInterface {
 
   setUseOriginalBundle(original: boolean): Promise<boolean>;
 
-  reloadApp(): Promise<boolean>;
+  reloadApp(): void;
 }
 
 export default UpdateManagerInterface;

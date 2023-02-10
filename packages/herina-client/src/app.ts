@@ -1,4 +1,4 @@
-import { AppVersionConfig, HerinaVersionsHistoryItem } from "@herina-rn/shared";
+import { AppVersionConfig, HerinaVersionsItem } from "@herina-rn/shared";
 import AppCapacityInterface from "./contracts/AppCapacityInterface";
 import { promisifyNativeFunction } from "./utils/fn";
 
@@ -36,19 +36,16 @@ class AppCapacityImplements implements AppCapacityInterface {
     }
   }
 
-  downloadIncrementalUpdates(
-    baseUrl: string,
-    versions: HerinaVersionsHistoryItem[]
-  ) {
+  downloadIncrementalUpdates(baseUrl: string, versions: HerinaVersionsItem[]) {
     return promisifyNativeFunction<boolean>(
       this.__nativeModule.downloadIncrementalUpdates
     )({ baseUrl, versions });
   }
 
-  downloadBundleToUpdate(baseUrl: string) {
+  downloadBundleToUpdate(baseUrl: string, version: HerinaVersionsItem) {
     return promisifyNativeFunction<boolean>(
       this.__nativeModule.downloadBundleToUpdate
-    )({ baseUrl });
+    )({ baseUrl, version });
   }
 
   setVersionConfigValues(params: Partial<AppVersionConfig>) {
@@ -69,9 +66,9 @@ class AppCapacityImplements implements AppCapacityInterface {
     )();
   }
 
-  applyBundleUpdate() {
+  applyFullUpdate() {
     return promisifyNativeFunction<boolean>(
-      this.__nativeModule.applyBundleUpdate
+      this.__nativeModule.applyFullUpdate
     )();
   }
 

@@ -1,5 +1,5 @@
 import { HerinaConfig } from "@herina-rn/shared";
-import fs, { pathExistsSync } from "fs-extra";
+import fs, { existsSync, pathExistsSync } from "fs-extra";
 import git, { walk } from "isomorphic-git";
 import path, { resolve } from "path";
 
@@ -46,9 +46,13 @@ export const computeDifferentFiles = async (
         return;
       }
 
-      const file = await fs.lstat(resolve(dir, filename));
+      const fullPath = resolve(dir, filename);
 
-      if (file.isDirectory()) return;
+      if (existsSync(fullPath)) {
+        const file = await fs.lstat(fullPath);
+
+        if (file.isDirectory()) return;
+      }
 
       return data;
     }

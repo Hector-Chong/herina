@@ -9,6 +9,8 @@
 #import "FileUtils.h"
 #import "AppVersionConfig.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation VersionUtils
 
 + (NSString *)getVersionJsonPath
@@ -17,7 +19,7 @@
 }
 
 + (void)setVersionKeyValue:(NSString *)key
-                  value:(id)value
+                  value:(nullable id)value
 {
     NSFileManager *manager = [NSFileManager defaultManager];
     NSString *path = [VersionUtils getVersionJsonPath];
@@ -60,7 +62,7 @@
     }
 }
 
-+ (AppVersionConfig *)createVersionJson:(NSDictionary *)params
++ (nullable AppVersionConfig *)createVersionJson:(NSDictionary *)params
 {
     NSFileManager *manager = [NSFileManager defaultManager];
     NSString *path = [VersionUtils getVersionJsonPath];
@@ -79,3 +81,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -52,7 +52,7 @@ export const createModuleIdFactory = (config: HerinaConfig) => {
     }
   });
 
-  let nextId = manifest.maxId + 1;
+  let nextId = manifest.maxId;
 
   return (path: string) => {
     let id = fileToIdMap.get(path);

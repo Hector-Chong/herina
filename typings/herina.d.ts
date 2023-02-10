@@ -1,19 +1,20 @@
-import { HerinaUpdateType } from "packages/shared/src";
+import { Node } from "@babel/traverse";
+import { HerinaUpdateType } from "@herina-rn/shared";
 
-type HerinaSupportPlatforms = "ios" | "android";
+export type HerinaSupportPlatforms = "ios" | "android";
 
-type HerinaBuildEnvironment = "production" | "development";
+export type HerinaBuildEnvironment = "production" | "development";
 
 export interface HerinaConfig {
   environment: HerinaBuildEnvironment;
   baseUrl: string | Record<HerinaSupportPlatforms, string>;
   entryFile: string;
-  outputPath: string;
+  outputPath: string | Record<HerinaSupportPlatforms, string>;
   clean?: boolean;
   minify?: boolean;
   root?: string;
   platform: HerinaSupportPlatforms;
-  manifestPath: string;
+  manifestPath: string | Record<HerinaSupportPlatforms, string>;
   previousCommitHash?: string;
   currentCommitHash?: string;
   extensions?: string[];
@@ -25,6 +26,12 @@ export interface HerinaConfig {
   iosSourcePath?: string;
   androidSourcePath?: string;
   metaInfo?: any;
+}
+
+export interface HerinaConfigInternal extends HerinaConfig {
+  baseUrl: string;
+  outputPath: string;
+  manifestPath: string;
 }
 
 export interface HerinaManifest {
@@ -41,8 +48,8 @@ export interface HerinaVersionsItem {
   versionNum: number;
   commitHash: string;
   lastCommitHash: string;
-  filePath: {
-    full: string;
+  fileNames: {
+    main: string;
     incremental: string;
     vendor: string;
   };
@@ -53,6 +60,7 @@ export interface HerinaVersionsItem {
 export interface HerinaVersionsInfo {
   releaseVersionNums: number[];
   versions: HerinaVersionsItem[];
+  isSuccessFul?: boolean;
 }
 
 export interface AppVersionConfig {
@@ -63,7 +71,15 @@ export interface AppVersionConfig {
   commitHash: string;
   nextVersionNum: number;
   nextCommitHash: string;
-  isBundleAvailable: boolean;
+  isFullAvailable: boolean;
   isIncrementalAvailable: boolean;
   incrementalsToApply: string[];
+  appliedVersionNums: number[];
+  fullToApply?: HerinaVersionsItem;
 }
+
+export interface HerinaBuildEvents {
+  afterBundleBuild: (ast: Node) => void;
+}
+
+export type HerinaBuildEventNames = keyof HerinaBuildEvents;

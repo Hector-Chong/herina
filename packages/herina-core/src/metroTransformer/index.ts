@@ -1,4 +1,8 @@
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
+import {
+  HerinaConfig,
+  HerinaManifest,
+  generateRandomStr
+} from "@herina-rn/shared";
 import {
   JsTransformerConfig,
   JsTransformOptions,
@@ -13,7 +17,6 @@ import appVersionConfigTransformer from "./appVersionConfigTransformer";
 import changeDynamicNameTransformer from "./changeDynamicNameTransformer";
 import collectAssetTransformer from "./collectAssetTransformer";
 import collectDynamicTransformer from "./collectDynamicTransformer";
-import { generateRandomStr } from "../utils/str";
 import path from "path";
 
 export interface MetroTranformerParams {

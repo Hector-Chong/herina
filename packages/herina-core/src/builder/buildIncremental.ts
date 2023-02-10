@@ -8,21 +8,19 @@ import { manifest } from "./manifest";
 import { createIncrementalFileNameViaCommitHashes } from "../utils/version";
 import { HerinaConfig } from "@herina-rn/shared";
 import { HerinaUpdateBuiilder } from ".";
+import { filterFile } from "./buildUpdate";
 
-const filterFiles = (config: HerinaConfig, files: CommitDifferentFile[]) => {
-  const filtered = files.filter(
-    (file) =>
-      config.extensions!.some((ext) => file.filename.endsWith("." + ext)) ||
-      Object.keys(manifest.chunks.assets).some((filePath) =>
-        filePath.match(file.filename)
-      )
-  );
+const getFilesToTransform = (
+  config: HerinaConfig,
+  files: CommitDifferentFile[]
+) => {
+  return files
+    .map((file) => {
+      file.filename = path.join(config.root, file.filename);
 
-  return filtered.map((file) => {
-    file.filename = path.join(config.root, file.filename);
-
-    return file;
-  });
+      return file;
+    })
+    .filter((file) => filterFile(config, file.filename));
 };
 
 const buildIncremental: HerinaUpdateBuiilder = async (
@@ -44,7 +42,7 @@ const buildIncremental: HerinaUpdateBuiilder = async (
     currentCommitHash
   );
 
-  const incrementalFiles = filterFiles(config, differentFiles);
+  const incrementalFiles = getFilesToTransform(config, differentFiles);
 
   const { ast } = incrementalTransformer(
     manifest,

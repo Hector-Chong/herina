@@ -1,7 +1,5 @@
 package com.hectorchong.herina;
 
-import android.util.Log;
-
 import androidx.annotation.MainThread;
 
 import com.facebook.react.ReactActivity;
@@ -16,6 +14,7 @@ import com.facebook.react.bridge.ReadableType;
 import com.hectorchong.herina.models.AppVersionConfig;
 import com.hectorchong.herina.models.HerinaVersionsHistoryItem;
 import com.hectorchong.herina.utils.FileUtils;
+import com.hectorchong.herina.utils.JsonUtils;
 import com.hectorchong.herina.utils.VersionUtils;
 
 import org.json.JSONException;
@@ -26,11 +25,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,9 +47,17 @@ public class AppCapacityImpl {
   private static AppCapacityImpl instance;
   private static ReactApplicationContext reactContext;
 
+  private String baseUrl;
+
   public AppCapacityImpl(ReactApplicationContext context) {
     reactContext = context;
     instance = this;
+  }
+
+  public Map<String, Object> getConstants() {
+    final Map<String, Object> constants = new HashMap<>();
+    constants.put("assetsURL", "file://" + FileUtils.getAssetStorePath(reactContext));
+    return constants;
   }
 
   public void initVersionJson(ReadableMap params, Callback callback) {
@@ -91,8 +103,10 @@ public class AppCapacityImpl {
               versionConfigJson.put(key, params.getString(key));
               break;
             case Array:
-              versionConfigJson.put(key, params.getArray(key));
+              versionConfigJson.put(key, JsonUtils.readableArrayToJsonArray(params.getArray(key)));
               break;
+            case Map:
+              versionConfigJson.put(key, JsonUtils.readableMapToJsonObject(params.getMap(key)));
           }
 
           VersionUtils.writeVersionJson(reactContext, versionConfigJson);
@@ -113,40 +127,24 @@ public class AppCapacityImpl {
 
   public void downloadBundleToUpdate(ReadableMap params, Callback callback) {
     String baseUrl = params.getString("baseUrl");
+    HerinaVersionsHistoryItem version = HerinaVersionsHistoryItem.initWithDictionary(params.getMap("version"));
 
     ArrayList<String> chunkTypes = new ArrayList<>();
     chunkTypes.add("vendor");
     chunkTypes.add("main");
 
-    String baseStorePath = FileUtils.getBundleStoreDirPath(reactContext);
-    String nextBundleStorePath = baseStorePath + "/" + "bundle.next.js";
-    File nextBundleFile = new File(nextBundleStorePath);
-    FileOutputStream os;
-
-    try {
-      if (!nextBundleFile.exists()) {
-        nextBundleFile.createNewFile();
-      }
-
-      os = new FileOutputStream(nextBundleFile);
-
-    } catch (IOException e) {
-      e.printStackTrace();
-
-      callback.invoke(true, "Unable to create bundle file.");
-      return;
-    }
+    this.baseUrl = baseUrl;
 
     OkHttpClient client = new OkHttpClient();
 
     for (int i = 0; i < chunkTypes.size(); i++) {
       String chunkType = chunkTypes.get(i);
+      String chunkStoreDir = FileUtils.getChunkStoreDirPath(reactContext, chunkType);
+      String chunkName = version.getFileNames().getReadbleMap().getString(chunkType);
+      String chunkStorePath = chunkStoreDir + "/" + chunkName;
+      File chunkFile = new File(chunkStorePath);
 
-      String chunkName = chunkType + ".chunk.js";
-      String nextChunkName = chunkType + ".chunk.next.js";
-      String nextChunkStorePath = baseStorePath + "/" + nextChunkName;
-
-      String chunkUrl = baseUrl + "/" + chunkName;
+      String chunkUrl = baseUrl + "/" + chunkType + "/" + chunkName;
 
       Request request = new Request.Builder().url(chunkUrl).build();
 
@@ -159,16 +157,14 @@ public class AppCapacityImpl {
         ResponseBody body = response.body();
         String chunkData = body.string();
 
-        if (!nextBundleFile.exists()) {
-          nextBundleFile.createNewFile();
+        if (!chunkFile.exists()) {
+          chunkFile.createNewFile();
         }
 
-        FileOutputStream handle = new FileOutputStream(nextChunkStorePath, false);
+        FileOutputStream handle = new FileOutputStream(chunkFile, false);
 
         handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
         handle.close();
-
-        os.write(chunkData.getBytes(StandardCharsets.UTF_8));
       } catch (IOException e) {
         e.printStackTrace();
 
@@ -178,26 +174,70 @@ public class AppCapacityImpl {
       }
     }
 
-    try {
-      os.close();
-    } catch (IOException e) {
-      e.printStackTrace();
+    if (version.getAssets() != null && downloadAssets(version.getAssets(), callback)) {
+      callback.invoke(false);
+      return;
     }
 
     callback.invoke(false);
   }
 
+  public boolean downloadAssets(HashMap<String, Object> assets, Callback callback) {
+    String assetStoreDir = FileUtils.getAssetStorePath(reactContext);
+    Iterator<String> assetKeys = assets.keySet().iterator();
+
+    OkHttpClient client = new OkHttpClient();
+
+    while (assetKeys.hasNext()) {
+      String assetId = assetKeys.next();
+      String assetName = (String) assets.get(assetId);
+      String assetStorePath = assetStoreDir + "/" + assetName;
+      File assetFile = new File(assetStorePath);
+
+      String fullUrl = baseUrl + "/" + "assets" + "/" + assetName;
+
+      Request request = new Request.Builder().url(fullUrl).build();
+
+      try (Response response = client.newCall(request).execute()) {
+        if (!response.isSuccessful()) {
+          callback.invoke(true, fullUrl + " downloading failed.");
+          return false;
+        }
+
+        ResponseBody body = response.body();
+        if (!assetFile.exists()) {
+          assetFile.createNewFile();
+        }
+
+        FileOutputStream handle = new FileOutputStream(assetFile, false);
+
+        handle.write(body.bytes());
+        handle.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, fullUrl + " downloading failed.");
+
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   public void downloadIncrementalUpdates(ReadableMap params, Callback callback) {
     String baseUrl = params.getString("baseUrl");
+    this.baseUrl = baseUrl;
+
     ReadableArray versionDicts = params.getArray("versions");
     OkHttpClient client = new OkHttpClient();
-    ArrayList<String> incrementals = new ArrayList<>();
 
     for (int i = 0; i < versionDicts.size(); i++) {
       HerinaVersionsHistoryItem item = HerinaVersionsHistoryItem.initWithDictionary(versionDicts.getMap(i));
 
-      String incrementalUrl = baseUrl + "/" + "incremental" + "/" + item.getFilePath();
-      String incrementalStorePath = FileUtils.getIncrementalStorePath(reactContext) + "/" + item.getFilePath();
+      String fileName = item.getFileNames().getIncremental();
+      String incrementalUrl = baseUrl + "/" + "incremental" + "/" + fileName;
+      String incrementalStorePath = FileUtils.getIncrementalStorePath(reactContext) + "/" + fileName;
 
       File incrementalFile = new File(incrementalStorePath);
       incrementalFile.deleteOnExit();
@@ -220,7 +260,9 @@ public class AppCapacityImpl {
         handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
         handle.close();
 
-        incrementals.add(item.getFilePath());
+        if (item.getAssets() != null && !downloadAssets(item.getAssets(), callback)) {
+          break;
+        }
       } catch (IOException e) {
         e.printStackTrace();
 
@@ -230,67 +272,69 @@ public class AppCapacityImpl {
       }
     }
 
-    Collections.reverse(incrementals);
-
-    VersionUtils.setVersionKey(reactContext, "isIncrementalAvailable", 1);
-    VersionUtils.setVersionKey(reactContext, "incrementalsToApply", incrementals);
-
     callback.invoke(false);
   }
 
-  public void applyBundleUpdate(Callback callback) {
-    String baseStorePath = FileUtils.getBundleStoreDirPath(reactContext);
-    String oldBundleStorePath = baseStorePath + "/" + "bundle.old.js";
-    String nextBundleStorePath = baseStorePath + "/" + "bundle.next.js";
-    String bundleStorePath = baseStorePath + "/" + "bundle.js";
+  public void applyFullUpdate(Callback callback) {
+    AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
 
-    File oldBundleFile = new File(oldBundleStorePath);
-    File nextBundleFile = new File(nextBundleStorePath);
-    File bundleFile = new File(bundleStorePath);
+    if (config == null || config.getFullToApply() == null) {
+      callback.invoke(true, "No downloaded bundle found. Please make sure you've invoked `requestFullUpdate`.");
 
-    if (!nextBundleFile.exists()) {
-      callback.invoke(true, "No downloaded bundle found. Please make sure you`ve invoked `downloadBundleToUpdate` or `requestIncrementalUpdates`.");
       return;
     }
+
+    String baseStorePath = FileUtils.getBundleStoreDirPath(reactContext);
+    String bundleStorePath = baseStorePath + "/" + config.getNextVersionNum() + ".js";
+    File bundleFile = new File(bundleStorePath);
+    PrintWriter bundleWriter = null;
 
     ArrayList<String> chunkTypes = new ArrayList<>();
     chunkTypes.add("vendor");
     chunkTypes.add("main");
 
+    bundleFile.deleteOnExit();
+
+    try {
+      bundleFile.createNewFile();
+      bundleWriter = new PrintWriter(bundleFile);
+    } catch (IOException e) {
+      callback.invoke(true, "Failed to create the new bundle file.");
+    }
+
     for (int i = 0; i < chunkTypes.size(); i++) {
       String chunkType = chunkTypes.get(i);
 
-      String chunkName = chunkType + ".chunk.js";
-      String chunkStorePath = baseStorePath + "/" + chunkName;
+      String chunkName = config.getFullToApply().getFileNames().getReadbleMap().getString(chunkType);
+      String chunkStorePath = FileUtils.getChunkStoreDirPath(reactContext, chunkType) + "/" + chunkName;
       File chunkFile = new File(chunkStorePath);
 
-      String oldChunkName = chunkType + ".chunk.js";
-      String oldChunkStorePath = baseStorePath + "/" + oldChunkName;
-      File oldChunkFile = new File(oldChunkStorePath);
+      try {
+        BufferedReader br = new BufferedReader(new FileReader(chunkFile));
 
-      if (chunkFile.exists()) {
-        chunkFile.renameTo(oldChunkFile);
+        String line = br.readLine();
+
+        while (line != null) {
+          bundleWriter.println(line);
+          line = br.readLine();
+        }
+
+        br.close();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, "Failed to find " + chunkStorePath + ".");
+        return;
+      } catch (IOException e) {
+        e.printStackTrace();
+
+        callback.invoke(true, "Failed to read " + chunkStorePath + ".");
+        return;
       }
     }
 
-    if (bundleFile.exists()) {
-      bundleFile.renameTo(oldBundleFile);
-    }
-
-    nextBundleFile.renameTo(bundleFile);
-
-    AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
-
-    if (config != null) {
-      VersionUtils.setVersionKey(reactContext, "versionNum", config.getNextVersionNum());
-      VersionUtils.setVersionKey(reactContext, "commitHash", config.getNextCommitHash());
-
-      VersionUtils.setVersionKey(reactContext, "nextVersionNum", 0);
-      VersionUtils.setVersionKey(reactContext, "nextCommitHash", "");
-    }
-
-    VersionUtils.setVersionKey(reactContext, "useOriginal", 0);
-    VersionUtils.setVersionKey(reactContext, "isBundleAvailable", 0);
+    bundleWriter.flush();
+    bundleWriter.close();
 
     callback.invoke(false);
   }
@@ -299,7 +343,7 @@ public class AppCapacityImpl {
     AppVersionConfig config = VersionUtils.getVersionJson(reactContext);
 
     if (config == null) {
-      callback.invoke(true, "No version.json found.");
+      callback.invoke(true, "version.json is not found.");
       return;
     }
 
@@ -338,21 +382,8 @@ public class AppCapacityImpl {
     incrementalCode += insertTag;
     bundleCode = bundleCode.replace(insertTag, incrementalCode);
 
-    Log.d("Herina", "incrementalCode " + incrementalCode);
-    Log.d("Herina", "bundleCode " + bundleCode);
-
-    String baseStorePath = FileUtils.getBundleStoreDirPath(reactContext);
-    String oldBundleStorePath = baseStorePath + "/" + "bundle.old.js";
-    String bundleStorePath = baseStorePath + "/" + "bundle.js";
-
-    File oldBundleFile = new File(oldBundleStorePath);
-    File bundleFile = new File(bundleStorePath);
-
-    if (bundleFile.exists()) {
-      oldBundleFile.deleteOnExit();
-    }
-
-    bundleFile.renameTo(oldBundleFile);
+    String bundlePath = FileUtils.getBundleStoreDirPath(reactContext) + "/" + config.getNextVersionNum() + ".js";
+    File bundleFile = new File(bundlePath);
 
     try {
       bundleFile.createNewFile();
@@ -361,21 +392,11 @@ public class AppCapacityImpl {
       os.write(bundleCode.getBytes(StandardCharsets.UTF_8));
       os.close();
 
-      VersionUtils.setVersionKey(reactContext, "versionNum", config.getNextVersionNum());
-      VersionUtils.setVersionKey(reactContext, "commitHash", config.getNextCommitHash());
-
-      VersionUtils.setVersionKey(reactContext, "nextVersionNum", 0);
-      VersionUtils.setVersionKey(reactContext, "nextCommitHash", "");
-
-      VersionUtils.setVersionKey(reactContext, "isIncrementalAvailable", 0);
-      VersionUtils.setVersionKey(reactContext, "incrementalsToApply", new ArrayList());
-      VersionUtils.setVersionKey(reactContext, "useOriginal", 0);
-
       callback.invoke(false);
     } catch (IOException e) {
       e.printStackTrace();
 
-      callback.invoke(true);
+      callback.invoke(true, e.getMessage());
     }
   }
 
@@ -384,7 +405,7 @@ public class AppCapacityImpl {
 
     boolean res = VersionUtils.setVersionKey(reactContext, "useOriginal", isOriginal);
 
-    callback.invoke(res);
+    callback.invoke(!res);
   }
 
   @MainThread

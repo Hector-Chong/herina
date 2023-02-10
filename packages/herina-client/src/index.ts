@@ -7,9 +7,13 @@ const appCapacity = new AppCapacityImplements(Herina);
 
 let manager: UpdateManager;
 
-export const registerUpdateManager = (baseUrl = "") => {
+export const registerUpdateManager = (baseUrl = "", ignoreRelease = false) => {
   if (!manager) {
-    manager = UpdateManagerStatic.getInstance(appCapacity, baseUrl);
+    manager = UpdateManagerStatic.getInstance(
+      appCapacity,
+      baseUrl,
+      ignoreRelease
+    );
   }
 
   return manager;
@@ -24,3 +28,5 @@ export const getUpdateManager = () => {
 
   return manager;
 };
+
+export { registerAsset } from "./assets";

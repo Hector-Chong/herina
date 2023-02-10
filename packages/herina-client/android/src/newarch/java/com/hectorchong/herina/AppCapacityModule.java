@@ -20,6 +20,11 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
     return AppCapacityImpl.NAME;
   }
 
+  @Override
+  public Map<String, Object> getConstants() {
+    return moduleImpl.getConstants();
+  }
+
   @ReactMethod
   public void initVersionJson(ReadableMap params, Callback callback) {
     moduleImpl.initVersionJson(params, callback);
@@ -46,8 +51,8 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void applyBundleUpdate(Callback callback) {
-    moduleImpl.applyBundleUpdate(callback);
+  public void applyFullUpdate(Callback callback) {
+    moduleImpl.applyFullUpdate(callback);
   }
 
   @ReactMethod

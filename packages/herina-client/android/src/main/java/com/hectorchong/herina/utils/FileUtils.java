@@ -1,6 +1,7 @@
 package com.hectorchong.herina.utils;
 
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -19,20 +20,24 @@ public class FileUtils {
     return dir;
   }
 
+  public static String getChunkStoreDirPath(Context context, String chunkType) {
+    String path = getHerinaDir(context) + "/" + chunkType;
+
+    createDirIfNotExists(path);
+
+    return path;
+  }
+
   public static String getBundleStoreDirPath(Context context) {
-    String dir = getHerinaDir(context) + "/" + "/bundle";
-
-    createDirIfNotExists(dir);
-
-    return dir;
+    return getChunkStoreDirPath(context, "bundle");
   }
 
   public static String getIncrementalStorePath(Context context) {
-    String dir = getHerinaDir(context) + "/" + "/incremental";
+    return getChunkStoreDirPath(context, "incremental");
+  }
 
-    createDirIfNotExists(dir);
-
-    return dir;
+  public static String getAssetStorePath(Context context) {
+    return getChunkStoreDirPath(context, "assets");
   }
 
   public static void createDirIfNotExists(String path) {
@@ -50,7 +55,7 @@ public class FileUtils {
       InputStream is = new FileInputStream(jsonFile);
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
       StringBuilder stringBuilder = new StringBuilder();
-      String line = null;
+      String line;
 
       while ((line = reader.readLine()) != null) {
         stringBuilder.append(line);

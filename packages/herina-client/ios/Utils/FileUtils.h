@@ -15,7 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)getBundleStoreDirPath;
 
++ (NSString *)getChunkStoreDirPath:(NSString *)chunkType;
+
 + (NSString *)getIncrementalStorePath;
+
++ (NSString *)getAssetStorePath;
 
 + (void)createDirIfNotExists:(NSString *)path;
 

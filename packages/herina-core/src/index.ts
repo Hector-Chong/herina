@@ -2,11 +2,13 @@ export * from "./builder";
 export { default as defineHerinaConfig } from "./helpers/defineHerinaConfig";
 export { default as createMetroConfig } from "./factory/createMetroConfig";
 export { default as isAppBuilding } from "./helpers/isAppBuilding";
+export { default as HerinaPluginManager } from "./plugins";
 
-export type {
+export {
   HerinaConfig,
   HerinaManifest,
   HerinaConfigManualChunks,
   HerinaVersionsItem,
-  HerinaVersionsInfo
+  HerinaVersionsInfo,
+  HerinaUpdateType
 } from "@herina-rn/shared";

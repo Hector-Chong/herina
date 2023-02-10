@@ -1,11 +1,11 @@
 import fs from "fs-extra";
 import path from "path";
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
-import { getHerinaCachePath, getParsedConfig } from "./file";
+import { HerinaConfigInternal, HerinaManifest } from "@herina-rn/shared";
+import { getHerinaCachePath } from "./file";
 import { defaultsDeep } from "lodash";
 
 export const createManifestIfNotExist = (
-  config?: HerinaConfig
+  config?: HerinaConfigInternal
 ): HerinaManifest => {
   if (config && fs.existsSync(config.manifestPath)) {
     return fs.readJsonSync(config.manifestPath);
@@ -23,10 +23,18 @@ export const createManifestIfNotExist = (
 };
 
 export const overloadManifest = (
-  config: HerinaConfig,
+  config: HerinaConfigInternal,
   manifest: HerinaManifest
 ) => {
-  return defaultsDeep(manifest, createManifestIfNotExist(config));
+  const sourceManifest = createManifestIfNotExist(config);
+
+  defaultsDeep(manifest, sourceManifest);
+
+  if (!manifest.maxId) {
+    manifest.maxId = sourceManifest.maxId;
+  }
+
+  return manifest;
 };
 
 export const createDefaultManifest = () => ({
@@ -37,3 +45,19 @@ export const createDefaultManifest = () => ({
 
 export const getCacheManifestDir = () =>
   path.join(getHerinaCachePath(), "manifest");
+
+export const findHerinaModuleId = (() => {
+  let id: number;
+
+  return (manifest: HerinaManifest) => {
+    if (id) return id;
+
+    Object.keys(manifest.chunks.vendor).forEach((key) => {
+      if (key.match(/@herina\-rn\/client\/src\/index/)) {
+        id = manifest.chunks.vendor[key];
+      }
+    });
+
+    return id;
+  };
+})();

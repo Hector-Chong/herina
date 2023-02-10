@@ -60,11 +60,14 @@ const injectVersionConfigWithAST = (currentCommitHash: string, ast: Node) => {
 
       (properties as ObjectProperty[]).forEach((property) => {
         const propKey = property.key;
+        const propValue = property.value as StringLiteral;
 
         if (propKey.type === "StringLiteral" && dataKeys.has(propKey.value)) {
-          const propValue = property.value as StringLiteral;
-
           propValue.value = data[propKey.value];
+        }
+
+        if (propKey.type === "Identifier" && dataKeys.has(propKey.name)) {
+          propValue.value = data[propKey.name];
         }
       });
     }

@@ -6,8 +6,7 @@ import {
 } from "fs-extra";
 import { join, resolve } from "path";
 import { isProd } from "./runtime";
-import { md5 } from "./str";
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
+import { md5, HerinaManifest, HerinaConfigInternal } from "@herina-rn/shared";
 
 export const getHerinaCachePath = () =>
   resolve(__dirname, isProd() ? "../src/.herina" : "../.herina");
@@ -15,7 +14,7 @@ export const getHerinaCachePath = () =>
 export const getConfigFilePath = () =>
   join(getHerinaCachePath(), "config.json");
 
-export const getParsedConfig = (): HerinaConfig => {
+export const getParsedConfig = (): HerinaConfigInternal => {
   return readJsonSync(getConfigFilePath());
 };
 

@@ -2,20 +2,23 @@
   "name": "@herina-rn/client",
   "version": "1.0.1",
   "description": "A Dev Kit for dynamic ability.",
-  "main": "src/index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": "https://github.com/Hector-Chong/herina",
-  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
-  "license": "MIT",
+  "homepage": "https://github.com/Hector-Chong/herina#readme",
   "bugs": {
     "url": "https://github.com/Hector-Chong/herina/issues"
   },
-  "homepage": "https://github.com/Hector-Chong/herina#readme",
+  "repository": "https://github.com/Hector-Chong/herina",
+  "license": "MIT",
+  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin esbuild",
+    "publish:local": "yalc push"
+  },
   "dependencies": {
     "@herina-rn/core": "^1.0.0",
-    "@herina-rn/shared": "^1.0.0"
+    "@herina-rn/shared": "^1.0.0",
+    "@react-native/assets-registry": "^0.72.0",
+    "react-native": "^0.71.2"
   },
   "devDependencies": {
     "@types/node": "^18.11.18"

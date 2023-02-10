@@ -20,25 +20,18 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 public class BundleManager {
-  public static String getBundleURL(Context context, boolean debug) {
-    if (debug) {
-      return null;
-    }
-
-    AppVersionConfig versionConfig = VersionUtils.getVersionJson(context);
+  private static boolean copyOriginalBundle(Context context) {
     String bundleDir = FileUtils.getBundleStoreDirPath(context);
     String bundlePath = bundleDir + "/" + "bundle.js";
     String originalBundlePath = bundleDir + "/" + "bundle.original.js";
-    File bundleFile = new File(bundlePath);
     File originalBundleFile = new File(originalBundlePath);
 
-    if (versionConfig != null && !versionConfig.getUseOriginal() && bundleFile.exists()) {
-      return bundleFile.getAbsolutePath();
-    }
-
     try {
+      if (originalBundleFile.exists()) {
+        return true;
+      }
+
       AssetManager manager = context.getAssets();
-//        "index.android.bundle"
       InputStream is = manager.open("bundle.js");
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
       String line;
@@ -55,18 +48,41 @@ public class BundleManager {
 
       orignalOs.close();
       currentOs.close();
+
+      return true;
     } catch (IOException e) {
       e.printStackTrace();
+
+      return false;
+    }
+  }
+
+  public static String getBundleURL(Context context, boolean debug) {
+    if (debug) {
+      return null;
     }
 
-    if (originalBundleFile.exists()) {
+    Boolean hasCopied = copyOriginalBundle(context);
+
+    String bundleDir = FileUtils.getBundleStoreDirPath(context);
+    String originalBundlePath = bundleDir + "/" + "bundle.original.js";
+
+    AppVersionConfig versionConfig = VersionUtils.getVersionJson(context);
+
+    if (versionConfig != null && !versionConfig.getUseOriginal()) {
+      String bundlePath = bundleDir + "/" + versionConfig.getVersionNum() + ".js";
+      File bundleFile = new File(bundlePath);
+
+      if (bundleFile.exists()) {
+        return bundleFile.getAbsolutePath();
+      }
+    }
+
+    if (hasCopied) {
       return originalBundlePath;
     } else {
       return "assets://bundle.js";
-
-//      return null;
     }
-
   }
 
   public static String getBundleCode(Context context, boolean debug) {

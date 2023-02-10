@@ -1,4 +1,4 @@
-import { ChunkAsset } from "./chunkAssetAnalysers";
+import { ChunkAsset } from "./chunkAnalysers";
 import { minify } from "terser";
 
 const minifyCode = async (assets: Record<string, ChunkAsset[]>) => {
