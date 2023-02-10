@@ -1,22 +1,22 @@
 # defineHerinaConfig
 
-Create an object of Herina configuration.
+创建 Herina 配置文件对象。
 
-This function not only ensures the typing correctness, but also adds default properties to the object from the argument.
+此函数不仅保证类型安全，还会向参数对象添加默认属性。
 
-## Arguments
+## 参数
 
-| Name   | Required | Type                                         | Default Value | Note |
-| ------ | -------- | -------------------------------------------- | ------------- | ---- |
-| config | YES      | [`HerinaConfig`](/configuration/global.html) | /             | /    |
+| 参数名 | 必填 | 类型                                               | 默认值 | 备注 |
+| ------ | ---- | -------------------------------------------------- | ------ | ---- |
+| config | YES  | [`HerinaConfig`](/configuration/global.html) | /      | /    |
 
-## Returns
+## 返回值
 
 ```typescript
 interface HerinaConfig
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { defineHerinaConfig } from "@herina-rn/core";

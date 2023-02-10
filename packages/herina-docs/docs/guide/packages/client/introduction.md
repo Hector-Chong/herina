@@ -1,3 +1,3 @@
-# Introduction
+# 介绍
 
-`@herina-rn/client` exports entry functions for `UpdateManager` singleton instance.
+`@herina-rn/client` 导出获取 `UpdateManager` 单例的入口函数。

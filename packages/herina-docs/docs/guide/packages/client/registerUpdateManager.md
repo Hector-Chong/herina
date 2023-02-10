@@ -1,20 +1,20 @@
 # registerUpdateManager()
 
-Returns the singleton instance of [UpdateManager](/guide/packages/client/updateManager/introduction.html).
+返回 [UpdateManager](/guide/packages/client/updateManager/introduction.html) 的单例.
 
-## Arguments
+## 参数
 
-| Name    | Required | Type   | Default Value | Note |
-| ------- | -------- | ------ | ------------- | ---- |
-| baseUrl | NO       | string | /             | /    |
+| 参数名  | 必填 | 类型   | 默认值 | 备注 |
+| ------- | ---- | ------ | ------ | ---- |
+| baseUrl | NO   | string | /      | /    |
 
-## Returns
+## 返回值
 
 ```typescript
 typeof UpdateManager;
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { registerUpdateManager } from "@herina-rn/client";

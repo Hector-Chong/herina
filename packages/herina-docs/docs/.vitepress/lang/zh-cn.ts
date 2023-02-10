@@ -5,37 +5,37 @@ export function getGuideConfigZhCn() {
       items: [
         {
           text: "Herina",
-          link: "/zh-cn/guide/herina",
-          activeMatch: "/zh-cn/guide/"
+          link: "/guide/herina",
+          activeMatch: "/guide/"
         },
         {
           text: "安装",
-          link: "/zh-cn/guide/installation"
+          link: "/guide/installation"
         },
         {
           text: "配置",
-          link: "/zh-cn/guide/configuration"
+          link: "/guide/configuration"
         },
         {
           text: "概念",
-          link: "/zh-cn/guide/concepts"
+          link: "/guide/concepts"
         },
         {
           text: "开始上手",
-          link: "/zh-cn/guide/getting-started"
+          link: "/guide/getting-started"
         }
       ]
     },
     {
-      text: "代码更新",
+      text: "更新",
       items: [
         {
-          text: "全量更新",
-          link: "/zh-cn/guide/update/full"
+          text: "代码更新",
+          link: "/guide/update/code"
         },
         {
-          text: "递增式更新",
-          link: "/zh-cn/guide/update/incremental"
+          text: "资源文件更新",
+          link: "/guide/update/assets"
         }
       ]
     },
@@ -44,7 +44,7 @@ export function getGuideConfigZhCn() {
       items: [
         {
           text: "动态 Import",
-          link: "/zh-cn/guide/others/dynamic-import"
+          link: "/guide/others/dynamic-import"
         }
       ]
     },
@@ -56,27 +56,19 @@ export function getGuideConfigZhCn() {
           items: [
             {
               text: "介绍",
-              link: "/zh-cn/guide/packages/core/introduction"
+              link: "/guide/packages/core/introduction"
             },
             {
               text: "类型声明",
-              link: "/zh-cn/guide/packages/core/types"
+              link: "/guide/packages/core/types"
             },
             {
-              text: "build()",
-              link: "/zh-cn/guide/packages/core/build"
-            },
-            {
-              text: "buildIncremental()",
-              link: "/zh-cn/guide/packages/core/buildIncremental"
-            },
-            {
-              text: "buildVersionsJson()",
-              link: "/zh-cn/guide/packages/core/buildVersionsJson"
+              text: "buildUpdate()",
+              link: "/guide/packages/core/buildUpdate"
             },
             {
               text: "defineHerinaConfig()",
-              link: "/zh-cn/guide/packages/core/defineHerinaConfig"
+              link: "/guide/packages/core/defineHerinaConfig"
             }
           ]
         },
@@ -85,62 +77,50 @@ export function getGuideConfigZhCn() {
           items: [
             {
               text: "介绍",
-              link: "/zh-cn/guide/packages/client/introduction"
+              link: "/guide/packages/client/introduction"
             },
             {
               text: "registerUpdateManager()",
-              link: "/zh-cn/guide/packages/client/registerUpdateManager"
+              link: "/guide/packages/client/registerUpdateManager"
             },
             {
               text: "getUpdateManager()",
-              link: "/zh-cn/guide/packages/client/getUpdateManager"
+              link: "/guide/packages/client/getUpdateManager"
             },
             {
               text: "UpdateManager",
               items: [
                 {
                   text: "Introduction",
-                  link: "/zh-cn/guide/packages/client/updateManager/introduction"
+                  link: "/guide/packages/client/updateManager/introduction"
                 },
                 {
                   text: "checkForUpdate()",
-                  link: "/zh-cn/guide/packages/client/updateManager/checkForUpdate"
+                  link: "/guide/packages/client/updateManager/checkForUpdate"
                 },
                 {
-                  text: "requestBundleUpdate()",
-                  link: "/zh-cn/guide/packages/client/updateManager/requestBundleUpdate"
+                  text: "requestUpdate()",
+                  link: "/guide/packages/client/updateManager/requestUpdate"
                 },
                 {
-                  text: "requestIncrementalUpdates()",
-                  link: "/zh-cn/guide/packages/client/updateManager/requestIncrementalUpdates"
+                  text: "applyUpdate()",
+                  link: "/guide/packages/client/updateManager/applyUpdate"
                 },
                 {
-                  text: "applyBundleUpdate()",
-                  link: "/zh-cn/guide/packages/client/updateManager/applyBundleUpdate"
-                },
-                {
-                  text: "applyIncrementalUpdate()",
-                  link: "/zh-cn/guide/packages/client/updateManager/applyIncrementalUpdate"
-                },
-                {
-                  text: "isBundleUpdateAvailable()",
-                  link: "/zh-cn/guide/packages/client/updateManager/isBundleUpdateAvailable"
-                },
-                {
-                  text: "isIncrementalUpdateAvailable()",
-                  link: "/zh-cn/guide/packages/client/updateManager/isIncrementalUpdateAvailable"
+                  text: "isUpdateAvailable()",
+                  link: "/guide/packages/client/updateManager/isUpdateAvailable"
                 },
                 {
                   text: "clearCache()",
-                  link: "/zh-cn/guide/packages/client/updateManager/clearCache"
+                  link: "/guide/packages/client/updateManager/clearCache"
                 },
                 {
                   text: "setUseOriginalBundle()",
-                  link: "/zh-cn/guide/packages/client/updateManager/setUseOriginalBundle"
+                  link: "/guide/packages/client/updateManager/setUseOriginalBundle"
                 },
                 {
                   text: "reloadApp()",
-                  link: "/zh-cn/guide/packages/client/updateManager/reloadApp"
+                  link: "/guide/packages/client/updateManager/reloadApp"
                 }
               ]
             }
@@ -158,15 +138,11 @@ export function getConfigurationConfigZhCn() {
       items: [
         {
           text: "介绍",
-          link: "/zh-cn/configuration/introduction"
+          link: "/configuration/introduction"
         },
         {
           text: "全局配置",
-          link: "/zh-cn/configuration/global"
-        },
-        {
-          text: "递增式更新配置",
-          link: "/zh-cn/configuration/incremental"
+          link: "/configuration/global"
         }
       ]
     }

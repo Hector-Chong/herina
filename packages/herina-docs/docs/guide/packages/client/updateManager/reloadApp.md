@@ -1,16 +1,16 @@
 # reloadApp()
 
-Reloads the App.
+重载 App。
 
-## Arguments
-
-None
-
-## Returns
+## 参数
 
 None
 
-## Example
+## 返回值
+
+None
+
+## 代码示例
 
 ```typescript
 import { registerUpdateManager } from "@herina-rn/client";

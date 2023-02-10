@@ -1,20 +1,20 @@
-# Installation
+# 安装
 
 ```bash
 yarn add @herina-rn/core @herina-rn/client
 cd ./ios && pod install
 ```
 
-or
+或者
 
 ```bash
 npm install --save @herina-rn/core @herina-rn/client
 cd ./ios && pod install
 ```
 
-## Linking (Optional)
+## 链接库 (可选)
 
-If you are using an older version of React Native, you might need to execude the commands to link the library to your App.
+若您正在使用较旧的 React Native 版本，您可能需要执行以下命令将 Herina 关联至 App。
 
 ```bash
 npx react-native link @herina-rn/core

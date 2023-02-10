@@ -1,30 +1,36 @@
-# Types
+# 类型声明
 
 ```typescript
-export interface HerinaConfig {
-  environment: "production" | "development";
-  baseUrl: string;
+type HerinaSupportPlatforms = "ios" | "android";
+
+type HerinaBuildEnvironment = "production" | "development";
+
+interface HerinaConfig {
+  environment: HerinaBuildEnvironment;
+  baseUrl: string | Record<HerinaSupportPlatforms, string>;
   entryFile: string;
-  outputPath: string;
+  outputPath: string | Record<HerinaSupportPlatforms, string>;
   clean?: boolean;
   minify?: boolean;
   root?: string;
-  platform: "ios" | "android";
-  manifestPath: string;
-  incremental?: {
-    previousCommitHash?: string;
-    currentCommitHash?: string;
-    pure?: boolean;
-    filePath?: string;
-  };
+  platform: HerinaSupportPlatforms;
+  manifestPath: string | Record<HerinaSupportPlatforms, string>;
+  previousCommitHash?: string;
+  currentCommitHash?: string;
   extensions?: string[];
   manualChunks?: HerinaConfigManualChunks;
   maxWorkers?: number;
+  updateType?: HerinaUpdateType$1;
+  currentReleaseVersionNum?: number;
+  checkNativeChange?: boolean;
+  iosSourcePath?: string;
+  androidSourcePath?: string;
+  metaInfo?: any;
 }
 ```
 
 ```typescript
-export interface HerinaManifest {
+interface HerinaManifest {
   maxId: number;
   chunks: Record<string, Record<string, number>>;
   chunksReversed: Record<string, Record<number, string>>;
@@ -32,24 +38,32 @@ export interface HerinaManifest {
 ```
 
 ```typescript
-export type HerinaConfigManualChunks =
-  | Record<string, string[]>
-  | ((path: string) => string);
-```
-
-```typescript
-export interface HerinaVersionsHistoryItem {
+interface HerinaVersionsItem {
   versionNum: number;
   commitHash: string;
-  filePath: string;
+  lastCommitHash: string;
+  fileNames: {
+    main: string;
+    incremental: string;
+    vendor: string;
+  };
+  assets: Record<number, string>;
+  metaInfo?: string;
 }
 ```
 
 ```typescript
-export interface HerinaVersions {
-  currentVersionNum: number;
-  currentCommitHash: string;
-  previousCommitHash: string;
-  history: HerinaVersionsHistoryItem[];
+interface HerinaVersionsInfo {
+  releaseVersionNums: number[];
+  versions: HerinaVersionsItem[];
+  isSuccessFul?: boolean;
+}
+```
+
+```typescript
+enum HerinaUpdateType {
+  FULL,
+  INCREMENTAL,
+  ALL
 }
 ```

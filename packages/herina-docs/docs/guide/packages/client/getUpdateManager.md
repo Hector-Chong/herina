@@ -1,24 +1,24 @@
 # getUpdateManager
 
-Get the instance of [UpdateManager](/guide/packages/client/updateManager/introduction.html) that [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html) returns.
+获取 [UpdateManager](/guide/packages/client/updateManager/introduction.html) 实例，此实例和 [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html) 返回值相同。
 
 :::warning
 
-This function can not be called before [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html).
+此函数不可在 [`registerUpdateManager`](/guide/packages/client/registerUpdateManager.html) 之前调用。
 
 :::
 
-## Arguments
+## 参数
 
-None
+无
 
-## Returns
+## 返回值
 
 ```typescript
 typeof UpdateManager;
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { registerUpdateManager, getUpdateManager } from "@herina-rn/client";

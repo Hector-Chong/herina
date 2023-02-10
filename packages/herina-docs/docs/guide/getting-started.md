@@ -1,45 +1,40 @@
-# Getting Started
+# 开始上手
 
-There are two types of update: [full and incremental](/guide/concepts#full-update).
+## 步骤. 1: 创建配置文件
 
-To save space, the full update will be introduced here.
+在项目根目录创建名为 `herina.config.js` 的文件。
 
-## Step. 1: Create the config file
+然后创建如下对象，并以 CommonJS 的形式导出。
 
-Create a file named `herina.config.ts` (recommended) in the root dictionary of your project.
-
-Then, import `defineHerinaConfig` from `@herina-rn/core` and call it to create the configuration to be exported.
-
-Here is an example:
-
-```typescript
-import { defineHerinaConfig } from "@herina-rn/core";
-
-export default defineHerinaConfig({
+```javascript
+/**
+ * 此注释为 JSDOC 注解，用于在 IDE 提示配置项，可省略
+ * @type {import('@herina-rn/core').HerinaConfig}
+ */ 
+module.exports = {
   environment: "production",
   baseUrl: "https://hector.im",
   root: "/Users/hectorchong/MyApp",
   entryFile: "/Users/hectorchong/MyApp/index.js",
   outputPath: "/Users/hectorchong/MyApp/dist",
-  minify: false,
   platform: "ios",
   manifestPath: "/Users/hectorchong/MyApp/manifest.json"
-});
+};
 ```
 
 ::: info
-For more details of config, refer to [Configuration](/configuration/introduction).
+若要了解更多细节，请参考[配置文档](/configuration/introduction)。
 :::
 
-## Step. 2: Build update
+## 步骤. 2: 构建更新
 
-You may use function or CLI to build update.
+您可使用函数或 CLI 构建更新。
 
 ::: code-group
 
 ```typescript [function]
-import {build} from '@herina-rn/core';
-import herinaConfig from './herina.config';
+import { build } from "@herina-rn/core";
+import herinaConfig from "./herina.config";
 
 const start = async (config: any) => {
   await build(config);
@@ -49,68 +44,31 @@ start(herinaConfig);
 ```
 
 ```bash [CLI]
-npx herina build-chunks herina.config.js
+npx herina build herina.config.js
 ```
 
 :::
 
-## Step. 3: Build `versions.json`
+## 步骤. 3: 将文件上传至服务器
 
-This step is essential. Without the file, Herina would not know the newest version number of your bundle, which means no updates are available.
+打开您在配置文件指定的输出目录 `outputPath`，并将里面所有文件上传到与配置文件的 `baseUrl` 对应的服务器或 CDN。
 
-::: code-group
+## 步骤. 4: 调用 JS API
 
-```typescript [function]
-import {buildVersionsJson, HerinaConfig} from '@herina-rn/core';
-import herinaConfig from './herina.config';
+首先，您需要 `registerUpdateManager` 获取 `UpdateManager` 对象。第一个参数是可选的，它代表更新文件地址的 Base URL，若此参数未被定义，将读取原始 Bundle 内的 Base URL。
 
-const start = async (config: HerinaConfig) => {
-  await buildVersionsJson(config);
-};
+然后，调用 `requestUpdate` 下载更新包。这个函数返回一个 Promise 对象。
 
-start(herinaConfig);
-```
-
-```bash [CLI]
-npx herina build-versions-json herina.config.js
-```
-
-:::
-
-## Step. 4: Upload files to server
-
-Take a look at the output dictionary that you assigned in the configuration file. You might see the files below.
-
-```
-- dist
-  | -- 176a85.dynamic.chunk.js
-  | -- u190xa.dynamic.chunk.js
-  | -- main.chunk.js
-  | -- vendor.chunk.js
-  | -- versions.json
-```
-
-Files whose names are suffixed with `dynamic.chunk.js` are [dynamic chunks](/guide/concepts.html#code-splitting).
-
-Along with dynamic chunks, upload `main.chunk.js` and `versions.json` to your server matching `baseUrl` in the configuration.
-
-## Step. 5: Invoke APIs in JS
-
-First, you need to call `registerUpdateManager` to get `UpdateManager` instance. The first argument indicating the base URL for your resources to be downloaded is optional.
-
-Then, call `requestBundleUpdate` to download the new bundle. This function returns a Promise. 
-
-Finally, When the promise is resolved, call `applyBundleUpdate` to apply the new bundle and reload the App.
+最后，当 Promise 为 Resolved 状态时，调用 `applyUpdate` 以应用更新并重载 App。
 
 ```typescript
-import {registerUpdateManager} from '@herina-rn/client';
+import { registerUpdateManager } from "@herina-rn/client";
 
-const manager = registerUpdateManager('https://hector.im');
+const manager = registerUpdateManager("https://hector.im");
 
-const onUpdateByFull = async () => {
-  await manager.requestBundleUpdate();
+const onUpdate = async () => {
+  await manager.requestUpdate();
 
-  manager.applyBundleUpdate(true);
+  manager.applyUpdate(true);
 };
 ```
-

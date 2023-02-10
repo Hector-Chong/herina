@@ -1,86 +1,150 @@
-# Global Config
+# 全局配置
 
 ## environment
 
-- **Required**
-- Type: `'development' | 'production'`
+- **必填**
+- 类型：`'development' | 'production'`
 
-The bundle will be built in which mode.
+Bundle 的构建模式。
 
-In production mode, code for profiling may be removed and the bundle will be minified by Terser.
+在生产模式下，用于监控性能的代码可能会被移除，并且 Bundle 会使用 Terser 进行压缩。
 
 ## baseUrl
 
-- **Required**
-- Type: `string` | `Record<'android' | 'ios', string>`
+- **必填**
+- 类型：`` string` | `Record<'android' | 'ios', string> ``
 
-The base URL for your resouces. This will be used to concat resource file name. When you called `requestBundleUpdate`, Herina would try to concat the bundle name with `baseUrl`. Let's say the `baseUrl` is `https://hector.im`, and the full URL for the business chunk will be `https://hector.im/main.chunk.js`.
+用于访问资源的基础 URL。此配置项将用于拼接资源文件名。
 
-If `baseUrl` is an object, each key represents a different base URL for each platform.
+当您调用 `requestUpdate` 时，Herina 会把文件名和 `baseUrl` 拼接起来。假设 `baseUrl` 为 `https://hector.im`，文件包名为 `main.chunk.js`，获取更新包的完整 URL 为 `https://hector.im/main.chunk.js`。
 
-You should use https as the protocol. Otherwise, your connection will be seen as unsecured to the OS.
+若 `baseUrl` 为对象，可以为各个平台配置不同的基础 URL。
+
+您应该使用 HTTPS 协议。否则，您的请求会被系统视为不安全的连接。
 
 ## entryFile
 
-- **Required**
-- Type: `string`
+- **必填**
+- 类型：`string`
 
-The path of your project entry file. Usually, it's `index.js` in the root dictionary.
+项目入口文件的路径。通常是项目根目录的 `index.js`。
 
 ## outputPath
 
-- **Required**
-- Type: `string`
+- **必填**
+- 类型：`` string` | `Record<'android' | 'ios', string> ``
 
-The path of place output files.
+输出文件的存放路径。
+
+若 `outputPath` 为对象，可以为各个平台配置不同的存放路径。
 
 ## manifestPath
 
-- **Required**
-- Type: `string`
+- **必填**
+- 类型：`` string` | `Record<'android' | 'ios', string> ``
 
-The path of place [`manifest.json`](/guide/concepts.html#manifest-json).
+[`manifest.json`](/guide/concepts.html#manifest-json) 的存放路径。
+
+若 `manifestPath` 为对象，可以为各个平台配置不同的 `manifest.json` 存放路径。
 
 ## platform
 
-- **Required**
-- Type: `'ios' | 'android'`
+- **必填**
+- 类型：`'ios' | 'android'`
 
-The target platform for buidling bundle.
+Bundle 构建的目标平台。
 
 ## clean
 
-- Type: `boolean`
-- Default: `false`
+- 类型：`boolean`
+- 默认值：`false`
 
-Whether to clean `outputPath` or not before buidling.
+是否在构建更新前，清空 `outputPath`。
 
 ## minify
 
-- Type: `boolean`
-- Default: `false`
+- 类型：`boolean`
+- 默认值：`false`
 
-Whether to use Terser to minify output files or not.
+表示是否使用 Terser 压缩输出文件。
 
-This option does not work if the `environment` is set to `production`.
+若 `environment` 为 `production`，此配置项将不会生效。
 
 ## root
 
-- Type: `string`
-- Default: `process.cwd()`
+- 类型：`string`
+- 默认值：`process.cwd()`
 
-The root dictionary path for your project.
+项目根目录的路径。
 
 ## extensions
 
-- Type: `string[]`
-- Default: `["js", "jsx", "ts", "tsx"]`
+- 类型：`string[]`
+- 默认值：`["js", "jsx", "ts", "tsx"]`
 
-When it comes to dynamic import, if you require a module without giving its suffix like `import('./dynamic')`, `extensions` will be used to match the correct suffix.
+此配置项用于动态引入模块。当一个未设置后缀名的模块被动态导入时，将使用 `extensions` 尝试匹配正确的后缀名。
 
 ## maxWorkers
 
-The number of workers to use for parallel processing in Metro.
+Metro 用于并发处理进程的 Worker 数。
 
-- Type: `number`
-- Default: `cpus().length`
+- 类型：`number`
+- 默认值：`cpus().length`
+
+## previousCommitHash
+
+- 类型：`string`
+- 默认值：上一个版本的 Commit 的哈希值
+
+从某一个 Commit 开始构建更新。
+
+## currentCommitHash
+
+- 类型：`string`
+- 默认值：当前项目的 Commit 的哈希值
+
+截止到某一个 Commit 构建更新。
+
+## updateType
+
+- 类型：`HerinaUpdateType`
+- 默认值：`HerinaUpdateType.ALL`
+
+指定构建的更新类型。
+
+- `HerinaUpdateType.ALL`：构建全量更新与增量更新
+- `HerinaUpdateType.FULL`：只构建全量更新
+- `HerinaUpdateType.INCREMENTAL`：只构建增量更新
+
+## currentReleaseVersionNum
+
+- 类型：`number`
+
+指定[发行版本号](/guide/concepts.html#发行版本号-release-version-number)。
+
+## checkNativeChange
+
+- 类型：`boolean`
+- 默认值：`true`
+
+构建更新时，检查原生代码是否发生了修改。
+
+## iosSourcePath
+
+- 类型：`string`
+- 默认值：`path.join(root, "ios")`
+
+iOS 工程路径。
+
+## androidSourcePath
+
+- 类型：`string`
+- 默认值：`path.join(root, "ios")`
+
+Android 工程路径。
+
+## metaInfo
+
+- 类型：可被 `JSON.stringify` 正常转换的对象类型
+
+版本元信息。

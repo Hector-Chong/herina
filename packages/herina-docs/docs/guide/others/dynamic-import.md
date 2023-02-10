@@ -1,10 +1,10 @@
-# Dynamic Import
+# 动态 Import
 
-You can use dynamic import with Herina. It's exactly the same how you use `import()` with `Webpack` or `Vite`.
+使用 Herina，您可以动态引入模块。它的调用方式就和您在 `Webpack` 或 `Vite` 使用 `import()` 一样。
 
-## Load Remote Module
+## 加载远程模块
 
-Let's say you have a function requiring a module to excuse.
+假设您要引入一个模块并执行。
 
 :::code-group
 
@@ -26,11 +26,11 @@ export const dynamicFunction = () => {
 
 :::
 
-When `onCallDynamic` is called, you will see an alert on the screen.
+当 `onCallDynamic` 被调用时，您会在屏幕上看到提示框。
 
 ## React Suspense API
 
-Of course, Herina gives you the ability to use `Suspense` API and lazily load component.
+当然，Herina 为您提供了使用 `Suspense` API 的能力以及懒加载组件。
 
 :::code-group
 
@@ -68,8 +68,8 @@ export default DynamicImportComponent;
 
 :::
 
-## How does it work?
+## 实现原理
 
-Although React Native does not support this feature by default, we know [`Metro`](https://facebook.github.io/metro) as React Native's bundler giving us the [API](https://facebook.github.io/metro/docs/configuration/#transformer-options) to make it happen.
+尽管 React Native 默认并不支持此功能，但我们知道 [`Metro`](https://facebook.github.io/metro) 是 React Native 的构建工具，为我们提供了 [API](https://facebook.github.io/metro/docs/configuration/#transformer-options) 来实现这一功能。
 
-Based on this [API](https://facebook.github.io/metro/docs/configuration/#transformer-options), Herina creates its own runtime similar to Webpack to resolve remote modules.
+基于这个 [API](https://facebook.github.io/metro/docs/configuration/#transformer-options)，Herina 创建了自己的运行时，这和 Webpack 处理远程模块的方法相似。

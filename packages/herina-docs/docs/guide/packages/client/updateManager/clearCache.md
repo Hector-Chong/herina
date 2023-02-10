@@ -1,18 +1,18 @@
 # clearCache()
 
-Clears network cache.
+清除网络缓存。
 
-## Arguments
+## 参数
 
 None
 
-## Returns
+## 返回值
 
 ```typescript
 Promise<boolean>;
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { registerUpdateManager } from "@herina-rn/client";

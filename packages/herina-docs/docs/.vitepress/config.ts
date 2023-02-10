@@ -7,33 +7,33 @@ export default defineConfig({
   description: "Build bundle with Herina.",
   locales: {
     root: {
-      label: "English",
-      lang: "en",
+      label: "简体中文",
+      lang: "zh-cn",
       themeConfig: {
         sidebar: {
-          "/guide/": getGuideConfigEn(),
-          "/configuration/": getConfigurationConfigEn()
+          "/guide/": getGuideConfigZhCn(),
+          "/configuration/": getConfigurationConfigZhCn()
         },
         nav: [
-          { text: "Guide", link: "/guide/herina" },
-          { text: "Configuration", link: "/configuration/introduction" },
-          { text: "Author", link: "/author/index" }
+          { text: "指引", link: "/guide/herina" },
+          { text: "配置", link: "/configuration/introduction" },
+          { text: "开发人", link: "/author/index" }
         ]
       }
     },
-    ["zh-cn"]: {
-      label: "简体中文",
-      lang: "zh-cn",
-      link: "/zh-cn",
+    ["en"]: {
+      label: "English",
+      lang: "en",
+      link: "/en",
       themeConfig: {
         sidebar: {
-          "/zh-cn/guide/": getGuideConfigZhCn(),
-          "/zh-cn/configuration/": getConfigurationConfigZhCn()
+          "/en/guide/": getGuideConfigEn(),
+          "/en/configuration/": getConfigurationConfigEn()
         },
         nav: [
-          { text: "指引", link: "/zh-cn/guide/herina" },
-          { text: "配置", link: "/zh-cn/configuration/introduction" },
-          { text: "开发人", link: "/zh-cn/author/index" }
+          { text: "Guide", link: "/en/guide/herina" },
+          { text: "Configuration", link: "/en/configuration/introduction" },
+          { text: "Author", link: "/en/author/index" }
         ]
       }
     }

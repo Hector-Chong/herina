@@ -107,24 +107,24 @@ export function getGuideConfigEn() {
                   link: "/guide/packages/client/updateManager/checkForUpdate"
                 },
                 {
-                  text: "requestBundleUpdate()",
-                  link: "/guide/packages/client/updateManager/requestBundleUpdate"
+                  text: "requestUpdate()",
+                  link: "/guide/packages/client/updateManager/requestUpdate"
                 },
                 {
                   text: "requestIncrementalUpdates()",
                   link: "/guide/packages/client/updateManager/requestIncrementalUpdates"
                 },
                 {
-                  text: "applyBundleUpdate()",
-                  link: "/guide/packages/client/updateManager/applyBundleUpdate"
+                  text: "applyUpdate()",
+                  link: "/guide/packages/client/updateManager/applyUpdate"
                 },
                 {
                   text: "applyIncrementalUpdate()",
                   link: "/guide/packages/client/updateManager/applyIncrementalUpdate"
                 },
                 {
-                  text: "isBundleUpdateAvailable()",
-                  link: "/guide/packages/client/updateManager/isBundleUpdateAvailable"
+                  text: "isUpdateAvailable()",
+                  link: "/guide/packages/client/updateManager/isUpdateAvailable"
                 },
                 {
                   text: "isIncrementalUpdateAvailable()",

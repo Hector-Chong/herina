@@ -1,33 +1,29 @@
 # checkForUpdate()
 
-Fetch `versions.json` from remote to check whether an update is available.
+从服务器获取 `versions.json` 检查是否有可用更新。
 
 :::info
 
-The response will be cached by defualt. If you don't want to cache the resposne, call [`clearCache()`](/guide/packages/client/updateManager/clearCache.html) first.
+响应数据默认会被缓存。若您不需要缓存响应，请提前调用 [`clearCache()`](/guide/packages/client/updateManager/clearCache.html)。
 
 :::
 
-## Arguments
+## 参数
 
-None
+无
 
-## Returns
+## 返回值
 
 ```typescript
 Promise<boolean>;
 ```
 
-## Example
+## 代码示例
 
 ```typescript
 import { getUpdateManager } from "@herina-rn/client";
 
 const manager = getUpdateManager();
 
-const isUpdateAvailable = async () => {
-  return manager.checkForUpdate();
-};
-
-await isUpdateAvailable();
+await manager.checkForUpdate();
 ```
