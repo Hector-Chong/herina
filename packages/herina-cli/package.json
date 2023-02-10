@@ -1,20 +1,21 @@
 {
   "name": "@herina-rn/cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "CLI for using Herina to split bundle.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Héctor Chong",
   "main": "dist/index.js",
-  "scripts": {
-    "build": "rollup --config rollup.config.ts --configPlugin esbuild"
-  },
   "bin": {
     "herina": "./bin/herina"
   },
-  "publishConfig": {
-    "access": "public"
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin esbuild"
   },
-  "keywords": [],
-  "author": "Héctor Chong",
-  "license": "MIT",
+  "dependencies": {
+    "@herina-rn/core": "^1.0.1",
+    "react-native": "^0.70.6"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-json": "^6.0.0",
@@ -22,8 +23,7 @@
     "rollup": "^3.9.1",
     "rollup-plugin-ts": "^3.0.2"
   },
-  "dependencies": {
-    "@herina-rn/core": "^1.0.1",
-    "react-native": "^0.70.6"
+  "publishConfig": {
+    "access": "public"
   }
 }

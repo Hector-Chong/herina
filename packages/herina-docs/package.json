@@ -1,20 +1,20 @@
 {
   "name": "herina-docs",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.1.0",
   "description": "Herina Docs",
-  "license": "MIT",
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:serve": "vitepress serve docs"
-  },
-  "repository": "https://github.com/Hector-Chong/herina",
-  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
+  "homepage": "https://github.com/Hector-Chong/herina#readme",
   "bugs": {
     "url": "https://github.com/Hector-Chong/herina/issues"
   },
-  "homepage": "https://github.com/Hector-Chong/herina#readme",
+  "repository": "https://github.com/Hector-Chong/herina",
+  "license": "MIT",
+  "author": "Héctor Chong <i@hector.im> (https://github.com/Hector-Chong)",
+  "main": "index.js",
+  "scripts": {
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:serve": "vitepress serve docs"
+  },
   "devDependencies": {
     "vitepress": "^1.0.0-alpha.38",
     "vue": "^3.2.41"
