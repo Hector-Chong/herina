@@ -5,24 +5,24 @@ export function getGuideConfigEn() {
       items: [
         {
           text: "Herina",
-          link: "/guide/herina",
-          activeMatch: "/guide/"
+          link: "/en/guide/herina",
+          activeMatch: "/en/guide/"
         },
         {
           text: "Installation",
-          link: "/guide/installation"
+          link: "/en/guide/installation"
         },
         {
           text: "Configuration",
-          link: "/guide/configuration"
+          link: "/en/guide/configuration"
         },
         {
           text: "Concepts",
-          link: "/guide/concepts"
+          link: "/en/guide/concepts"
         },
         {
           text: "Getting Started",
-          link: "/guide/getting-started"
+          link: "/en/guide/getting-started"
         }
       ]
     },
@@ -31,11 +31,11 @@ export function getGuideConfigEn() {
       items: [
         {
           text: "Full Update",
-          link: "/guide/update/full"
+          link: "/en/guide/update/full"
         },
         {
           text: "Incremental Update",
-          link: "/guide/update/incremental"
+          link: "/en/guide/update/incremental"
         }
       ]
     },
@@ -44,7 +44,7 @@ export function getGuideConfigEn() {
       items: [
         {
           text: "Dynamic import",
-          link: "/guide/others/dynamic-import"
+          link: "/en/guide/others/dynamic-import"
         }
       ]
     },
@@ -56,27 +56,27 @@ export function getGuideConfigEn() {
           items: [
             {
               text: "Introduction",
-              link: "/guide/packages/core/introduction"
+              link: "/en/guide/packages/core/introduction"
             },
             {
               text: "Types",
-              link: "/guide/packages/core/types"
+              link: "/en/guide/packages/core/types"
             },
             {
               text: "build()",
-              link: "/guide/packages/core/build"
+              link: "/en/guide/packages/core/build"
             },
             {
               text: "buildIncremental()",
-              link: "/guide/packages/core/buildIncremental"
+              link: "/en/guide/packages/core/buildIncremental"
             },
             {
               text: "buildVersionsJson()",
-              link: "/guide/packages/core/buildVersionsJson"
+              link: "/en/guide/packages/core/buildVersionsJson"
             },
             {
               text: "defineHerinaConfig()",
-              link: "/guide/packages/core/defineHerinaConfig"
+              link: "/en/guide/packages/core/defineHerinaConfig"
             }
           ]
         },
@@ -85,62 +85,62 @@ export function getGuideConfigEn() {
           items: [
             {
               text: "Introduction",
-              link: "/guide/packages/client/introduction"
+              link: "/en/guide/packages/client/introduction"
             },
             {
               text: "registerUpdateManager()",
-              link: "/guide/packages/client/registerUpdateManager"
+              link: "/en/guide/packages/client/registerUpdateManager"
             },
             {
               text: "getUpdateManager()",
-              link: "/guide/packages/client/getUpdateManager"
+              link: "/en/guide/packages/client/getUpdateManager"
             },
             {
               text: "UpdateManager",
               items: [
                 {
                   text: "Introduction",
-                  link: "/guide/packages/client/updateManager/introduction"
+                  link: "/en/guide/packages/client/updateManager/introduction"
                 },
                 {
                   text: "checkForUpdate()",
-                  link: "/guide/packages/client/updateManager/checkForUpdate"
+                  link: "/en/guide/packages/client/updateManager/checkForUpdate"
                 },
                 {
                   text: "requestUpdate()",
-                  link: "/guide/packages/client/updateManager/requestUpdate"
+                  link: "/en/guide/packages/client/updateManager/requestUpdate"
                 },
                 {
                   text: "requestIncrementalUpdates()",
-                  link: "/guide/packages/client/updateManager/requestIncrementalUpdates"
+                  link: "/en/guide/packages/client/updateManager/requestIncrementalUpdates"
                 },
                 {
                   text: "applyUpdate()",
-                  link: "/guide/packages/client/updateManager/applyUpdate"
+                  link: "/en/guide/packages/client/updateManager/applyUpdate"
                 },
                 {
                   text: "applyIncrementalUpdate()",
-                  link: "/guide/packages/client/updateManager/applyIncrementalUpdate"
+                  link: "/en/guide/packages/client/updateManager/applyIncrementalUpdate"
                 },
                 {
                   text: "isUpdateAvailable()",
-                  link: "/guide/packages/client/updateManager/isUpdateAvailable"
+                  link: "/en/guide/packages/client/updateManager/isUpdateAvailable"
                 },
                 {
                   text: "isIncrementalUpdateAvailable()",
-                  link: "/guide/packages/client/updateManager/isIncrementalUpdateAvailable"
+                  link: "/en/guide/packages/client/updateManager/isIncrementalUpdateAvailable"
                 },
                 {
                   text: "clearCache()",
-                  link: "/guide/packages/client/updateManager/clearCache"
+                  link: "/en/guide/packages/client/updateManager/clearCache"
                 },
                 {
                   text: "setUseOriginalBundle()",
-                  link: "/guide/packages/client/updateManager/setUseOriginalBundle"
+                  link: "/en/guide/packages/client/updateManager/setUseOriginalBundle"
                 },
                 {
                   text: "reloadApp()",
-                  link: "/guide/packages/client/updateManager/reloadApp"
+                  link: "/en/guide/packages/client/updateManager/reloadApp"
                 }
               ]
             }
@@ -158,15 +158,15 @@ export function getConfigurationConfigEn() {
       items: [
         {
           text: "Introduction",
-          link: "/configuration/introduction"
+          link: "/en/configuration/introduction"
         },
         {
           text: "Global Config",
-          link: "/configuration/global"
+          link: "/en/configuration/global"
         },
         {
           text: "Incremental Config",
-          link: "/configuration/incremental"
+          link: "/en/configuration/incremental"
         }
       ]
     }
