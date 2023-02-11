@@ -28,7 +28,7 @@ module.exports = {
 };
 ```
 
-### TypeScript（推荐）
+### TypeScript
 
 ::: warning 提示
 此方式虽然能够保障类型安全，但是不被 Bundle 的构建环境支持。若您坚持使用此方式，请自行采取相关措施，将其转换为 CommonJS。
