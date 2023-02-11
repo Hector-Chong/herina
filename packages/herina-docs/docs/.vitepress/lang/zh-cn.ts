@@ -21,6 +21,10 @@ export function getGuideConfigZhCn() {
           link: "/guide/concepts"
         },
         {
+          text: "比较",
+          link: "/guide/comparisons"
+        },
+        {
           text: "开始上手",
           link: "/guide/getting-started"
         }
