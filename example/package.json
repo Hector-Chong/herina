@@ -1,0 +1,59 @@
+{
+  "name": "ReactNativeNewArch70",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "preset": "react-native"
+  },
+  "dependencies": {
+    "@herina-rn/cli": "^1.1.2",
+    "@herina-rn/client": "^1.1.0",
+    "@herina-rn/core": "^1.1.1",
+    "@herina-rn/shared": "^1.1.0",
+    "@react-native/assets-registry": "^0.72.0",
+    "@react-native/js-polyfills": "^0.72.0",
+    "crypto-js": "^4.1.1",
+    "md5-file": "^5.0.0",
+    "native-wechat": "^1.0.10",
+    "react": "18.1.0",
+    "react-native": "0.70.1",
+    "react-native-device-info": "^10.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@tsconfig/react-native": "^2.0.2",
+    "@types/fs-extra": "^11.0.0",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^18.11.18",
+    "@types/react-native": "^0.70.5",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.32.0",
+    "fs-extra": "^11.1.0",
+    "isomorphic-git": "^1.21.0",
+    "jest": "^26.6.3",
+    "metro-react-native-babel-preset": "^0.72.1",
+    "react-test-renderer": "18.1.0",
+    "terminal-kit": "^3.0.0",
+    "typescript": "^4.8.3"
+  }
+}

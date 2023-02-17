@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingVertical="24dp">
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="24dp"
+    android:gravity="center"
+    android:text="服务协议与隐私政策"
+    android:textSize="18dp"
+    android:textStyle="bold">
+
+  </TextView>
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_marginBottom="24dp"
+    android:layout_height="240dp">
+    <TextView
+      android:id="@+id/policy_content"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingHorizontal="24dp"
+      android:text="各条款，包括但不限于：为了向您提供所在地商品库存、送货我们需要收集你的位置信息、手机号码、姓名；为了向您提供实名认证服务，我们需要收集您的身份证号、姓名、摄像头和存储权限；当您注册账户时，我们将收集您的昵称、移动手机号；当您使用第三方登录时，我们将收集您的第三方平台的姓名、用户名、头像、该第三方平台的用户标识、生日、移动电话号码、性别、所在地区；为了您的账号安全，我们将收集你的设备服务日志信息，包括IP地址、您互联网服务提供商的信息、操作系统信息、版本信息、将您链接至应用的链接、所访问网页的URL以及所浏览或使用的具体服务和功能、使用的语言、访问日期和时间，以及相关设备信息；当您使用客服服务时，我们将请求您的照片及文件权限你可以在手机的设置
+    、变更、删除个人信息并管理你的授权。" />
+  </ScrollView>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="2"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingHorizontal="24dp">
+
+    <Button
+      android:id="@+id/disagree_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginRight="12dp"
+      android:layout_weight="5"
+      android:background="#ccc"
+      android:text="拒绝"></Button>
+
+    <Button
+      android:id="@+id/agree_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="5"
+      android:background="#0E5EFF"
+      android:text="同意"
+      android:textColor="#fff"></Button>
+  </LinearLayout>
+</LinearLayout>

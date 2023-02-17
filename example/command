@@ -1,0 +1,1 @@
+npx react-native bundle --entry-file index.js --platform ios --dev --minify false --bundle-output dist/dist.bundle
