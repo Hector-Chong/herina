@@ -79,16 +79,6 @@ package com.project.name;
 import android.app.Application;
 import android.content.Context;
 
-import androidx.annotation.Nullable;
-
-import com.facebook.react.PackageList;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactInstanceManager;
-import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.config.ReactFeatureFlags;
-import com.facebook.soloader.SoLoader;
-
 import com.hectorchong.herina.BundleManager; // [!code ++]
 ```
 
@@ -110,6 +100,8 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
 ```
 
 ## iOS
+
+### 原生项目
 
 ::: warning
 在修改代码之前，请确保已安装 `@herina-rn/client`，并执行了 `pod install`。否则，您可能会遇到错误。
@@ -143,27 +135,33 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
 }
 ```
 
+### Expo
+
+若要将 Herina 引入 Expo 项目，它的操作与[原生项目](/guide/configuration.html#原生项目)别无二致。
+
+若您在引入时发生了错误，请确保 `AppDelegate.h` 只存在一个 `@interface`。
+
 ## JavaScript
 
 找到项目根目录的 `metro.config.js` 文件，替换为以下内容：
 
 ```javascript
-const {createMetroConfig, isAppBuilding} = require('@herina-rn/core');
-const herinaConfig = require('./herina.config');
+const { createMetroConfig, isAppBuilding } = require("@herina-rn/core");
+const herinaConfig = require("./herina.config");
 
 const config = {
   transformer: {
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
+        inlineRequires: true
+      }
+    })
+  }
 };
 
 module.exports = (_, isBuilding) => {
-  isBuilding = typeof isBuilding === 'undefined' ? isAppBuilding() : isBuilding;
+  isBuilding = typeof isBuilding === "undefined" ? isAppBuilding() : isBuilding;
 
   return isBuilding ? createMetroConfig(herinaConfig, config, true) : config;
 };
