@@ -1,12 +1,12 @@
 {
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "extends": ["plugin:prettier/recommended"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "import/no-commonjs": "off",
     "no-unused-vars": "off"
-  },
-  "parser": "@typescript-eslint/parser"
+  }
 }
