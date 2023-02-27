@@ -50,7 +50,7 @@ export const validateConfig = async (
     await getPrevAndCurCommitHashes(config);
 
   if (!previousCommitHash) {
-    throw new Error(`Cannot find previoud commit<${previousCommitHash}>`);
+    throw new Error(`Cannot find previous commit<${previousCommitHash}>`);
   }
   if (!currentCommitHash) {
     throw new Error(`Cannot find current commit<${currentCommitHash}>`);

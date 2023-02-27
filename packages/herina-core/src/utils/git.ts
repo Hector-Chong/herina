@@ -76,6 +76,11 @@ export const getPrevAndCurCommitHashes = async (config: HerinaConfig) => {
   });
 
   if (!previousCommitHash) {
+    if (!commits[1])
+      throw new Error(
+        "This is probably a new Git repository because of no previous commit found. You should commit again before building update."
+      );
+
     previousCommitHash = commits[1].oid;
   }
 
