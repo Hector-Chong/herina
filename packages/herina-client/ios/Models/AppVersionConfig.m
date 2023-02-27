@@ -26,7 +26,7 @@
         self.isFullAvailable = [dictionary[@"isFullAvailable"] isEqual:@YES];
         self.incrementalsToApply = dictionary[@"incrementalsToApply"] ? dictionary[@"incrementalsToApply"] : @[];
         self.appliedVersionNums = dictionary[@"appliedVersionNums"] ? dictionary[@"appliedVersionNums"] : @[];
-        self.fullToApply = [dictionary objectForKey:@"fullToApply"] ? [[HerinaVersionsHistoryItem alloc] initWithDictionary: dictionary[@"fullToApply"]] : nil;
+        self.fullToApply = [dictionary objectForKey:@"fullToApply"] == [NSNull null] ? [[HerinaVersionsHistoryItem alloc] initWithDictionary: dictionary[@"fullToApply"]] : nil;
     }
 
     return self;
