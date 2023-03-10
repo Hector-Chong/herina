@@ -11,8 +11,10 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.bridge.WritableMap;
 import com.hectorchong.herina.models.AppVersionConfig;
 import com.hectorchong.herina.models.HerinaVersionsHistoryItem;
+import com.hectorchong.herina.tools.FileDownloader;
 import com.hectorchong.herina.utils.FileUtils;
 import com.hectorchong.herina.utils.JsonUtils;
 import com.hectorchong.herina.utils.VersionUtils;
@@ -27,16 +29,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import okhttp3.OkHttpClient;
+import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -48,10 +50,13 @@ public class AppCapacityImpl {
   private static ReactApplicationContext reactContext;
 
   private String baseUrl;
+  private JSONObject versionsJson;
+  private FileDownloader fileDownloader;
 
   public AppCapacityImpl(ReactApplicationContext context) {
     reactContext = context;
     instance = this;
+    fileDownloader = new FileDownloader();
   }
 
   public Map<String, Object> getConstants() {
@@ -135,27 +140,16 @@ public class AppCapacityImpl {
 
     this.baseUrl = baseUrl;
 
-    OkHttpClient client = new OkHttpClient();
-
     for (int i = 0; i < chunkTypes.size(); i++) {
       String chunkType = chunkTypes.get(i);
       String chunkStoreDir = FileUtils.getChunkStoreDirPath(reactContext, chunkType);
       String chunkName = version.getFileNames().getReadbleMap().getString(chunkType);
       String chunkStorePath = chunkStoreDir + "/" + chunkName;
       File chunkFile = new File(chunkStorePath);
-
       String chunkUrl = baseUrl + "/" + chunkType + "/" + chunkName;
 
-      Request request = new Request.Builder().url(chunkUrl).build();
-
-      try (Response response = client.newCall(request).execute()) {
-        if (!response.isSuccessful()) {
-          callback.invoke(true, chunkUrl + " downloading failed.");
-          return;
-        }
-
-        ResponseBody body = response.body();
-        String chunkData = body.string();
+      try {
+        String chunkData = fileDownloader.downloadTextFile(chunkUrl);
 
         if (!chunkFile.exists()) {
           chunkFile.createNewFile();
@@ -166,63 +160,73 @@ public class AppCapacityImpl {
         handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
         handle.close();
       } catch (IOException e) {
-        e.printStackTrace();
-
-        callback.invoke(true, chunkUrl + " downloading failed.");
-
-        return;
+        callback.invoke(true, e.getMessage());
+        break;
       }
     }
 
-    if (version.getAssets() != null && downloadAssets(version.getAssets(), callback)) {
+    if (version.getAssets() != null) {
+      downloadAssets(version.getAssets(), callback);
+    } else {
       callback.invoke(false);
-      return;
     }
-
-    callback.invoke(false);
   }
 
-  public boolean downloadAssets(HashMap<String, Object> assets, Callback callback) {
+  public void downloadAssets(HashMap<String, Object> assets, Callback callback) {
     String assetStoreDir = FileUtils.getAssetStorePath(reactContext);
     Iterator<String> assetKeys = assets.keySet().iterator();
-
-    OkHttpClient client = new OkHttpClient();
+    HashMap<String, String> assetsMap = new HashMap<>();
+    ArrayList<String> urls = new ArrayList<>();
 
     while (assetKeys.hasNext()) {
       String assetId = assetKeys.next();
       String assetName = (String) assets.get(assetId);
-      String assetStorePath = assetStoreDir + "/" + assetName;
-      File assetFile = new File(assetStorePath);
-
       String fullUrl = baseUrl + "/" + "assets" + "/" + assetName;
+      urls.add(fullUrl);
 
-      Request request = new Request.Builder().url(fullUrl).build();
-
-      try (Response response = client.newCall(request).execute()) {
-        if (!response.isSuccessful()) {
-          callback.invoke(true, fullUrl + " downloading failed.");
-          return false;
-        }
-
-        ResponseBody body = response.body();
-        if (!assetFile.exists()) {
-          assetFile.createNewFile();
-        }
-
-        FileOutputStream handle = new FileOutputStream(assetFile, false);
-
-        handle.write(body.bytes());
-        handle.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-
-        callback.invoke(true, fullUrl + " downloading failed.");
-
-        return false;
-      }
+      assetsMap.put(fullUrl, assetName);
     }
 
-    return true;
+    fileDownloader.downloadBinaryFileBatch(urls, new FileDownloader.FileDownloaderBinaryBatchCallback() {
+      @Override
+      public boolean onSuccess(String url, InputStream is) {
+        String assetName = assetsMap.get(url);
+        String assetStorePath = assetStoreDir + "/" + assetName;
+        File assetFile = new File(assetStorePath);
+
+        try {
+          if (!assetFile.exists()) {
+            assetFile.createNewFile();
+          }
+
+          FileOutputStream handle = new FileOutputStream(assetFile, false);
+
+          byte[] buf = new byte[8192];
+          int length;
+          while ((length = is.read(buf)) > 0) {
+            handle.write(buf, 0, length);
+          }
+
+          handle.close();
+
+          return true;
+        } catch (IOException e) {
+          callback.invoke(true, e.getMessage());
+          return false;
+        }
+      }
+
+      @Override
+      public void onError(String error) {
+        callback.invoke(true, error);
+      }
+
+      @Override
+      public void onFinish() {
+        callback.invoke(false);
+
+      }
+    }, true);
   }
 
   public void downloadIncrementalUpdates(ReadableMap params, Callback callback) {
@@ -230,7 +234,7 @@ public class AppCapacityImpl {
     this.baseUrl = baseUrl;
 
     ReadableArray versionDicts = params.getArray("versions");
-    OkHttpClient client = new OkHttpClient();
+    HashMap<String, Object> assetsMap = new HashMap<>();
 
     for (int i = 0; i < versionDicts.size(); i++) {
       HerinaVersionsHistoryItem item = HerinaVersionsHistoryItem.initWithDictionary(versionDicts.getMap(i));
@@ -242,37 +246,33 @@ public class AppCapacityImpl {
       File incrementalFile = new File(incrementalStorePath);
       incrementalFile.deleteOnExit();
 
-      Request request = new Request.Builder().url(incrementalUrl).build();
-
-      try (Response response = client.newCall(request).execute()) {
-        if (!response.isSuccessful()) {
-          callback.invoke(true, incrementalUrl + " downloading failed.");
-          return;
-        }
-
-        ResponseBody body = response.body();
-        String chunkData = body.string();
+      try {
+        String chunkData = fileDownloader.downloadTextFile(incrementalUrl);
 
         incrementalFile.createNewFile();
 
         FileOutputStream handle = new FileOutputStream(incrementalStorePath, false);
 
         handle.write(chunkData.getBytes(StandardCharsets.UTF_8));
+
         handle.close();
-
-        if (item.getAssets() != null && !downloadAssets(item.getAssets(), callback)) {
-          break;
-        }
       } catch (IOException e) {
-        e.printStackTrace();
-
-        callback.invoke(true, incrementalUrl + " downloading failed.");
-
+        callback.invoke(true, incrementalUrl + " downloading failed: " + e.getMessage());
         return;
+      }
+
+      HashMap<String, Object> assets = item.getAssets();
+
+      if (assets != null) {
+        assetsMap.putAll(assets);
       }
     }
 
-    callback.invoke(false);
+    if (assetsMap.isEmpty()) {
+      callback.invoke(false);
+    } else {
+      downloadAssets(assetsMap, callback);
+    }
   }
 
   public void applyFullUpdate(Callback callback) {
@@ -415,5 +415,23 @@ public class AppCapacityImpl {
     ReactInstanceManager manager = application.getReactNativeHost().getReactInstanceManager();
 
     manager.recreateReactContextInBackground();
+  }
+
+  public void getVersionsJsonFromRemote(ReadableMap params, Callback callback) {
+    String url = params.getString("url");
+
+    if (versionsJson != null) {
+      callback.invoke(false, JsonUtils.jsonToWritable(versionsJson));
+      return;
+    }
+
+    try {
+      String data = fileDownloader.downloadTextFile(url);
+      versionsJson = new JSONObject(data);
+
+      callback.invoke(false, JsonUtils.jsonToWritable(versionsJson));
+    } catch (IOException | JSONException e) {
+      callback.invoke(true, e.getMessage());
+    }
   }
 }

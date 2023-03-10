@@ -1,4 +1,8 @@
-import { AppVersionConfig, HerinaVersionsItem } from "@herina-rn/shared";
+import {
+  AppVersionConfig,
+  HerinaVersionsInfo,
+  HerinaVersionsItem
+} from "@herina-rn/shared";
 import AppCapacityInterface from "./contracts/AppCapacityInterface";
 import { promisifyNativeFunction } from "./utils/fn";
 
@@ -74,6 +78,12 @@ class AppCapacityImplements implements AppCapacityInterface {
 
   reloadApp() {
     return this.__nativeModule.reloadApp();
+  }
+
+  getVersionsJsonFromRemote(url: string) {
+    return promisifyNativeFunction<HerinaVersionsInfo>(
+      this.__nativeModule.getVersionsJsonFromRemote
+    )({ url: `${url}/versions.json` });
   }
 }
 

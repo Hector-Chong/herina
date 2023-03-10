@@ -1,4 +1,8 @@
-import { AppVersionConfig, HerinaVersionsItem } from "@herina-rn/shared";
+import {
+  AppVersionConfig,
+  HerinaVersionsInfo,
+  HerinaVersionsItem
+} from "@herina-rn/shared";
 
 interface AppCapacityInterface {
   getVersionConfig(): Promise<AppVersionConfig>;
@@ -24,6 +28,8 @@ interface AppCapacityInterface {
   reloadApp(): void;
 
   initVersionJson(config: AppVersionConfig): Promise<boolean>;
+
+  getVersionsJsonFromRemote(url: string): Promise<HerinaVersionsInfo>;
 }
 
 export default AppCapacityInterface;

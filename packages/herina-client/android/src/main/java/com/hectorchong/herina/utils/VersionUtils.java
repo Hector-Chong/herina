@@ -5,7 +5,6 @@ import android.content.Context;
 import com.facebook.react.bridge.ReadableMap;
 import com.hectorchong.herina.models.AppVersionConfig;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,38 +21,6 @@ public class VersionUtils {
   }
 
   public static boolean setVersionKey(Context context, String key, int value) {
-    JSONObject jsonObject = getVersionJsonAsJson(context);
-
-    try {
-      jsonObject.put(key, value);
-
-      writeVersionJson(context, jsonObject);
-
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-
-      return false;
-    }
-  }
-
-  public static boolean setVersionKey(Context context, String key, boolean value) {
-    JSONObject jsonObject = getVersionJsonAsJson(context);
-
-    try {
-      jsonObject.put(key, value);
-
-      writeVersionJson(context, jsonObject);
-
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-
-      return false;
-    }
-  }
-
-  public static boolean setVersionKey(Context context, String key, Object value) {
     JSONObject jsonObject = getVersionJsonAsJson(context);
 
     try {
@@ -97,7 +64,7 @@ public class VersionUtils {
     File jsonFile = new File(path);
 
     if (jsonFile.exists()) {
-      String jsonPlain = FileUtils.readFileAsJsonString(path);
+      String jsonPlain = FileUtils.readFileAsString(path);
 
       try {
         JSONObject jsonObject = new JSONObject(jsonPlain);

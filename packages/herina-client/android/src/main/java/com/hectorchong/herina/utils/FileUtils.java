@@ -48,7 +48,7 @@ public class FileUtils {
     }
   }
 
-  public static String readFileAsJsonString(String path) {
+  public static String readFileAsString(String path) {
     File jsonFile = new File(path);
 
     try {

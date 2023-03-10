@@ -60,7 +60,7 @@ class UpdateManager implements UpdateManagerInterface {
 
   async getNextReleaseVersionNum() {
     const versionConfig = await this.__app.getVersionConfig();
-    const info = await this.getVersionsJsonFromRemote();
+    const info = await this.__app.getVersionsJsonFromRemote(this.__baseUrl);
 
     const { originalVersionNum } = versionConfig;
     const { releaseVersionNums } = info;
@@ -75,7 +75,7 @@ class UpdateManager implements UpdateManagerInterface {
 
   async getAvailableVersions() {
     const versionConfig = await this.__app.getVersionConfig();
-    const info = await this.getVersionsJsonFromRemote();
+    const info = await this.__app.getVersionsJsonFromRemote(this.__baseUrl);
     const nextReleaseNum = await this.getNextReleaseVersionNum();
 
     const nextReleaseVersionNum =

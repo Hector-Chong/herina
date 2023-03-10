@@ -1,8 +1,4 @@
-import { HerinaVersionsInfo } from "@herina-rn/shared";
-
 interface UpdateManagerInterface {
-  getVersionsJsonFromRemote(): Promise<HerinaVersionsInfo>;
-
   checkForUpdate(): Promise<boolean>;
 
   requestUpdate(): Promise<boolean>;

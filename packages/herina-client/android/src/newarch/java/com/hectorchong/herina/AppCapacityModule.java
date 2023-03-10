@@ -69,4 +69,9 @@ public class AppCapacityModule extends ReactContextBaseJavaModule {
   public void reloadApp() {
     moduleImpl.reloadApp();
   }
+
+  @ReactMethod
+  public void getVersionsJsonFromRemote(ReadableMap params, Callback callback) {
+    moduleImpl.getVersionsJsonFromRemote(params, callback);
+  }
 }
