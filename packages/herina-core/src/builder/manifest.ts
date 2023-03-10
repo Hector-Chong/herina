@@ -4,7 +4,13 @@ import {
   getCacheManifestDir
 } from "../utils/manifest";
 import { getManifestChunks } from "../utils/file";
-import { existsSync, readdirSync, readJsonSync } from "fs-extra";
+import {
+  emptyDirSync,
+  existsSync,
+  readdirSync,
+  readJsonSync,
+  writeJsonSync
+} from "fs-extra";
 import { join } from "path";
 import { defaultsDeep } from "lodash";
 
@@ -71,6 +77,8 @@ export const combineManifestFromMetroWorkers = (
       defaultsDeep(manifest, workerMf);
     });
 
+  emptyDirSync(manifestDir);
+
   return manifest;
 };
 
@@ -79,3 +87,9 @@ export const calculateMaxId = (manifest: HerinaManifest) =>
     (prev, cur) => prev + Object.values(manifest.chunks[cur]).length,
     0
   );
+
+export const updateManifest = (config: HerinaConfigInternal) => {
+  manifest.maxId = calculateMaxId(manifest);
+
+  writeJsonSync(config.manifestPath, manifest);
+};

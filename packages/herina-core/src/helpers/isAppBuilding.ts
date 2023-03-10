@@ -3,7 +3,9 @@ const isAppBuilding = () => {
   const devArgIdx = args.findIndex((arg) => arg === "--dev");
 
   if (devArgIdx >= 0) {
-    return !JSON.parse(args[devArgIdx + 1]);
+    const nextArg = args[devArgIdx + 1];
+
+    return nextArg.startsWith("--") ? false : !JSON.parse(nextArg);
   } else {
     return false;
   }

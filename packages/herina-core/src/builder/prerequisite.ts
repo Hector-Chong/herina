@@ -42,8 +42,7 @@ export const prepareToBuild = (config: HerinaConfig | HerinaConfigInternal) => {
 export const checkNativeChange = async (config: HerinaConfigInternal) => {
   const info = getVersionsJson(config);
 
-  if (!config.checkNativeChange || !info || !isArrayWithLength(info.versions))
-    return;
+  if (!info || !isArrayWithLength(info.versions)) return;
 
   const currentReleaseVerNum =
     config.currentReleaseVersionNum || getArrayLastOne(info.releaseVersionNums);

@@ -27,10 +27,6 @@ const babelTransformer = (args: BabelTransformerArgs) => {
     ast: ast as File
   };
 
-  if (args.filename.match(/logo/)) {
-    console.log(args);
-  }
-
   changeDynamicToAbsoluteTransformer(argsForHerina);
 
   return { ast };

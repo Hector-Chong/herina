@@ -1,6 +1,10 @@
 import { resolve } from "path";
-import { HerinaConfig, HerinaManifest } from "@herina-rn/shared";
-import { manifest } from "../builder/manifest";
+import {
+  HerinaConfig,
+  HerinaConfigInternal,
+  HerinaManifest
+} from "@herina-rn/shared";
+import { manifest, updateManifest } from "../builder/manifest";
 
 const getChunkName = (config: HerinaConfig, modulePath: string) => {
   let chunkNameValue = "main";
@@ -42,7 +46,7 @@ export const fileToIdMap = new Map<string, number>();
 
 export const idToFileMap = new Map<number, string>();
 
-export const createModuleIdFactory = (config: HerinaConfig) => {
+export const createModuleIdFactory = (config: HerinaConfigInternal) => {
   Object.keys(manifest.chunks).forEach((key) => {
     const modules = (manifest as HerinaManifest).chunks[key] || {};
 
@@ -64,6 +68,8 @@ export const createModuleIdFactory = (config: HerinaConfig) => {
     }
 
     recordModule(getChunkName(config, path), path, id);
+
+    updateManifest(config);
 
     return id;
   };

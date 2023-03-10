@@ -7,7 +7,6 @@ import {
   isArrayWithLength
 } from "@herina-rn/shared";
 import {
-  emptyDirSync,
   ensureFileSync,
   readFileSync,
   removeSync,
@@ -18,7 +17,7 @@ import { defaultsDeep } from "lodash";
 import { HerinaUpdateBuiilder } from ".";
 import HerinaEventManager from "../events";
 import { getPrevAndCurCommitHashes, isGitRepository } from "../utils/git";
-import { getCacheManifestDir, overloadManifest } from "../utils/manifest";
+import { overloadManifest } from "../utils/manifest";
 import {
   addAssetsToVersionsJson,
   addVersionHistory,
@@ -30,11 +29,11 @@ import buildFull from "./buildFull";
 import buildIncremental from "./buildIncremental";
 import { ChunkAsset } from "./chunkAnalysers";
 import {
-  calculateMaxId,
   combineManifestFromMetroWorkers,
   manifest,
   removeDuplicatedDependencies,
-  removeSplittingChunkFromMain
+  removeSplittingChunkFromMain,
+  updateManifest
 } from "./manifest";
 import { checkNativeChange, prepareToBuild } from "./prerequisite";
 import splitAssets from "./splitAssets";
@@ -77,7 +76,8 @@ export const validateConfig = async (
 
 export const filterFile = (config: HerinaConfig, filePath: string) =>
   config.extensions!.some((ext) => filePath.endsWith("." + ext)) ||
-  Object.keys(manifest.chunks.assets).some((path) => path.match(filePath));
+  (manifest.chunks.assets &&
+    Object.keys(manifest.chunks.assets).some((path) => path.match(filePath)));
 
 const buildRules: Record<HerinaUpdateType, HerinaUpdateBuiilder[]> = {
   [HerinaUpdateType.ALL]: [buildIncremental, buildFull],
@@ -109,14 +109,6 @@ const updateVersionsJson = async (
   info.isSuccessFul = true;
 
   writeJsonSync(getVersionsJsonPath(config), info);
-};
-
-const updateManifest = (config: HerinaConfigInternal) => {
-  manifest.maxId = calculateMaxId(manifest);
-
-  emptyDirSync(getCacheManifestDir());
-
-  writeJsonSync(config.manifestPath, manifest);
 };
 
 const buildUpdate = async (config: HerinaConfig) => {
@@ -186,7 +178,9 @@ const buildUpdate = async (config: HerinaConfig) => {
     {}
   );
 
-  await checkNativeChange(internalConfig);
+  if (config.checkNativeChange) {
+    await checkNativeChange(internalConfig);
+  }
 
   updateVersionsJson(internalConfig, info, buildAssets);
 
